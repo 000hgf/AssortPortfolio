@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "WillBeAOS",
+			"Path": "..\\Source\\WillBeAOS.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "WillBeAOSEditor",
+			"Path": "..\\Source\\WillBeAOSEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}

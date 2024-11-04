@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\WillBeAOS.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{F31BBDD1-B3E8-3BCC-9652-680E16935819}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\WillBeAOS.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\WillBeAOSEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\.vsconfig" />
+    <Filter Include="Config">
+      <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Source\WillBeAOS">
+      <UniqueIdentifier>{D65A2194-DD04-3F7A-B408-114360C8D518}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\WillBeAOS\WillBeAOS.Build.cs">
+      <Filter>Source\WillBeAOS</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\WillBeAOS\WillBeAOS.cpp">
+      <Filter>Source\WillBeAOS</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\WillBeAOS\WillBeAOS.h">
+      <Filter>Source\WillBeAOS</Filter>
+    </ClInclude>
+    <Filter Include="Source\WillBeAOS\Character">
+      <UniqueIdentifier>{78D2F75E-0DFC-35E8-BAD8-4470FCFAE9C7}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\WillBeAOS\Character\WCharacterBase.cpp">
+      <Filter>Source\WillBeAOS\Character</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\WillBeAOS\Character\WCharacterBase.h">
+      <Filter>Source\WillBeAOS\Character</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\WillBeAOS\Character\WCharAnimInstance.cpp">
+      <Filter>Source\WillBeAOS\Character</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\WillBeAOS\Character\WCharAnimInstance.h">
+      <Filter>Source\WillBeAOS\Character</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

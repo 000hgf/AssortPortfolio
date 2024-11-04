@@ -1,0 +1,17 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-WillBeAOS-0084.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"D:\FirstMakePP\WBA\WillBeAOS\Intermediate\Build\Win64\x64\WillBeAOSEditor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h.obj"
+"D:\FirstMakePP\WBA\WillBeAOS\Intermediate\Build\Win64\x64\UnrealEditor\Development\WillBeAOS\WCharacterBase.gen.cpp.obj"
+"D:\FirstMakePP\WBA\WillBeAOS\Intermediate\Build\Win64\x64\UnrealEditor\Development\WillBeAOS\WCharAnimInstance.gen.cpp.obj"
+"D:\FirstMakePP\WBA\WillBeAOS\Intermediate\Build\Win64\x64\UnrealEditor\Development\WillBeAOS\WillBeAOS.init.gen.cpp.obj"
+"D:\FirstMakePP\WBA\WillBeAOS\Intermediate\Build\Win64\x64\UnrealEditor\Development\WillBeAOS\WillBeAOS.cpp.obj"
+"D:\FirstMakePP\WBA\WillBeAOS\Intermediate\Build\Win64\x64\UnrealEditor\Development\WillBeAOS\WCharacterBase.cpp.obj"
+"D:\FirstMakePP\WBA\WillBeAOS\Intermediate\Build\Win64\x64\UnrealEditor\Development\WillBeAOS\WCharAnimInstance.cpp.obj"
+"D:\FirstMakePP\WBA\WillBeAOS\Intermediate\Build\Win64\x64\UnrealEditor\Development\WillBeAOS\Default.rc2.res"
+/OUT:"D:\FirstMakePP\WBA\WillBeAOS\Intermediate\Build\Win64\x64\UnrealEditor\Development\WillBeAOS\UnrealEditor-WillBeAOS-0084.lib"

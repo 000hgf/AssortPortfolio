@@ -1,0 +1,8 @@
+{
+	"SourceFiles": [
+		"D:\\FirstMakePP\\WBA\\WillBeAOS\\Source\\WillBeAOS\\WillBeAOS.Build.cs",
+		"D:\\FirstMakePP\\WBA\\WillBeAOS\\Source\\WillBeAOS.Target.cs",
+		"D:\\FirstMakePP\\WBA\\WillBeAOS\\Source\\WillBeAOSEditor.Target.cs"
+	],
+	"EngineVersion": "5.4.4"
+}
