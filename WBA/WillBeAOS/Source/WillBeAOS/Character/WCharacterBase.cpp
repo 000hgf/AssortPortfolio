@@ -5,6 +5,8 @@
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetArrayLibrary.h"
+
 
 AWCharacterBase::AWCharacterBase()
 {
@@ -94,4 +96,15 @@ void AWCharacterBase::Move(const FInputActionValue& Value)
 
 void AWCharacterBase::Behavior(const FInputActionValue& Value)
 {
+	if (AttackCount < AttackMontages.Num())
+	{
+		ACharacter::PlayAnimMontage(AttackMontages[AttackCount], 1.f, TEXT("None"));
+		AttackCount++;
+		if (AttackCount >= AttackMontages.Num())
+		{
+			AttackCount = 0;
+		}
+	}
 }
+
+

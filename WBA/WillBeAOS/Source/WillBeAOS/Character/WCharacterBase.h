@@ -6,6 +6,7 @@
 
 struct FInputActionValue;
 class UInputAction;
+class UAnimMontage;
 
 UCLASS()
 class WILLBEAOS_API AWCharacterBase : public ACharacter
@@ -31,6 +32,11 @@ public:
 	UInputAction* IA_Jump;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_Behavior;
+
+	UPROPERTY(BlueprintReadWrite, Category = Combo)
+	TArray<UAnimMontage*> AttackMontages = {};
+	UPROPERTY(BlueprintReadOnly, Category = Combo)
+	int32 AttackCount = 0;
 
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
