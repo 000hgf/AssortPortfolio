@@ -33,10 +33,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_Behavior;
 
+	//콤보에 쓰일 몽타주 배열
 	UPROPERTY(BlueprintReadWrite, Category = Combo)
 	TArray<UAnimMontage*> AttackMontages = {};
-	UPROPERTY(BlueprintReadOnly, Category = Combo)
-	int32 AttackCount = 0;
 
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
@@ -46,6 +45,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY(BluePrintReadWrite, Category = Input)
+	class UCombatComponent* CharacterCombatComp;
 public:	
 	virtual void Tick(float DeltaTime) override;
 

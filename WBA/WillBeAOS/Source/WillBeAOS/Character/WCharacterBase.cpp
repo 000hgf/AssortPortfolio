@@ -6,6 +6,7 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetArrayLibrary.h"
+#include "CombatComponent.h"
 
 
 AWCharacterBase::AWCharacterBase()
@@ -26,6 +27,9 @@ AWCharacterBase::AWCharacterBase()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	CameraBoom->bUsePawnControlRotation = true;
+
+	CharacterCombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	CharacterCombatComp->SetCombatEnable(false);
 }
 
 
@@ -96,13 +100,19 @@ void AWCharacterBase::Move(const FInputActionValue& Value)
 
 void AWCharacterBase::Behavior(const FInputActionValue& Value)
 {
-	if (AttackCount < AttackMontages.Num())
+	if ((CharacterCombatComp->IsCombatEnable() == false))
 	{
-		ACharacter::PlayAnimMontage(AttackMontages[AttackCount], 1.f, TEXT("None"));
-		AttackCount++;
-		if (AttackCount >= AttackMontages.Num())
+		CharacterCombatComp->SetCombatEnable(true);
+
+		//ÄÞº¸ ·ÎÁ÷
+		if ((CharacterCombatComp->GetAttackCount()) < AttackMontages.Num())
 		{
-			AttackCount = 0;
+			ACharacter::PlayAnimMontage(AttackMontages[(CharacterCombatComp->GetAttackCount())], 1.f, TEXT("None"));
+			CharacterCombatComp->SetAttackCount(1);
+			if (CharacterCombatComp->GetAttackCount() >= AttackMontages.Num())
+			{
+				CharacterCombatComp->ResetCombo();
+			}
 		}
 	}
 }
