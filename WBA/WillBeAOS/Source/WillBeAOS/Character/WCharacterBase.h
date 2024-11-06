@@ -18,6 +18,8 @@ class WILLBEAOS_API AWCharacterBase : public ACharacter
 	class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"));
 	class UCameraComponent* FollowCamera;
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"));
+	class UCombatComponent* CombatComp;
 
 public:
 	AWCharacterBase();
@@ -47,6 +49,18 @@ protected:
 
 	UPROPERTY(BluePrintReadWrite, Category = Input)
 	class UCombatComponent* CharacterCombatComp;
+
+	UPROPERTY(EditAnywhere, Category = "Health")
+	float Health = 0;
+	UPROPERTY(EditAnywhere, Category = "Health")
+	float Max_Health= 100;
+	UPROPERTY(EditAnywhere, Category = "Health")
+	bool WIsDead;
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	bool IsDead();
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void WTakeDamage(float Damage);
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 

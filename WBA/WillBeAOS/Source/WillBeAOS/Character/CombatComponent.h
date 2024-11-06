@@ -28,7 +28,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	//공격을 하고있는지 여부
-	UPROPERTY(BluePrintReadOnly,Category = "Combat")
+	UPROPERTY(BluePrintReadOnly, Category = "Combat")
 	bool CombatEnable = false;
 
 	//콤보에 쓰일 int 인덱스
