@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetArrayLibrary.h"
 #include "CombatComponent.h"
+#include "Components/CapsuleComponent.h"
 
 
 AWCharacterBase::AWCharacterBase()
@@ -36,7 +37,41 @@ AWCharacterBase::AWCharacterBase()
 void AWCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	Health = Max_Health;
+}
+
+bool AWCharacterBase::IsDead()
+{
+	return Health <= 0 && WIsDead;
+}
+
+void AWCharacterBase::WTakeDamage(float Damage)
+{
+
+	if (Health > 0)
+	{
+		Health -= Damage;
+	} 
+	else if (Damage > Health)
+	{
+		Health = 0;
+	}
+
+	if (!(Health))
+	{
+		ACharacter* Char = Cast<ACharacter>(this);
+
+		if (Char != nullptr)
+		{
+			Char->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+			Char->GetMesh()->SetSimulatePhysics(true);
+		}
+
+		WIsDead = true;
+		auto Message = FString::Printf(TEXT("Dead"));
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
+
+	}
 }
 
 void AWCharacterBase::Tick(float DeltaTime)
