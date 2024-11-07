@@ -4,19 +4,12 @@
 #include "GameFramework/Character.h"
 #include "WMinionsCharacterBase.generated.h"
 
-class USpringArmComponent;
-class UCameraComponent;
 class UAnimMontage;
 
 UCLASS()
 class WILLBEAOS_API AWMinionsCharacterBase : public ACharacter
 {
 	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, Category = Camera)
-	USpringArmComponent* SpringArmComponent;
-	UPROPERTY(EditAnywhere, Category = Camera)
-	UCameraComponent* CameraComponent;
 	
 public:
 	AWMinionsCharacterBase();
