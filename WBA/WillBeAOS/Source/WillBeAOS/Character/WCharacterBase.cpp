@@ -29,50 +29,18 @@ AWCharacterBase::AWCharacterBase()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	CameraBoom->bUsePawnControlRotation = true;
 
-	CharacterCombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
-	CharacterCombatComp->SetCombatEnable(false);
+	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	CombatComp->SetCombatEnable(false);
 }
 
 
 void AWCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	Health = Max_Health;
+	CombatComp->DelegateDead.BindUObject(this, &ThisClass::BeingDead);
+	//CombatComp->DelegateHit.BindUObject(this, &ThisClass::);
 }
-
-bool AWCharacterBase::IsDead()
-{
-	return Health <= 0 && WIsDead;
-}
-
-void AWCharacterBase::WTakeDamage(float Damage)
-{
-
-	if (Health > 0)
-	{
-		Health -= Damage;
-	} 
-	else if (Damage > Health)
-	{
-		Health = 0;
-	}
-
-	if (!(Health))
-	{
-		ACharacter* Char = Cast<ACharacter>(this);
-
-		if (Char != nullptr)
-		{
-			Char->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-			Char->GetMesh()->SetSimulatePhysics(true);
-		}
-
-		WIsDead = true;
-		auto Message = FString::Printf(TEXT("Dead"));
-		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
-
-	}
-}
+		//Char->PlayAnimMontage(HitAnimMontage); 
 
 void AWCharacterBase::Tick(float DeltaTime)
 {
@@ -135,21 +103,41 @@ void AWCharacterBase::Move(const FInputActionValue& Value)
 
 void AWCharacterBase::Behavior(const FInputActionValue& Value)
 {
-	if ((CharacterCombatComp->IsCombatEnable() == false))
-	{
-		CharacterCombatComp->SetCombatEnable(true);
 
-		//콤보 로직
-		if ((CharacterCombatComp->GetAttackCount()) < AttackMontages.Num())
+	if (CombatComp != nullptr)
+	{
+		//공격중이 아닐시
+		if ((CombatComp->IsCombatEnable() == false))
 		{
-			ACharacter::PlayAnimMontage(AttackMontages[(CharacterCombatComp->GetAttackCount())], 1.f, TEXT("None"));
-			CharacterCombatComp->SetAttackCount(1);
-			if (CharacterCombatComp->GetAttackCount() >= AttackMontages.Num())
+			//공격중 활성화
+			CombatComp->SetCombatEnable(true);
+
+			//콤보 로직
+			if ((CombatComp->GetAttackCount()) < AttackMontages.Num())
 			{
-				CharacterCombatComp->ResetCombo();
+				ACharacter::PlayAnimMontage(AttackMontages[(CombatComp->GetAttackCount())]);
+				CombatComp->SetAttackCount(1);
+				if (CombatComp->GetAttackCount() >= AttackMontages.Num())
+				{
+					CombatComp->ResetCombo();
+				}
 			}
 		}
 	}
 }
+
+void AWCharacterBase::BeingDead()
+{
+	////죽음 메세지 출력
+	auto Message = FString::Printf(TEXT("Dead"));
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
+	//무브먼트, 콜리전 없애고 몽타주 출력
+	ACharacter::GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	ACharacter::GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ACharacter::GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	ACharacter::PlayAnimMontage(DeadAnimMontage);
+}
+
+
 
 

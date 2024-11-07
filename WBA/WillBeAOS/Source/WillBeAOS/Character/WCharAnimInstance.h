@@ -13,10 +13,14 @@ class WILLBEAOS_API UWCharAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(BlueprintReadOnly, Category=Movement)
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	AWCharacterBase* WCharBase;
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	UCharacterMovementComponent* WCharMovementComponent;
+
+
+protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	FVector WCharVelocity;
@@ -27,10 +31,10 @@ public:
 	bool WShouldMove;
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	bool WCharInAir;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = "FullBody")
 	bool FullBody;
 
-protected:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
 };

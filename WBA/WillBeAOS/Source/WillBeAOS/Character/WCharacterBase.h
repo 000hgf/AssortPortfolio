@@ -18,7 +18,7 @@ class WILLBEAOS_API AWCharacterBase : public ACharacter
 	class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"));
 	class UCameraComponent* FollowCamera;
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"));
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"));
 	class UCombatComponent* CombatComp;
 
 public:
@@ -35,7 +35,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_Behavior;
 
-	//콤보에 쓰일 몽타주 배열
+	//죽을때 쓰일 몽타주
+	UPROPERTY(BlueprintReadWrite, Category = "Health")
+	UAnimMontage* DeadAnimMontage;
+	//피격시 쓰일 몽타주
+	UPROPERTY(BlueprintReadWrite, Category = "Health")
+	UAnimMontage* HitAnimMontage;
+	//콤보에 쓰일 애님몽타주 배열
 	UPROPERTY(BlueprintReadWrite, Category = Combo)
 	TArray<UAnimMontage*> AttackMontages = {};
 
@@ -43,23 +49,11 @@ public:
 	void Move(const FInputActionValue& Value);
 	void Behavior(const FInputActionValue& Value);
 
+	UFUNCTION(BlueprintCallable, Category = Dead)
+	void BeingDead();
 
 protected:
 	virtual void BeginPlay() override;
-
-	UPROPERTY(BluePrintReadWrite, Category = Input)
-	class UCombatComponent* CharacterCombatComp;
-
-	UPROPERTY(EditAnywhere, Category = "Health")
-	float Health = 0;
-	UPROPERTY(EditAnywhere, Category = "Health")
-	float Max_Health= 100;
-	UPROPERTY(EditAnywhere, Category = "Health")
-	bool WIsDead;
-	UFUNCTION(BlueprintCallable, Category = "Health")
-	bool IsDead();
-	UFUNCTION(BlueprintCallable, Category = "Health")
-	void WTakeDamage(float Damage);
 
 public:	
 	virtual void Tick(float DeltaTime) override;
