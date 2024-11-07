@@ -5,14 +5,6 @@
 AWMinionsCharacterBase::AWMinionsCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	SpringArmComponent->SetupAttachment(GetMesh());
-	SpringArmComponent->bUsePawnControlRotation = true;
-
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	CameraComponent->SetupAttachment(SpringArmComponent);
-	CameraComponent->bUsePawnControlRotation = true;
 }
 
 void AWMinionsCharacterBase::BeginPlay()
