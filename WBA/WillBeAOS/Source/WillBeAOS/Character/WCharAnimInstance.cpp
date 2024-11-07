@@ -3,6 +3,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
+
 void UWCharAnimInstance::NativeInitializeAnimation()
 {
 	// 캐릭터 레퍼런스 저장
@@ -16,6 +17,7 @@ void UWCharAnimInstance::NativeInitializeAnimation()
 // 애니메이션 업데이트 루프
 void UWCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
+
 	if (WCharMovementComponent)
 	{
 		WCharVelocity = WCharMovementComponent->Velocity;

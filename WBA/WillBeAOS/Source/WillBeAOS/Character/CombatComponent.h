@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "WDelegateDefine.h"
 #include "CombatComponent.generated.h"
-
 
 UCLASS( Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class WILLBEAOS_API UCombatComponent : public UActorComponent
@@ -24,6 +24,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void SetCombatEnable(bool Val);
 
+
+	FDelegateSignature DelegateDead;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -35,6 +38,19 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = Combo)
 	int32 AttackCount = 0;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Health")
+	float Health = 0;
+	UPROPERTY(EditAnywhere, Category = "Health")
+	float Max_Health = 100;
+	UPROPERTY(BlueprintReadOnly, Category = "Health")
+	bool IsDead;
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void WTakeDamage(float Damage);
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void SetIsDead(bool Val);
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	bool GetIsDead();
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

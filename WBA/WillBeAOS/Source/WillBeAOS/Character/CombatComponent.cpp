@@ -40,8 +40,34 @@ void UCombatComponent::SetCombatEnable(bool Val)
 void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	Health = Max_Health;
+}
 
-	
+void UCombatComponent::WTakeDamage(float Damage)
+{
+	if (Health > 0)
+	{
+		Health -= Damage;
+	}
+	else if (Damage > Health)
+	{
+		Health = 0;
+	}
+	if (!Health)
+	{
+		SetIsDead(true);
+		DelegateDead.ExecuteIfBound();
+	}
+}
+
+void UCombatComponent::SetIsDead(bool Val)
+{
+	IsDead = Val;
+}
+
+bool UCombatComponent::GetIsDead()
+{
+	return IsDead;
 }
 
 
