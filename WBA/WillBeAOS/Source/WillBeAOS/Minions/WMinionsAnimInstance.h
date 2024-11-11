@@ -26,6 +26,8 @@ public:
 	float WMinionSpeed;
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	bool WMinionShouldMove;
+	UPROPERTY(BlueprintReadOnly, Category = FullBody)
+	bool FullBody;
 
 protected:
 	virtual void NativeInitializeAnimation() override;

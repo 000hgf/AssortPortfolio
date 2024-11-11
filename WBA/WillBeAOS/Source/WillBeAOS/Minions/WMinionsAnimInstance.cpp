@@ -27,5 +27,11 @@ void UWMinionsAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		{
 			WMinionShouldMove = true;
 		}
+
+		float CurveValue = UAnimInstance::GetCurveValue(TEXT("FullBody"));
+		if (CurveValue > 0.f)
+		{
+			FullBody = true;
+		}
 	}
 }
