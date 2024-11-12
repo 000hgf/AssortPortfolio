@@ -65,6 +65,10 @@ public:
 	//체력관련 함수
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void HandleTakeDamage(float Damage);//데미지 받음
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void SetIsDead(bool Val);
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	bool GetIsDead();
 
 	FDelegateSignature DelegateDead;//죽을때 사용할 델리게이트
 	FMDS1 DelegatePointDamage;//포인트 데미지에 사용할 델리게이트
@@ -91,10 +95,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
 	bool IsDead;
 
-	UFUNCTION(BlueprintCallable, Category = "Health")
-	void SetIsDead(bool Val);
-	UFUNCTION(BlueprintCallable, Category = "Health")
-	bool GetIsDead();
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

@@ -23,7 +23,6 @@ AWMinionsCharacterBase::AWMinionsCharacterBase()
 void AWMinionsCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 	CombatComponent->DelegateDead.BindUObject(this, &ThisClass::BeingDead);
 	//HandleApplyPointDamage 멀티델리게이트 바인딩
 	CombatComponent->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);

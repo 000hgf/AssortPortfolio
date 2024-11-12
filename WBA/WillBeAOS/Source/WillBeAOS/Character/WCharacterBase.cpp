@@ -32,12 +32,15 @@ AWCharacterBase::AWCharacterBase()
 
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComp->SetCombatEnable(false);
+
 }
 
 
 void AWCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	//안죽음
+	IsDead = false;
 	//BeingDead 델리게이트 바인딩
 	CombatComp->DelegateDead.BindUObject(this, &ThisClass::BeingDead);
 	//HandleApplyPointDamage 멀티델리게이트 바인딩
@@ -106,7 +109,6 @@ void AWCharacterBase::Move(const FInputActionValue& Value)
 void AWCharacterBase::Behavior(const FInputActionValue& Value)
 {
 	CombatComp->SetCollisionMesh(GetMesh());
-
 	if (CombatComp != nullptr)
 	{
 		//공격중이 아닐시
@@ -131,6 +133,7 @@ void AWCharacterBase::Behavior(const FInputActionValue& Value)
 
 void AWCharacterBase::BeingDead()
 {
+	IsDead = true;
 	////죽음 메세지 출력
 	auto Message = FString::Printf(TEXT("Dead"));
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
@@ -161,7 +164,15 @@ float AWCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	float TakeDamage = DamageAmount;
 	CombatComp->HandleTakeDamage(TakeDamage);
-	auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"), TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
+
+	if (!IsDead) 
+	{
+		PlayAnimMontage(HitAnimMontage);
+	}
+
+	auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"),
+	TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
+
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
 
 	return DamageAmount;

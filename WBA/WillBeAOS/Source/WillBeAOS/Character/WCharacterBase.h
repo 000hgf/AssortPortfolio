@@ -36,6 +36,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_Behavior;
 
+	UPROPERTY(BlueprintReadonly)
+	bool IsDead;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Health")
 	UAnimMontage* DeadAnimMontage;	//Á×À»¶§ ¾²ÀÏ ¸ùÅ¸ÁÖ
