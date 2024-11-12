@@ -3,6 +3,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "../Character/CombatComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "WDelegateDefine.h"
 #include "Components/PrimitiveComponent.h"
@@ -16,15 +17,16 @@ AWMinionsCharacterBase::AWMinionsCharacterBase()
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetCombatEnable(false);
+	CombatComponent->SetCollisionMesh(GetMesh());
 }
 
 void AWMinionsCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//CombatComponent->DelegateDead.BindUObject(this, &ThisClass::BeingDead);
-
-	Health = MaxHealth;
+	CombatComponent->DelegateDead.BindUObject(this, &ThisClass::BeingDead);
+	//HandleApplyPointDamage 멀티델리게이트 바인딩
+	CombatComponent->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
 }
 
 void AWMinionsCharacterBase::Tick(float DeltaTime)
@@ -39,22 +41,6 @@ void AWMinionsCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 }
 
-void AWMinionsCharacterBase::EnemyTakeDamage(float Damage)
-{
-	if (Health > 0)
-	{
-		if (Health < Damage)
-			Health = 0;
-		else
-			Health -= Damage;
-	}
-
-	if (Health <= 0)
-	{
-		//DelegateDead.ExecuteIfBound();
-		BeingDead();
-	}
-}
 
 void AWMinionsCharacterBase::BeingDead()
 {
@@ -70,3 +56,26 @@ void AWMinionsCharacterBase::BeingDead()
 	PlayAnimMontage(DeadAnimMontage);
 }
 
+void AWMinionsCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
+{
+	UGameplayStatics::ApplyPointDamage(
+		LastHit.GetActor(),
+		CharacterDamage,
+		GetOwner()->GetActorForwardVector(),
+		LastHit,
+		GetInstigatorController(),
+		this,
+		UDamageType::StaticClass()
+	);
+}
+
+float AWMinionsCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	float TakeDamage = DamageAmount;
+	CombatComponent->HandleTakeDamage(TakeDamage);
+	auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"), TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
+
+	return DamageAmount;
+}

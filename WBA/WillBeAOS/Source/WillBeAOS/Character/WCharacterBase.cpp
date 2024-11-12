@@ -6,6 +6,7 @@
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetArrayLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "CombatComponent.h"
 #include "Components/CapsuleComponent.h"
 
@@ -37,8 +38,10 @@ AWCharacterBase::AWCharacterBase()
 void AWCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	//BeingDead 델리게이트 바인딩
 	CombatComp->DelegateDead.BindUObject(this, &ThisClass::BeingDead);
-	//CombatComp->DelegateHit.BindUObject(this, &ThisClass::);
+	//HandleApplyPointDamage 멀티델리게이트 바인딩
+	CombatComp->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
 }
 		//Char->PlayAnimMontage(HitAnimMontage); 
 
@@ -72,7 +75,6 @@ void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	}
 }
 
-
 void AWCharacterBase::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
@@ -103,6 +105,7 @@ void AWCharacterBase::Move(const FInputActionValue& Value)
 
 void AWCharacterBase::Behavior(const FInputActionValue& Value)
 {
+	CombatComp->SetCollisionMesh(GetMesh());
 
 	if (CombatComp != nullptr)
 	{
@@ -138,6 +141,30 @@ void AWCharacterBase::BeingDead()
 	ACharacter::PlayAnimMontage(DeadAnimMontage);
 }
 
+//포인트 데미지 주는 함수
+void AWCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
+{
+	UGameplayStatics::ApplyPointDamage(
+		LastHit.GetActor(),
+		CharacterDamage,
+		GetOwner()->GetActorForwardVector(),
+		LastHit,
+		GetInstigatorController(),
+		this,
+		UDamageType::StaticClass()
+	);
+}
 
+
+float AWCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	float TakeDamage = DamageAmount;
+	CombatComp->HandleTakeDamage(TakeDamage);
+	auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"), TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
+
+	return DamageAmount;
+}
 
 

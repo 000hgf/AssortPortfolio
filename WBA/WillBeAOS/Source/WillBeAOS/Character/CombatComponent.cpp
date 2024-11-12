@@ -1,4 +1,5 @@
 #include "CombatComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -43,13 +44,13 @@ void UCombatComponent::BeginPlay()
 	Health = Max_Health;
 }
 
-void UCombatComponent::WTakeDamage(float Damage)
+void UCombatComponent::HandleTakeDamage(float WDamage)
 {
 	if (Health > 0)
 	{
-		Health -= Damage;
+		Health -= WDamage;
 	}
-	else if (Damage > Health)
+	else if (WDamage > Health)
 	{
 		Health = 0;
 	}
@@ -76,6 +77,70 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	if (IsCollisionEnabled)
+	{
+		CollisionTrace();
+	}
 }
 
+void UCombatComponent::SetCollisionMesh(UPrimitiveComponent* PrimComp)
+{
+	CollisionMeshComponent = PrimComp;
+}
+
+void UCombatComponent::CollisionTrace()
+{
+	//HitResults 배열 선언
+	TArray<FHitResult> OutHits = {};
+
+	//SphereTraceMultForObjects함수로 트레이스
+	bool Hit = UKismetSystemLibrary::SphereTraceMultiForObjects(
+		GetWorld(),
+		CollisionMeshComponent->GetSocketLocation(StartSocket),
+		CollisionMeshComponent->GetSocketLocation(EndSocket),
+		Radius,
+		ObjectTypes,
+		false,
+		AlreadyHitActors,
+		EDrawDebugTrace::ForDuration,
+		OutHits,
+		true,
+		FLinearColor::Red,
+		FLinearColor::Green,
+		5.0f
+	);
+
+	if (Hit)
+	{
+		for (const FHitResult& LastHit : OutHits)
+		{
+			AActor* HitActor = LastHit.GetActor();
+			if (HitActor && !AlreadyHitActors.Contains(HitActor))
+			{
+				// 새로운 히트 오브젝트인 경우
+				UE_LOG(LogTemp, Log, TEXT("Hit: %s"), *LastHit.GetActor()->GetName());
+				// AlreadyHitActors에 추가
+				AlreadyHitActors.Add(HitActor);
+				//델리게이트 함수 호출
+				DelegatePointDamage.Broadcast(LastHit);
+			}
+		}
+	}
+}
+
+void UCombatComponent::EnableCollision()
+{
+	ClearHitActor();
+	IsCollisionEnabled = true;
+}
+
+void UCombatComponent::DisableCollision()
+{
+	IsCollisionEnabled = false;
+}
+
+void UCombatComponent::ClearHitActor()
+{
+	AlreadyHitActors.Empty();
+	AlreadyHitActors.Add(GetOwner());
+}

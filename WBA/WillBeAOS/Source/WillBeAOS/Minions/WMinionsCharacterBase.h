@@ -19,22 +19,20 @@ class WILLBEAOS_API AWMinionsCharacterBase : public ACharacter
 public:
 	AWMinionsCharacterBase();
 
-	UPROPERTY(BlueprintReadWrite, Category = HP)
-	float MaxHealth = 100;
-	UPROPERTY(BlueprintReadWrite, Category = HP)
-	float Health;
-	UPROPERTY(BlueprintReadWrite)
-	float AttackPoint = 10;
-
 	UPROPERTY(BlueprintReadWrite, Category = Combo)
 	TArray<UAnimMontage*> AttackMontages = {};
-	UPROPERTY(BlueprintReadWrite, Category = Combo)
-	float AttackCount = 0;
 
 	UPROPERTY(BlueprintReadWrite, Category = Dead)
 	UAnimMontage* DeadAnimMontage;
 
 	FDelegateSignature DelegateDead;
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void HandleApplyPointDamage(FHitResult LastHit);//포인트 데미지를 줄시 델리게이트로 호출될 함수
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	float CharacterDamage;	//데미지
 
 protected:
 	virtual void BeginPlay() override;
@@ -44,8 +42,6 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION(BlueprintCallable)
-	void EnemyTakeDamage(float Damage);
 	void BeingDead();
 
 };
