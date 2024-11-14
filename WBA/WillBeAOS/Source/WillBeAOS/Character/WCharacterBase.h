@@ -7,6 +7,7 @@
 struct FInputActionValue;
 class UInputAction;
 class UAnimMontage;
+class UWidgetComponent;
 
 UCLASS()
 class WILLBEAOS_API AWCharacterBase : public ACharacter
@@ -21,6 +22,10 @@ class WILLBEAOS_API AWCharacterBase : public ACharacter
 	class UCameraComponent* FollowCamera;
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"));
 	class UCombatComponent* CombatComp;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UWidgetComponent* WidgetComponent;
 
 public:
 	AWCharacterBase();
@@ -69,4 +74,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void SetHpPercentage(float Health, float MaxHealth);
 };

@@ -54,7 +54,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	int32 GetAttackCount();//ÄÞº¸ È½¼ö
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-	void SetAttackCount(int32 Val);//ÄÞº¸ È½¼ö ¼¼ÆÃ
+	void AddAttackCount(int32 Val);//ÄÞº¸ È½¼ö ¼¼ÆÃ
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void ResetCombo();//ÄÞº¸ ¸®¼Â
 	UFUNCTION(BlueprintCallable, Category = "Combat")
@@ -76,6 +76,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+public:
 	//°ø°ÝÀ» ÇÏ°íÀÖ´ÂÁö ¿©ºÎ
 	UPROPERTY(BluePrintReadOnly, Category = "Combat")
 	bool CombatEnable = false;
@@ -89,7 +90,7 @@ protected:
 	TArray<AActor*> AlreadyHitActors = {};
 
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
-	float Health = 0;
+	float Health = 50;
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float Max_Health = 100;
 	UPROPERTY(BlueprintReadOnly, Category = "Health")

@@ -13,7 +13,7 @@ int32 UCombatComponent::GetAttackCount()
 	return AttackCount;
 }
 
-void UCombatComponent::SetAttackCount(int32 Val)
+void UCombatComponent::AddAttackCount(int32 Val)
 {
 	AttackCount += Val;
 }
@@ -49,12 +49,10 @@ void UCombatComponent::HandleTakeDamage(float WDamage)
 	if (Health > 0)
 	{
 		Health -= WDamage;
+		if (WDamage > Health)
+			Health = 0;
 	}
-	else if (WDamage > Health)
-	{
-		Health = 0;
-	}
-	if (!Health)
+	if (Health <= 0)
 	{
 		SetIsDead(true);
 		DelegateDead.ExecuteIfBound();
@@ -102,7 +100,7 @@ void UCombatComponent::CollisionTrace()
 		ObjectTypes,
 		false,
 		AlreadyHitActors,
-		EDrawDebugTrace::ForDuration,
+		EDrawDebugTrace::ForOneFrame,
 		OutHits,
 		true,
 		FLinearColor::Red,
