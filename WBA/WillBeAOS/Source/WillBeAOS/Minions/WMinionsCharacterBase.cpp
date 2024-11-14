@@ -9,6 +9,9 @@
 #include "Components/PrimitiveComponent.h"
 #include "WMinionsAIController.h"
 #include "BrainComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Components/ProgressBar.h"
+#include "HealthBar.h"
 
 
 AWMinionsCharacterBase::AWMinionsCharacterBase()
@@ -18,6 +21,10 @@ AWMinionsCharacterBase::AWMinionsCharacterBase()
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetCombatEnable(false);
 	CombatComponent->SetCollisionMesh(GetMesh());
+
+	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	WidgetComponent->SetupAttachment(GetMesh());
+	WidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 200.f));
 }
 
 void AWMinionsCharacterBase::BeginPlay()
@@ -33,6 +40,10 @@ void AWMinionsCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	float HP = CombatComponent->Health;
+	float MAXHP = CombatComponent->Max_Health;
+
+	SetHpPercentage(HP, MAXHP);
 }
 
 void AWMinionsCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -56,6 +67,17 @@ void AWMinionsCharacterBase::BeingDead()
 	PlayAnimMontage(DeadAnimMontage);
 }
 
+void AWMinionsCharacterBase::SetHpPercentage(float Health, float MaxHealth)
+{
+	auto Widget = Cast<UHealthBar>(WidgetComponent->GetWidget());
+
+	if (Widget != nullptr)
+	{
+		if (MaxHealth != 0)
+			Widget->HealthBar->SetPercent(Health / MaxHealth);
+	}
+}
+
 void AWMinionsCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
 {
 	UGameplayStatics::ApplyPointDamage(
@@ -76,6 +98,8 @@ float AWMinionsCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const&
 	CombatComponent->HandleTakeDamage(TakeDamage);
 	auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"), TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
+
+	SetHpPercentage((CombatComponent->Health), (CombatComponent->Max_Health));
 
 	return DamageAmount;
 }

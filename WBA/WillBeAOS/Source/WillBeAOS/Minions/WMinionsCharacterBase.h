@@ -7,14 +7,19 @@
 
 class UAnimMontage;
 class UCombatComponent;
+class UWidgetComponent;
+class UProgressBar;
 
 UCLASS()
 class WILLBEAOS_API AWMinionsCharacterBase : public ACharacter
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCombatComponent* CombatComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UWidgetComponent* WidgetComponent;
 	
 public:
 	AWMinionsCharacterBase();
@@ -43,5 +48,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void BeingDead();
+	void SetHpPercentage(float Health, float MaxHealth);
 
 };

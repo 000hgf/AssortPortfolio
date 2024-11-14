@@ -9,6 +9,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "CombatComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Components/ProgressBar.h"
+#include "../Minions/HealthBar.h"
 
 
 AWCharacterBase::AWCharacterBase()
@@ -32,6 +35,9 @@ AWCharacterBase::AWCharacterBase()
 
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComp->SetCombatEnable(false);
+
+	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	WidgetComponent->SetupAttachment(GetMesh());
 }
 
 
@@ -49,6 +55,10 @@ void AWCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	float HP = CombatComp->Health;
+	float MAXHP = CombatComp->Max_Health;
+
+	SetHpPercentage(HP, MAXHP);
 }
 
 void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -72,6 +82,17 @@ void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AWCharacterBase::Move);
 		EnhancedInputComponent->BindAction(IA_Behavior, ETriggerEvent::Started, this, &AWCharacterBase::Behavior);
+	}
+}
+
+void AWCharacterBase::SetHpPercentage(float Health, float MaxHealth)
+{
+	auto Widget = Cast<UHealthBar>(WidgetComponent->GetWidget());
+
+	if (Widget != nullptr)
+	{
+		if (MaxHealth != 0)
+			Widget->HealthBar->SetPercent(Health / MaxHealth);
 	}
 }
 
@@ -106,7 +127,6 @@ void AWCharacterBase::Move(const FInputActionValue& Value)
 void AWCharacterBase::Behavior(const FInputActionValue& Value)
 {
 	CombatComp->SetCollisionMesh(GetMesh());
-
 	if (CombatComp != nullptr)
 	{
 		//공격중이 아닐시
@@ -119,7 +139,7 @@ void AWCharacterBase::Behavior(const FInputActionValue& Value)
 			if ((CombatComp->GetAttackCount()) < AttackMontages.Num())
 			{
 				ACharacter::PlayAnimMontage(AttackMontages[(CombatComp->GetAttackCount())]);
-				CombatComp->SetAttackCount(1);
+				CombatComp->AddAttackCount(1);
 				if (CombatComp->GetAttackCount() >= AttackMontages.Num())
 				{
 					CombatComp->ResetCombo();
