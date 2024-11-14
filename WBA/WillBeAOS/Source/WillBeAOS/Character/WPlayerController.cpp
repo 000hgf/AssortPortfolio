@@ -1,14 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "WPlayerController.h"
 #include "Blueprint/UserWidget.h"
 
 void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 {
 	Super::GameHasEnded(EndGameFocus, bIsWinner);
-
 	if (bIsWinner)
 	{
+		SetShowMouseCursor(true);
 		UUserWidget* WinScreen = CreateWidget(this, WinScreenClass);
 		if (WinScreen != nullptr)
 		{
@@ -23,8 +21,6 @@ void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 			LoseScreen->AddToViewport();
 		}
 	}
-
-	GetWorldTimerManager().SetTimer(RestartTimer, this, &APlayerController::RestartLevel, RestartDelay);
 }
 
 void AWPlayerController::BeginPlay()

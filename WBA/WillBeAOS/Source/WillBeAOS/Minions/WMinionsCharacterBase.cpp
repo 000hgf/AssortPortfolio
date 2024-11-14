@@ -17,12 +17,13 @@ AWMinionsCharacterBase::AWMinionsCharacterBase()
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetCombatEnable(false);
-	CombatComponent->SetCollisionMesh(GetMesh());
 }
 
 void AWMinionsCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	CombatComponent->SetCollisionMesh(GetMesh());
+
 	CombatComponent->DelegateDead.BindUObject(this, &ThisClass::BeingDead);
 	//HandleApplyPointDamage 멀티델리게이트 바인딩
 	CombatComponent->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);

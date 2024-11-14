@@ -29,7 +29,7 @@ public:
 	//스켈레탈 메쉬의 콜리전 컴포넌트
 	UPROPERTY(VisibleDefaultsOnly)
 	UPrimitiveComponent* CollisionMeshComponent;
-
+	//콜리전 반지름
 	UPROPERTY(EditAnywhere, Category = "Collision")
 	float Radius;
 	//오브젝트 타입
