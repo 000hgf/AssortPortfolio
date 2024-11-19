@@ -28,7 +28,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	float WCharSpeed;
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
-	bool WShouldMove;
+	bool WIsAccelerating;
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	bool WCharInAir;
 	UPROPERTY(BlueprintReadOnly, Category = "FullBody")

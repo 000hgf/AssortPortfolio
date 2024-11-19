@@ -23,18 +23,18 @@ void UWCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		WCharVelocity = WCharMovementComponent->Velocity;
 		WCharSpeed = UKismetMathLibrary::VSizeXY(WCharVelocity);
 
-		WShouldMove = false;
-		bool Acceleration = !WCharMovementComponent->GetCurrentAcceleration().Equals(FVector::ZeroVector, 0);
-		if (WCharSpeed > 3.f && Acceleration)
-		{
-			WShouldMove = true;
-		}
+		if (UKismetMathLibrary::VSizeXY(WCharMovementComponent->GetCurrentAcceleration()) > 0)
+			WIsAccelerating = true;
+		else
+			WIsAccelerating = false;
 
 		float CurveValue = UAnimInstance::GetCurveValue(TEXT("FullBody"));
 		if (CurveValue > 0.f)
 		{
 			FullBody = true;
 		}
+		else
+			FullBody = false;
 
 		WCharInAir = WCharMovementComponent->IsFalling();
 	}

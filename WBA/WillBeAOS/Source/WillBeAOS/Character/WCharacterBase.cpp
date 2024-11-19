@@ -181,8 +181,8 @@ float AWCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	float TakeDamage = DamageAmount;
 	CombatComp->HandleTakeDamage(TakeDamage);
-	auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"), TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
+	//auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"), TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
+	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
 
 	return DamageAmount;
 }

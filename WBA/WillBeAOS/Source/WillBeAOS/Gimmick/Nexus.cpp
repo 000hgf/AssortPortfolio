@@ -32,7 +32,7 @@ float ANexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		{
 			DefaultSceneRootComponent->SetVisibility(false, true);
 			AWGameState* WGameState = GetWorld()->GetGameState<AWGameState>();
-			if (WGameState)
+			if (WGameState!=nullptr)
 			{
 				WGameState->HandleNexusDestroyed();
 			}
