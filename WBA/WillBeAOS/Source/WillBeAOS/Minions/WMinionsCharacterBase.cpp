@@ -96,8 +96,8 @@ float AWMinionsCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const&
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	float TakeDamage = DamageAmount;
 	CombatComponent->HandleTakeDamage(TakeDamage);
-	auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"), TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
+	//auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"), TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
+	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
 
 	SetHpPercentage((CombatComponent->Health), (CombatComponent->Max_Health));
 
