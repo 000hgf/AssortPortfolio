@@ -4,17 +4,14 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
-<<<<<<< HEAD
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "../Character/WCharacterBase.h"
 #include "../Character/CombatComponent.h"
 #include "../Game/WGameState.h"
-=======
 #include "Kismet/KismetSystemLibrary.h"
 #include "../Character/WCharacterBase.h"
->>>>>>> 736934335200dd41438b8bf57f184b65183f6ee1
 #include "../Minions/WMinionsCharacterBase.h"
 
 ATower::ATower()
@@ -60,11 +57,8 @@ void ATower::Tick(float DeltaTime)
 	{
 
 		TargetOfActors = OverlappingActors[0];
-<<<<<<< HEAD
 		NiagaraComponent->SetVectorParameter("Beam End", (TargetOfActors->GetActorLocation()) - AttackStartPoint->GetComponentLocation());
 		NiagaraComponent->SetVisibility(true);
-=======
->>>>>>> 736934335200dd41438b8bf57f184b65183f6ee1
 
 		// 라인 트레이스
 	/*	UKismetSystemLibrary::LineTraceMulti(
@@ -155,18 +149,17 @@ void ATower::OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActo
 {
 	OverlappingActors.Remove(OtherActor);
 
-<<<<<<< HEAD
+
 	// 타깃 배열이 비어있으면 스폰 시간 초기화 및 Niagara 비활성화
 	if (OverlappingActors.IsEmpty())
 	{
 		Delta = 0;
 		NiagaraComponent->SetVisibility(false);
-=======
+
 	// 타깃 배열이 비어있으면 스폰 시간 초기화
 	if (OverlappingActors.IsEmpty())
 	{
 		Delta = 0;
->>>>>>> 736934335200dd41438b8bf57f184b65183f6ee1
 	}
 }
 

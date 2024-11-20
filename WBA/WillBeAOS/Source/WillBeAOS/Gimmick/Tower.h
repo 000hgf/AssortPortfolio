@@ -35,12 +35,8 @@ public:
 	UStaticMeshComponent* StaticMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* AttackStartPoint;
-<<<<<<< HEAD
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* CombatComp;
-
-=======
->>>>>>> 736934335200dd41438b8bf57f184b65183f6ee1
 	UPROPERTY(BlueprintReadWrite, Category = SpawnActor)
 	TSubclassOf<AActor> SpawnActors;
 	UPROPERTY(BlueprintReadOnly, Category = SpawnActor)
