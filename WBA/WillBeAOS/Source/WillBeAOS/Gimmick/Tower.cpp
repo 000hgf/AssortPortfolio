@@ -21,9 +21,6 @@ ATower::ATower()
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	SetRootComponent(DefaultSceneRoot);
 
-	CapsuleCollisionComponet = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollision"));
-	CapsuleCollisionComponet->SetupAttachment(GetRootComponent());
-
 	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraParticleSystem"));
 	NiagaraComponent->SetupAttachment(GetRootComponent());
 
@@ -32,6 +29,9 @@ ATower::ATower()
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(GetRootComponent());
+
+	CapsuleCollisionComponet = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollision"));
+	CapsuleCollisionComponet->SetupAttachment(GetRootComponent());
 
 	AttackStartPoint = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AttackStartPoint"));
 	AttackStartPoint->SetupAttachment(NiagaraComponent);
@@ -156,10 +156,6 @@ void ATower::OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActo
 		Delta = 0;
 		NiagaraComponent->SetVisibility(false);
 
-	// 타깃 배열이 비어있으면 스폰 시간 초기화
-	if (OverlappingActors.IsEmpty())
-	{
-		Delta = 0;
 	}
 }
 
