@@ -75,4 +75,6 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void SetHpPercentage(float Health, float MaxHealth);
+	UFUNCTION(BlueprintCallable)
+	float GetHpPercentage();
 };

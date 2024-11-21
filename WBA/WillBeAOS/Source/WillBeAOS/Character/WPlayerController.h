@@ -18,17 +18,28 @@ class WILLBEAOS_API AWPlayerController : public APlayerController
 	//죽음 위젯
 	UPROPERTY(EditAnywhere, Category = "Widget")
 	TSubclassOf<class UUserWidget> DeathScreenClass;
+	// 리스폰 위젯
+	UPROPERTY(EditAnywhere, Category = Widget)
+	TSubclassOf<UUserWidget> RespawnScreenClass;
+	UUserWidget* RespawnScreen;
 
+public:
 	//리스폰시 필요한
-	UPROPERTY(EditAnywhere)
-	float RestartDelay = 5;
+	UPROPERTY(BlueprintReadWrite)
+	int RespawnTime = 5;
+	UPROPERTY(BlueprintReadWrite)
+	int CurrentRespawnTime;
 
 	FTimerHandle RestartTimer;
+	FTimerHandle RespawnTimerHandle;
 
 public:
 
 	//리스폰 함수(PlayerController->GameHasEnded())
 	virtual void GameHasEnded(class AActor* EndGameFocus = nullptr, bool bIsWinner = false) override;
+	void ShowRespawnWidget();
+	void UpdateRespawnWidget();
+	void HideRespawnWidget();
 
 protected:
 	virtual void BeginPlay() override;

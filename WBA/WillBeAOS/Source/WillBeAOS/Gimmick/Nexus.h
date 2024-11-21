@@ -16,7 +16,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	class USceneComponent* DefaultSceneRootComponent;
 	UPROPERTY(VisibleAnywhere)
-	class UCapsuleComponent* CapsuleCollisionComponet;
+	class UBoxComponent* BoxCollisionComponet;
 	UPROPERTY(VisibleAnywhere)
 	class UStaticMeshComponent* NexusMeshComponent;
 	UPROPERTY(VisibleAnywhere)
