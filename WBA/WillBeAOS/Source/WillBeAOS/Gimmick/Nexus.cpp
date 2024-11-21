@@ -1,6 +1,6 @@
 #include "Nexus.h"
 #include "Components/SceneComponent.h"
-#include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 #include "../Character/CombatComponent.h"
 #include "../Game/WGameState.h"
 
@@ -11,8 +11,8 @@ ANexus::ANexus()
 	DefaultSceneRootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	SetRootComponent(DefaultSceneRootComponent);
 
-	CapsuleCollisionComponet = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollision"));
-	CapsuleCollisionComponet->SetupAttachment(DefaultSceneRootComponent);
+	BoxCollisionComponet = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
+	BoxCollisionComponet->SetupAttachment(DefaultSceneRootComponent);
 
 	NexusMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("NexusMesh"));
 	NexusMeshComponent->SetupAttachment(DefaultSceneRootComponent);

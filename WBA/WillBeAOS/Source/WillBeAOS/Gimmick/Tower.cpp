@@ -150,12 +150,17 @@ void ATower::OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActo
 	OverlappingActors.Remove(OtherActor);
 
 
+=======
+>>>>>>> origin/HyunGyu
 	// 타깃 배열이 비어있으면 스폰 시간 초기화 및 Niagara 비활성화
 	if (OverlappingActors.IsEmpty())
 	{
 		Delta = 0;
 		NiagaraComponent->SetVisibility(false);
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/HyunGyu
 	}
 }
 

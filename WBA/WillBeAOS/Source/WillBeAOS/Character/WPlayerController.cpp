@@ -15,11 +15,46 @@ void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 	}
 	else
 	{
+		SetShowMouseCursor(true);
 		UUserWidget* LoseScreen = CreateWidget(this, LoseScreenClass);
 		if (LoseScreen != nullptr)
 		{
 			LoseScreen->AddToViewport();
 		}
+	}
+}
+
+void AWPlayerController::ShowRespawnWidget()
+{
+	RespawnScreen = CreateWidget(this, RespawnScreenClass);
+	if (RespawnScreen != nullptr)
+	{
+		RespawnScreen->AddToViewport();
+	}
+
+	CurrentRespawnTime = RespawnTime;
+
+	GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ThisClass::UpdateRespawnWidget, 1.f, true);
+}
+
+void AWPlayerController::UpdateRespawnWidget()
+{
+	if (CurrentRespawnTime > 0)
+	{
+		CurrentRespawnTime--;
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().ClearTimer(RespawnTimerHandle);
+		HideRespawnWidget();
+	}
+}
+
+void AWPlayerController::HideRespawnWidget()
+{
+	if (RespawnScreen != nullptr)
+	{
+		RespawnScreen->RemoveFromViewport();
 	}
 }
 

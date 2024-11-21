@@ -12,6 +12,7 @@
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
 #include "../Minions/HealthBar.h"
+#include "WPlayerController.h"
 
 
 AWCharacterBase::AWCharacterBase()
@@ -36,8 +37,8 @@ AWCharacterBase::AWCharacterBase()
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComp->SetCombatEnable(false);
 
-	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
-	WidgetComponent->SetupAttachment(GetMesh());
+	/*WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	WidgetComponent->SetupAttachment(GetMesh());*/
 }
 
 
@@ -55,10 +56,10 @@ void AWCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	float HP = CombatComp->Health;
-	float MAXHP = CombatComp->Max_Health;
+	//float HP = CombatComp->Health;
+	//float MAXHP = CombatComp->Max_Health;
 
-	SetHpPercentage(HP, MAXHP);
+	//SetHpPercentage(HP, MAXHP);
 }
 
 void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -94,6 +95,11 @@ void AWCharacterBase::SetHpPercentage(float Health, float MaxHealth)
 		if (MaxHealth != 0)
 			Widget->HealthBar->SetPercent(Health / MaxHealth);
 	}
+}
+
+float AWCharacterBase::GetHpPercentage()	// HP 게이지 업데이트
+{
+	return (CombatComp->Health / CombatComp->Max_Health);
 }
 
 void AWCharacterBase::Look(const FInputActionValue& Value)
@@ -151,6 +157,13 @@ void AWCharacterBase::Behavior(const FInputActionValue& Value)
 
 void AWCharacterBase::BeingDead()
 {
+	// 리스폰 위젯 출력
+	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
+	if (PC)
+	{
+		PC->ShowRespawnWidget();
+	}
+
 	////죽음 메세지 출력
 	auto Message = FString::Printf(TEXT("Dead"));
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
