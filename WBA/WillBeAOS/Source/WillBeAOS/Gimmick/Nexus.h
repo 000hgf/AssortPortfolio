@@ -11,6 +11,9 @@ class WILLBEAOS_API ANexus : public AActor
 	
 public:	
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+
+	float GetNexusHPPercent();
+
 protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(VisibleAnywhere)

@@ -22,6 +22,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void SetHpPercentage(float Health, float MaxHealth);
 public:	
 	UPROPERTY(EditAnywhere)
 	USceneComponent* DefaultSceneRoot;
@@ -35,8 +36,11 @@ public:
 	UStaticMeshComponent* StaticMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* AttackStartPoint;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	class UWidgetComponent* WidgetComponent;
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* CombatComp;
+
 	UPROPERTY(BlueprintReadWrite, Category = SpawnActor)
 	TSubclassOf<AActor> SpawnActors;
 	UPROPERTY(BlueprintReadOnly, Category = SpawnActor)
