@@ -161,7 +161,7 @@ void AWCharacterBase::BeingDead()
 	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
 	if (PC)
 	{
-		PC->ShowRespawnWidget();
+		PC->ShowRespawnWidget(); 
 	}
 
 	////죽음 메세지 출력

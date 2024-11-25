@@ -129,10 +129,10 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 			Destroy();
 		}
 	}
-	auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"),
+	/*auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"),
 		TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
 
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);*/
 
 	return DamageAmount;
 }
