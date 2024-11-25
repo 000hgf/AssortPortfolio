@@ -48,9 +48,9 @@ void UCombatComponent::HandleTakeDamage(float WDamage)
 {
 	if (Health > 0)
 	{
-		Health -= WDamage;
 		if (WDamage > Health)
 			Health = 0;
+		Health -= WDamage;
 	}
 	if (Health <= 0)
 	{
