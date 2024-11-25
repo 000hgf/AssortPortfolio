@@ -1,2 +1,2 @@
-#include "Minions/HealthBar.h"
+#include "HealthBar.h"
 #include "Components/ProgressBar.h"

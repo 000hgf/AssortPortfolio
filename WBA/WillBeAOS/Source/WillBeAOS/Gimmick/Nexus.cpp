@@ -47,6 +47,11 @@ float ANexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	return DamageAmount;
 }
 
+float ANexus::GetNexusHPPercent()
+{
+	return CombatComp->Health/CombatComp->Max_Health;
+}
+
 void ANexus::BeginPlay()
 {
 	Super::BeginPlay();

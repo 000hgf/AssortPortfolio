@@ -1,18 +1,18 @@
 #include "WCharacterBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Components/ProgressBar.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "CombatComponent.h"
 #include "Kismet/KismetArrayLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "CombatComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "Components/WidgetComponent.h"
-#include "Components/ProgressBar.h"
-#include "../Minions/HealthBar.h"
 #include "WPlayerController.h"
+#include "WCharacterHUD.h"
 
 
 AWCharacterBase::AWCharacterBase()
@@ -37,8 +37,6 @@ AWCharacterBase::AWCharacterBase()
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComp->SetCombatEnable(false);
 
-	/*WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
-	WidgetComponent->SetupAttachment(GetMesh());*/
 }
 
 
@@ -86,17 +84,6 @@ void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	}
 }
 
-void AWCharacterBase::SetHpPercentage(float Health, float MaxHealth)
-{
-	auto Widget = Cast<UHealthBar>(WidgetComponent->GetWidget());
-
-	if (Widget != nullptr)
-	{
-		if (MaxHealth != 0)
-			Widget->HealthBar->SetPercent(Health / MaxHealth);
-	}
-}
-
 float AWCharacterBase::GetHpPercentage()	// HP 게이지 업데이트
 {
 	return (CombatComp->Health / CombatComp->Max_Health);
@@ -140,7 +127,7 @@ void AWCharacterBase::Behavior(const FInputActionValue& Value)
 		{
 			//공격중 활성화
 			CombatComp->SetCombatEnable(true);
-
+			DSkillLCooldown.ExecuteIfBound();
 			//콤보 로직
 			if ((CombatComp->GetAttackCount()) < AttackMontages.Num())
 			{

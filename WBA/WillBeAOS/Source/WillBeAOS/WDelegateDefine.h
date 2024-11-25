@@ -7,6 +7,8 @@
 
 // 기본 델리게이트
 DECLARE_DELEGATE(FDelegateSignature)
+DECLARE_DELEGATE(FDS_SkillLCooldown)
+
 // 기본 델리게이트에 인자 1개를 전달
 DECLARE_DELEGATE_OneParam(FDelegateSignatureParam1, FLinearColor)
 // 기본 델리게이트에 인자 2개를 전달

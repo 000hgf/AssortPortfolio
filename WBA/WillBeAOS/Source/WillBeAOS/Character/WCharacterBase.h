@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WDelegateDefine.h"
 #include "GameFramework/Character.h"
 #include "WCharacterBase.generated.h"
 
@@ -22,10 +23,10 @@ class WILLBEAOS_API AWCharacterBase : public ACharacter
 	class UCameraComponent* FollowCamera;
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"));
 	class UCombatComponent* CombatComp;
-
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UWidgetComponent* WidgetComponent;
+
 
 public:
 	AWCharacterBase();
@@ -64,6 +65,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")//TakeDamage 함수 오버라이드
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
+	//델리게이트 정의
+	FDS_SkillLCooldown DSkillLCooldown;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -74,7 +78,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	void SetHpPercentage(float Health, float MaxHealth);
 	UFUNCTION(BlueprintCallable)
 	float GetHpPercentage();
 };

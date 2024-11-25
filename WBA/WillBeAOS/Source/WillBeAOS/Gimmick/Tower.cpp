@@ -9,6 +9,9 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "../Character/WCharacterBase.h"
 #include "../Character/CombatComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Components/ProgressBar.h"
+#include "../Minions/HealthBar.h"
 #include "../Game/WGameState.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "../Character/WCharacterBase.h"
@@ -35,6 +38,10 @@ ATower::ATower()
 
 	AttackStartPoint = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AttackStartPoint"));
 	AttackStartPoint->SetupAttachment(NiagaraComponent);
+
+	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
+	WidgetComponent->SetupAttachment(GetRootComponent());
+	WidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 200.f));
 
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 
@@ -118,14 +125,16 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	{
 		CombatComp->HandleTakeDamage(TakeDamage);
 
+		SetHpPercentage((CombatComp->Health), (CombatComp->Max_Health));
+
 		if ((CombatComp->GetIsDead()))
 		{
 			//DefaultSceneRoot->SetVisibility(false, true);
-			//AWGameState* WGameState = GetWorld()->GetGameState<AWGameState>();
-			//if (WGameState != nullptr)
-			//{
-			//	WGameState->HandleNexusDestroyed();
-			//}
+			AWGameState* WGS = GetWorld()->GetGameState<AWGameState>();
+			if (WGS != nullptr)
+			{
+				WGS->TowerArray.Remove(this);
+			}
 			Destroy();
 		}
 	}
@@ -162,4 +171,15 @@ void ATower::spawn()
 {
 	FActorSpawnParameters SpawnParams;
 	GetWorld()->SpawnActor<AActor>(SpawnActors, AttackStartPoint->GetComponentTransform(), SpawnParams);
+}
+
+void ATower::SetHpPercentage(float Health, float MaxHealth)
+{
+	auto Widget = Cast<UHealthBar>(WidgetComponent->GetWidget());
+
+	if (Widget != nullptr)
+	{
+		if (MaxHealth != 0)
+			Widget->HealthBar->SetPercent(Health / MaxHealth);
+	}
 }
