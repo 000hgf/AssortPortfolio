@@ -4,6 +4,8 @@
 #include "GameFramework/PlayerController.h"
 #include "WPlayerController.generated.h"
 
+class UUserWidget;
+
 UCLASS()
 class WILLBEAOS_API AWPlayerController : public APlayerController
 {
@@ -11,17 +13,26 @@ class WILLBEAOS_API AWPlayerController : public APlayerController
 
 	//이김 위젯
 	UPROPERTY(EditAnywhere, Category = "Widget")
-	TSubclassOf<class UUserWidget> WinScreenClass;
+	TSubclassOf< UUserWidget> WinScreenClass;
 	//패배 위젯
 	UPROPERTY(EditAnywhere, Category = "Widget")
-	TSubclassOf<class UUserWidget> LoseScreenClass;
+	TSubclassOf< UUserWidget> LoseScreenClass;
 	//죽음 위젯
 	UPROPERTY(EditAnywhere, Category = "Widget")
-	TSubclassOf<class UUserWidget> DeathScreenClass;
+	TSubclassOf< UUserWidget> DeathScreenClass;
 	// 리스폰 위젯
 	UPROPERTY(EditAnywhere, Category = Widget)
 	TSubclassOf<UUserWidget> RespawnScreenClass;
+
+	// UserWidget 클래스의 타입을 저장하는 변수
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> UserWidgetClass;
+
+	class UWCharacterHUD* PlayerHUD;
+
 	UUserWidget* RespawnScreen;
+
+	class AWCharacterBase* AWC;
 
 public:
 	//리스폰시 필요한
@@ -44,4 +55,5 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void OnPossess(APawn* InPawn);
 };

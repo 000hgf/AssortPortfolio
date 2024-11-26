@@ -20,6 +20,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "PlayerState")
 	class AWPlayerState* AWPS;
 
+	UFUNCTION(BlueprintCallable, Category = "Initialize")
+	void UpdateCharacter(class AWCharacterBase* Char);
+
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget), Category = "Health")
 	TObjectPtr<class UProgressBar>HealthBar;
 	UFUNCTION(BlueprintPure, Category = "Health")

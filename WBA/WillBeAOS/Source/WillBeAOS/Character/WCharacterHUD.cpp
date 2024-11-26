@@ -11,19 +11,28 @@ void UWCharacterHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	AWC = Cast<AWCharacterBase>(GetOwningPlayerPawn());
+	AWGS = GetWorld()->GetGameState<AWGameState>();
 
+	AWC = Cast<AWCharacterBase>(GetOwningPlayerPawn());
 	if (AWC)
 	{
 		AWC->DSkillLCooldown.BindUObject(this, &ThisClass::SetSkillLTimer);
 	}
 
-	AWGS = GetWorld()->GetGameState<AWGameState>();
-
 	APlayerController* PlayerController = GetOwningPlayer();
 	if (PlayerController)
 	{
 		AWPS = Cast<AWPlayerState>(PlayerController->PlayerState);
+	}
+}
+
+void UWCharacterHUD::UpdateCharacter(AWCharacterBase* Char)
+{
+	AWC = Char;
+
+	if (AWC)
+	{
+		AWC->DSkillLCooldown.BindUObject(this, &ThisClass::SetSkillLTimer);
 	}
 }
 
