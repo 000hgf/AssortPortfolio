@@ -25,6 +25,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Tower")
 	TArray<ATower*> TowerArray = {};//Å¸¿ö °´Ã¼µé
 
+	UPROPERTY(BlueprintReadWrite, Category = "State")
+	bool IsGameEnd = false;
+
 	void HandleNexusDestroyed();
 	void HandlePlayIsDead();
 

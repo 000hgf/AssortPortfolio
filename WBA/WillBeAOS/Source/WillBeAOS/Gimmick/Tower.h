@@ -32,7 +32,7 @@ public:
 	class UNiagaraComponent* NiagaraComponent;
 	UPROPERTY(EditAnywhere)
 	USphereComponent* OverlapTrigger;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* StaticMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* AttackStartPoint;

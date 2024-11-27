@@ -12,6 +12,7 @@
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
 #include "HealthBar.h"
+#include "../Game/WGameState.h"
 
 
 AWMinionsCharacterBase::AWMinionsCharacterBase()
@@ -44,6 +45,15 @@ void AWMinionsCharacterBase::Tick(float DeltaTime)
 	float MAXHP = CombatComponent->Max_Health;
 
 	SetHpPercentage(HP, MAXHP);
+
+	// 게임이 끝나면 로직 끊기
+	AWGameState* WGS = Cast<AWGameState>(GetWorld()->GetGameState());
+	if (WGS && WGS->IsGameEnd)
+	{
+		AWMinionsAIController* MinionController = Cast<AWMinionsAIController>(GetController());
+		if(MinionController)
+			MinionController->GetBrainComponent()->StopLogic(TEXT("None"));
+	}
 }
 
 void AWMinionsCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

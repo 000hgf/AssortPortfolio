@@ -29,6 +29,9 @@ void AWPlayerController::BeginPlay()
 void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 {
 	Super::GameHasEnded(EndGameFocus, bIsWinner);
+	if(PlayerHUD)
+		PlayerHUD->RemoveFromViewport();
+
 	if (bIsWinner)
 	{
 		SetShowMouseCursor(true);

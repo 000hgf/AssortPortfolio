@@ -53,7 +53,6 @@ ATower::ATower()
 void ATower::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ATower::Tick(float DeltaTime)
@@ -64,35 +63,12 @@ void ATower::Tick(float DeltaTime)
 	{
 
 		TargetOfActors = OverlappingActors[0];
+
+
 		NiagaraComponent->SetVectorParameter("Beam End", (TargetOfActors->GetActorLocation()) - AttackStartPoint->GetComponentLocation());
 		NiagaraComponent->SetVisibility(true);
 
-		// 라인 트레이스
-	/*	UKismetSystemLibrary::LineTraceMulti(
-			GetWorld(),
-			AttackStartPoint->GetComponentLocation(),
-			TargetOfActors->GetActorLocation(),
-			TraceChannel,
-			false,
-			ActorsToIgnore,
-			EDrawDebugTrace::ForOneFrame,
-			OutHits,
-			true
-		);*/
-
-		/*AttackStartPoint->K2_LineTraceComponent(
-			AttackStartPoint->GetComponentLocation(),
-			TargetOfActors->GetActorLocation(),
-			true,
-			true,
-			false,
-			HitLocation,
-			HitNormal,
-			BoneName,
-			OutHit
-		);*/
-
-		// 2초마다 한번씩 스폰
+		// 공격 2초마다 한번씩 스폰
 		Delta += DeltaTime;
 		if(Delta >= 2)
 		{

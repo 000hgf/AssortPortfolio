@@ -30,19 +30,16 @@ float ANexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 		if ((CombatComp->GetIsDead()))
 		{
-			DefaultSceneRootComponent->SetVisibility(false, true);
+			//DefaultSceneRootComponent->SetVisibility(false, true);
 			AWGameState* WGameState = GetWorld()->GetGameState<AWGameState>();
 			if (WGameState!=nullptr)
 			{
 				WGameState->HandleNexusDestroyed();
 			}
-			Destroy();
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]() {Destroy(); GetWorld()->GetTimerManager().ClearTimer(TimerHandle); }, 1.5f, false);
 		}
 	}
-	/*auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"),
-	TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
-
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);*/
 
 	return DamageAmount;
 }
