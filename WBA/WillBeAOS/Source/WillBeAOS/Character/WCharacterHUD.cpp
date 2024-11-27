@@ -33,7 +33,17 @@ void UWCharacterHUD::UpdateCharacter(AWCharacterBase* Char)
 	if (AWC)
 	{
 		AWC->DSkillLCooldown.BindUObject(this, &ThisClass::SetSkillLTimer);
+		AWC->DSkillRCooldown.BindUObject(this, &ThisClass::SetSkillRTimer);
 	}
+	// Initialize Skill L Data
+	SkillLData.SkillCooldown = SkillLCooldown;
+	SkillLData.SkillProgress = Skill_LProgress;
+	SkillLData.SkillTimer = Skill_LTimer;
+
+	// Initialize Skill R Data
+	SkillRData.SkillCooldown = SkillRCooldown;
+	SkillRData.SkillProgress = Skill_RProgress;
+	SkillRData.SkillTimer = Skill_RTimer;
 }
 
 float UWCharacterHUD::GetHealthBarPercentage()
@@ -87,42 +97,94 @@ FText UWCharacterHUD::UpdateGameTimer()
 //	return 0.0f;
 //}
 
+void UWCharacterHUD::SetSkillTimer(FSkillCooldownData& SkillData)
+{
+	SkillData.CurrentSkillCooldown = SkillData.SkillCooldown;
+}
+
+FText UWCharacterHUD::ShowSkillTimer(FSkillCooldownData& SkillData)
+{
+	FString CooldownString;
+	if(SkillData.CurrentSkillCooldown<1)
+	{
+		CooldownString = FString::Printf(TEXT("%.1f"), SkillData.CurrentSkillCooldown);
+	}
+	else CooldownString = FString::Printf(TEXT("%d"), int32 (SkillData.CurrentSkillCooldown));
+	return FText::FromString(CooldownString);
+}
+
+float UWCharacterHUD::ShowSkillProgress(FSkillCooldownData& SkillData)
+{
+	return SkillData.CurrentSkillCooldown / SkillData.SkillCooldown;
+}
+
+
 void UWCharacterHUD::SetSkillLTimer()
 {
-	CurrentSkillLCooldown = SkillLCooldown;
-	GetWorld()->GetTimerManager().SetTimer(CooldownTimerHandle, this, &ThisClass::UpdateSkillLTimer, 0.1f, true);
+	SetSkillTimer(SkillLData);
+	GetWorld()->GetTimerManager().SetTimer(CooldownLTimerHandle, this, &ThisClass::UpdateSkillLTimer, 0.1f, true);
 }
 
 FText UWCharacterHUD::ShowSkillLTimer()
 {
-	FString CooldownString = FString::Printf(TEXT("%.1f"), CurrentSkillLCooldown);
-	return FText::FromString(CooldownString);
+	return ShowSkillTimer(SkillLData);
 }
 
 float UWCharacterHUD::ShowSkillLProgress()
 {
-	return CurrentSkillLCooldown/SkillLCooldown;
+	return ShowSkillProgress(SkillLData);
 }
 
 void UWCharacterHUD::UpdateSkillLTimer()
 {
-	//0으로 지정할시 -0.1에 clear됨...
-	//왜지...
-	//0.1f에 지정했더니 0.0에 제대로 들어감
-
-	if (CurrentSkillLCooldown <= 0.1f)
+	if (SkillLData.CurrentSkillCooldown <= 0.1f)
 	{
-		GetWorld()->GetTimerManager().ClearTimer(CooldownTimerHandle);
-		Skill_LProgress->SetVisibility(ESlateVisibility::Hidden);
-		Skill_LTimer->SetVisibility(ESlateVisibility::Hidden);
+		GetWorld()->GetTimerManager().ClearTimer(CooldownLTimerHandle);
+		SkillLData.SkillProgress->SetVisibility(ESlateVisibility::Hidden);
+		SkillLData.SkillTimer->SetVisibility(ESlateVisibility::Hidden);
 	}
 	else
 	{
-		CurrentSkillLCooldown -= 0.1f;
-		Skill_LProgress->SetVisibility(ESlateVisibility::Visible);
-		Skill_LTimer->SetVisibility(ESlateVisibility::Visible);
+		SkillLData.CurrentSkillCooldown -= 0.1f;
+		SkillLData.SkillProgress->SetVisibility(ESlateVisibility::Visible);
+		SkillLData.SkillTimer->SetVisibility(ESlateVisibility::Visible);
 	}
+}
 
+void UWCharacterHUD::SetSkillRTimer()
+{
+	SetSkillTimer(SkillRData);
+	GetWorld()->GetTimerManager().SetTimer(CooldownRTimerHandle, this, &ThisClass::UpdateSkillRTimer, 0.1f, true);
+}
+
+FText UWCharacterHUD::ShowSkillRTimer()
+{
+	return ShowSkillTimer(SkillRData);
+}
+
+float UWCharacterHUD::ShowSkillRProgress()
+{
+	return ShowSkillProgress(SkillRData);
+}
+
+void UWCharacterHUD::UpdateSkillRTimer()
+{
+	if (SkillRData.CurrentSkillCooldown <= 0.1f)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(CooldownRTimerHandle);
+		SkillRData.SkillProgress->SetVisibility(ESlateVisibility::Hidden);
+		SkillRData.SkillTimer->SetVisibility(ESlateVisibility::Hidden);
+		if (AWC)
+		{
+			AWC->SkillREnable = false;
+		}
+	}
+	else
+	{
+		SkillRData.CurrentSkillCooldown -= 0.1f;
+		SkillRData.SkillProgress->SetVisibility(ESlateVisibility::Visible);
+		SkillRData.SkillTimer->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 FText UWCharacterHUD::SetPower()

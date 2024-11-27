@@ -41,6 +41,8 @@ public:
 	UInputAction* IA_Jump;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_Behavior;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* IA_SkillR;
 
 	UPROPERTY(BlueprintReadonly)
 	bool IsDead;
@@ -51,11 +53,15 @@ public:
 	UAnimMontage* HitAnimMontage;	//피격시 쓰일 몽타주
 	UPROPERTY(BlueprintReadWrite, Category = Combo)
 	TArray<UAnimMontage*> AttackMontages = {};	//콤보에 쓰일 애님몽타주 배열
-	
+	UPROPERTY(BlueprintReadWrite, Category = Combo)
+	UAnimMontage* SkillRMontage;//R스킬에 쓰일 몽타주
+
 	//입력 액션
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
 	void Behavior(const FInputActionValue& Value);
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void SkillR(const FInputActionValue& Value);
 
 	//델리게이트 함수
 	UFUNCTION(BlueprintCallable, Category = Dead)
@@ -67,6 +73,8 @@ public:
 
 	//델리게이트 정의
 	FDS_SkillLCooldown DSkillLCooldown;
+	FDS_SkillLCooldown DSkillRCooldown;
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -80,4 +88,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UFUNCTION(BlueprintCallable)
 	float GetHpPercentage();
+	UPROPERTY(BlueprintReadWrite, Category = "Skill")//차후 수정
+	bool SkillREnable;
 };

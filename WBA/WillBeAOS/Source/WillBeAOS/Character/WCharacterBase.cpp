@@ -81,6 +81,8 @@ void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AWCharacterBase::Move);
 		EnhancedInputComponent->BindAction(IA_Behavior, ETriggerEvent::Started, this, &AWCharacterBase::Behavior);
+		EnhancedInputComponent->BindAction(IA_SkillR, ETriggerEvent::Started, this, &AWCharacterBase::SkillR);
+
 	}
 }
 
@@ -141,6 +143,33 @@ void AWCharacterBase::Behavior(const FInputActionValue& Value)
 		}
 	}
 }
+
+void AWCharacterBase::SkillR(const FInputActionValue& Value)
+{
+	if (CombatComp != nullptr)
+	{
+		//공격중이 아닐시
+		if ((CombatComp->IsCombatEnable() == false))
+		{
+			if (SkillREnable == false) 
+			{
+				//공격중 활성화
+				CombatComp->SetCombatEnable(true);
+				//스킬R사용
+				SkillREnable = true;
+
+				DSkillRCooldown.ExecuteIfBound();
+				//몽타주 실행
+				if ((CombatComp->GetAttackCount()) < AttackMontages.Num())
+				{
+					ACharacter::PlayAnimMontage(SkillRMontage);
+				}
+			}
+		}
+	}
+}
+
+
 
 void AWCharacterBase::BeingDead()
 {
