@@ -24,6 +24,9 @@ ATower::ATower()
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	SetRootComponent(DefaultSceneRoot);
 
+	DamagedNiagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("DamagedParticle"));
+	DamagedNiagara->SetupAttachment(GetRootComponent());
+
 	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraParticleSystem"));
 	NiagaraComponent->SetupAttachment(GetRootComponent());
 
@@ -53,7 +56,6 @@ ATower::ATower()
 void ATower::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ATower::Tick(float DeltaTime)
@@ -64,35 +66,12 @@ void ATower::Tick(float DeltaTime)
 	{
 
 		TargetOfActors = OverlappingActors[0];
-		NiagaraComponent->SetVectorParameter("Beam End", (TargetOfActors->GetActorLocation()) - AttackStartPoint->GetComponentLocation());
+
+
+		NiagaraComponent->SetVectorParameter("Beam End001", (TargetOfActors->GetActorLocation()) - AttackStartPoint->GetComponentLocation());
 		NiagaraComponent->SetVisibility(true);
 
-		// 라인 트레이스
-	/*	UKismetSystemLibrary::LineTraceMulti(
-			GetWorld(),
-			AttackStartPoint->GetComponentLocation(),
-			TargetOfActors->GetActorLocation(),
-			TraceChannel,
-			false,
-			ActorsToIgnore,
-			EDrawDebugTrace::ForOneFrame,
-			OutHits,
-			true
-		);*/
-
-		/*AttackStartPoint->K2_LineTraceComponent(
-			AttackStartPoint->GetComponentLocation(),
-			TargetOfActors->GetActorLocation(),
-			true,
-			true,
-			false,
-			HitLocation,
-			HitNormal,
-			BoneName,
-			OutHit
-		);*/
-
-		// 2초마다 한번씩 스폰
+		// 공격 2초마다 한번씩 스폰
 		Delta += DeltaTime;
 		if(Delta >= 2)
 		{
@@ -126,6 +105,14 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		CombatComp->HandleTakeDamage(TakeDamage);
 
 		SetHpPercentage((CombatComp->Health), (CombatComp->Max_Health));
+
+		// 타워의 HP가 일정 이하로 떨어지면 데미지 받은 메쉬로 바꾸고 파티클 생성
+		if (CombatComp->Health <= (CombatComp->Max_Health / 2) && !IsParticleSpawned)
+		{
+			StaticMesh->SetStaticMesh(DamagedStaticMesh);
+			DamagedNiagara->SetAsset(DamageParticle);
+			IsParticleSpawned = true;
+		}
 
 		if ((CombatComp->GetIsDead()))
 		{

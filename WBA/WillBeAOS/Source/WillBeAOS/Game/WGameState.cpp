@@ -71,6 +71,8 @@ int32 AWGameState::GetTowerNum()
 
 void AWGameState::HandleNexusDestroyed()
 {
+    IsGameEnd = true;
+
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Nexus Destroyed!"));

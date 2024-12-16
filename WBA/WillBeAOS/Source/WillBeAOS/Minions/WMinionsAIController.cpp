@@ -11,8 +11,8 @@ void AWMinionsAIController::BeginPlay()
 		RunBehaviorTree(MinionBT);
 
 		// 플레이어 폰 저장
-		/*APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-		SetFocus(PlayerPawn);*/
+		//APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+		//SetFocus(PlayerPawn);
 	}
 }
 

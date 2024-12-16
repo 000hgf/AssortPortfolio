@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "WPlayerController.h"
 #include "WCharacterHUD.h"
+#include "Components/SceneComponent.h"
 
 
 AWCharacterBase::AWCharacterBase()
@@ -179,7 +180,8 @@ void AWCharacterBase::BeingDead()
 	{
 		PC->ShowRespawnWidget(); 
 	}
-
+	//죽으면 카메라 움직임에 메쉬 따라 움직이지 않게 하기
+	this->bUseControllerRotationYaw = false;
 	////죽음 메세지 출력
 	auto Message = FString::Printf(TEXT("Dead"));
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);

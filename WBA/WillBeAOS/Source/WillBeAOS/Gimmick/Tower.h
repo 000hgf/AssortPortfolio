@@ -32,7 +32,7 @@ public:
 	class UNiagaraComponent* NiagaraComponent;
 	UPROPERTY(EditAnywhere)
 	USphereComponent* OverlapTrigger;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* StaticMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* AttackStartPoint;
@@ -40,6 +40,14 @@ public:
 	class UWidgetComponent* WidgetComponent;
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* CombatComp;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UNiagaraComponent* DamagedNiagara;
+
+	UPROPERTY(BlueprintReadWrite)
+	class UStaticMesh* DamagedStaticMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UNiagaraSystem* DamageParticle;
+	bool IsParticleSpawned = false;
 
 	UPROPERTY(BlueprintReadWrite, Category = SpawnActor)
 	TSubclassOf<AActor> SpawnActors;
