@@ -11,20 +11,20 @@ class WILLBEAOS_API AWPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
-	//ÀÌ±è À§Á¬
+	//ì´ê¹€ ìœ„ì ¯
 	UPROPERTY(EditAnywhere, Category = "Widget")
 	TSubclassOf< UUserWidget> WinScreenClass;
-	//ÆĞ¹è À§Á¬
+	//íŒ¨ë°° ìœ„ì ¯
 	UPROPERTY(EditAnywhere, Category = "Widget")
 	TSubclassOf< UUserWidget> LoseScreenClass;
-	//Á×À½ À§Á¬
+	//ì£½ìŒ ìœ„ì ¯
 	UPROPERTY(EditAnywhere, Category = "Widget")
 	TSubclassOf< UUserWidget> DeathScreenClass;
-	// ¸®½ºÆù À§Á¬
+	// ë¦¬ìŠ¤í° ìœ„ì ¯
 	UPROPERTY(EditAnywhere, Category = Widget)
 	TSubclassOf<UUserWidget> RespawnScreenClass;
 
-	// UserWidget Å¬·¡½ºÀÇ Å¸ÀÔÀ» ÀúÀåÇÏ´Â º¯¼ö
+	// UserWidget í´ë˜ìŠ¤ì˜ íƒ€ì…ì„ ì €ì¥í•˜ëŠ” ë³€ìˆ˜
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> UserWidgetClass;
 
@@ -35,7 +35,7 @@ class WILLBEAOS_API AWPlayerController : public APlayerController
 	class AWCharacterBase* AWC;
 
 public:
-	//¸®½ºÆù½Ã ÇÊ¿äÇÑ
+	//ë¦¬ìŠ¤í°ì‹œ í•„ìš”í•œ
 	UPROPERTY(BlueprintReadWrite)
 	int RespawnTime = 5;
 	UPROPERTY(BlueprintReadWrite)
@@ -46,7 +46,7 @@ public:
 
 public:
 
-	//¸®½ºÆù ÇÔ¼ö(PlayerController->GameHasEnded())
+	//ë¦¬ìŠ¤í° í•¨ìˆ˜(PlayerController->GameHasEnded())
 	virtual void GameHasEnded(class AActor* EndGameFocus = nullptr, bool bIsWinner = false) override;
 	void ShowRespawnWidget();
 	void UpdateRespawnWidget();

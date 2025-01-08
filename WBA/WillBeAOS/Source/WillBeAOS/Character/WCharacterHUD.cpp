@@ -138,6 +138,9 @@ float UWCharacterHUD::ShowSkillLProgress()
 void UWCharacterHUD::UpdateSkillLTimer()
 {
 	if (SkillLData.CurrentSkillCooldown <= 0.1f)
+	//0으로 지정할시 -0.1에 clear됨...
+	//왜지...
+	//0.1f에 지정했더니 0.0에 제대로 들어감
 	{
 		GetWorld()->GetTimerManager().ClearTimer(CooldownLTimerHandle);
 		SkillLData.SkillProgress->SetVisibility(ESlateVisibility::Hidden);

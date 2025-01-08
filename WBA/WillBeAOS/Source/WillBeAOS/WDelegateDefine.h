@@ -1,26 +1,26 @@
 #pragma once
 
-#include "Delegates/DelegateCombinations.h" // µ¨¸®°ÔÀÌÆ® ¸ÅÅ©·Î°¡ Á¤ÀÇµÈ Çì´õ
+#include "Delegates/DelegateCombinations.h" // ë¸ë¦¬ê²Œì´íŠ¸ ë§¤í¬ë¡œê°€ ì •ì˜ëœ í—¤ë”
 
 //-----------------------------------------------------------------------------------
-// ´ÜÀÏ ¿ÀºêÁ§Æ® ¹ÙÀÎµù¿ë
+// ë‹¨ì¼ ì˜¤ë¸Œì íŠ¸ ë°”ì¸ë”©ìš©
 
-// ±âº» µ¨¸®°ÔÀÌÆ®
+// ê¸°ë³¸ ë¸ë¦¬ê²Œì´íŠ¸
 DECLARE_DELEGATE(FDelegateSignature)
 DECLARE_DELEGATE(FDS_SkillLCooldown)
 
-// ±âº» µ¨¸®°ÔÀÌÆ®¿¡ ÀÎÀÚ 1°³¸¦ Àü´Þ
+// ê¸°ë³¸ ë¸ë¦¬ê²Œì´íŠ¸ì— ì¸ìž 1ê°œë¥¼ ì „ë‹¬
 DECLARE_DELEGATE_OneParam(FDelegateSignatureParam1, FLinearColor)
-// ±âº» µ¨¸®°ÔÀÌÆ®¿¡ ÀÎÀÚ 2°³¸¦ Àü´Þ
+// ê¸°ë³¸ ë¸ë¦¬ê²Œì´íŠ¸ì— ì¸ìž 2ê°œë¥¼ ì „ë‹¬
 DECLARE_DELEGATE_TwoParams(FDelegateSignatureParam2, FLinearColor, int32)
 
 //-----------------------------------------------------------------------------------
-// ¸ÖÆ¼ ¿ÀºêÁ§Æ® ¹ÙÀÎµù¿ë
+// ë©€í‹° ì˜¤ë¸Œì íŠ¸ ë°”ì¸ë”©ìš©
 
-// ¸ÖÆ¼Ä³½ºÆ® µ¨¸®°ÔÀÌÆ®
+// ë©€í‹°ìºìŠ¤íŠ¸ ë¸ë¦¬ê²Œì´íŠ¸
 DECLARE_MULTICAST_DELEGATE(FMulticastDelegateSignature)
-// ¸ÖÆ¼Ä³½ºÆ® µ¨¸®°ÔÀÌÆ®¿¡ ÀÎÀÚ 1°³¸¦ Àü´Þ
+// ë©€í‹°ìºìŠ¤íŠ¸ ë¸ë¦¬ê²Œì´íŠ¸ì— ì¸ìž 1ê°œë¥¼ ì „ë‹¬
 DECLARE_MULTICAST_DELEGATE_OneParam(FMulticastDelegateSignature1, int32)
 DECLARE_MULTICAST_DELEGATE_OneParam(FMDS1, FHitResult)
-// ¸ÖÆ¼Ä³½ºÆ® µ¨¸®°ÔÀÌÆ®¿¡ ÀÎÀÚ 2°³¸¦ Àü´Þ
+// ë©€í‹°ìºìŠ¤íŠ¸ ë¸ë¦¬ê²Œì´íŠ¸ì— ì¸ìž 2ê°œë¥¼ ì „ë‹¬
 DECLARE_MULTICAST_DELEGATE_TwoParams(FMulticastDelegateSignature2, FLinearColor, int32)

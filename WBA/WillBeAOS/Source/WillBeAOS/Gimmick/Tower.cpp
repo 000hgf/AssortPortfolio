@@ -48,7 +48,7 @@ ATower::ATower()
 
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 
-	// Æ¯Á¤ ¿ä¼ÒÀÇ ¿À¹ö·¦ ÇÔ¼ö ¹ÙÀÎµåÇÏ±â ( OverlapTriggerÀÇ )
+	// íŠ¹ì • ìš”ì†Œì˜ ì˜¤ë²„ë© í•¨ìˆ˜ ë°”ì¸ë“œí•˜ê¸° ( OverlapTriggerì˜ )
 	OverlapTrigger->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
 	OverlapTrigger->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlap);
 }
@@ -71,7 +71,7 @@ void ATower::Tick(float DeltaTime)
 		NiagaraComponent->SetVectorParameter("Beam End001", (TargetOfActors->GetActorLocation()) - AttackStartPoint->GetComponentLocation());
 		NiagaraComponent->SetVisibility(true);
 
-		// °ø°İ 2ÃÊ¸¶´Ù ÇÑ¹ø¾¿ ½ºÆù
+		// ê³µê²© 2ì´ˆë§ˆë‹¤ í•œë²ˆì”© ìŠ¤í°
 		Delta += DeltaTime;
 		if(Delta >= 2)
 		{
@@ -81,7 +81,7 @@ void ATower::Tick(float DeltaTime)
 			Delta = 0;
 		}
 
-		// ³ªÀÇ °í»ıµé...
+		// ë‚˜ì˜ ê³ ìƒë“¤...
 		//FTimerHandle handle;
 		//FActorSpawnParameters SpawnParams;
 		//FTimerDelegate TimerCallback;
@@ -106,7 +106,7 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 		SetHpPercentage((CombatComp->Health), (CombatComp->Max_Health));
 
-		// Å¸¿öÀÇ HP°¡ ÀÏÁ¤ ÀÌÇÏ·Î ¶³¾îÁö¸é µ¥¹ÌÁö ¹ŞÀº ¸Ş½¬·Î ¹Ù²Ù°í ÆÄÆ¼Å¬ »ı¼º
+		// íƒ€ì›Œì˜ HPê°€ ì¼ì • ì´í•˜ë¡œ ë–¨ì–´ì§€ë©´ ë°ë¯¸ì§€ ë°›ì€ ë©”ì‰¬ë¡œ ë°”ê¾¸ê³  íŒŒí‹°í´ ìƒì„±
 		if (CombatComp->Health <= (CombatComp->Max_Health / 2) && !IsParticleSpawned)
 		{
 			StaticMesh->SetStaticMesh(DamagedStaticMesh);
@@ -146,7 +146,7 @@ void ATower::OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActo
 	OverlappingActors.Remove(OtherActor);
 
 
-	// Å¸±ê ¹è¿­ÀÌ ºñ¾îÀÖÀ¸¸é ½ºÆù ½Ã°£ ÃÊ±âÈ­ ¹× Niagara ºñÈ°¼ºÈ­
+	// íƒ€ê¹ƒ ë°°ì—´ì´ ë¹„ì–´ìˆìœ¼ë©´ ìŠ¤í° ì‹œê°„ ì´ˆê¸°í™” ë° Niagara ë¹„í™œì„±í™”
 	if (OverlappingActors.IsEmpty())
 	{
 		Delta = 0;
