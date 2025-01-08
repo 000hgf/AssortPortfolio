@@ -16,7 +16,7 @@ class WILLBEAOS_API AWCharacterBase : public ACharacter
 
 	GENERATED_BODY()
 
-	//ÄÄÆ÷³ÍÆ®
+	//ì»´í¬ë„ŒíŠ¸
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"));
 	class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"));
@@ -30,7 +30,7 @@ public:
 
 public:
 	AWCharacterBase();
-	//ÀÔ·Â ¿¡¼Â
+	//ì…ë ¥ ì—ì…‹
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputMappingContext* IMC_Asset;
 	UPROPERTY(EditAnywhere, Category = Input)
@@ -46,33 +46,33 @@ public:
 	bool IsDead;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Health")
-	UAnimMontage* DeadAnimMontage;	//Á×À»¶§ ¾²ÀÏ ¸ùÅ¸ÁÖ
+	UAnimMontage* DeadAnimMontage;	//ì£½ì„ë•Œ ì“°ì¼ ëª½íƒ€ì£¼
 	UPROPERTY(BlueprintReadWrite, Category = "Health")
-	UAnimMontage* HitAnimMontage;	//ÇÇ°İ½Ã ¾²ÀÏ ¸ùÅ¸ÁÖ
+	UAnimMontage* HitAnimMontage;	//í”¼ê²©ì‹œ ì“°ì¼ ëª½íƒ€ì£¼
 	UPROPERTY(BlueprintReadWrite, Category = Combo)
-	TArray<UAnimMontage*> AttackMontages = {};	//ÄŞº¸¿¡ ¾²ÀÏ ¾Ö´Ô¸ùÅ¸ÁÖ ¹è¿­
+	TArray<UAnimMontage*> AttackMontages = {};	//ì½¤ë³´ì— ì“°ì¼ ì• ë‹˜ëª½íƒ€ì£¼ ë°°ì—´
 	
-	//ÀÔ·Â ¾×¼Ç
+	//ì…ë ¥ ì•¡ì…˜
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
 	void Behavior(const FInputActionValue& Value);
 
-	//µ¨¸®°ÔÀÌÆ® ÇÔ¼ö
+	//ë¸ë¦¬ê²Œì´íŠ¸ í•¨ìˆ˜
 	UFUNCTION(BlueprintCallable, Category = Dead)
-	void BeingDead();//Á×À»¶§ µ¨¸®°ÔÀÌÆ®·Î È£ÃâµÉ ÇÔ¼ö
+	void BeingDead();//ì£½ì„ë•Œ ë¸ë¦¬ê²Œì´íŠ¸ë¡œ í˜¸ì¶œë  í•¨ìˆ˜
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-	void HandleApplyPointDamage(FHitResult LastHit);//Æ÷ÀÎÆ® µ¥¹ÌÁö¸¦ ÁÙ½Ã µ¨¸®°ÔÀÌÆ®·Î È£ÃâµÉ ÇÔ¼ö
-	UFUNCTION(BlueprintCallable, Category = "Combat")//TakeDamage ÇÔ¼ö ¿À¹ö¶óÀÌµå
+	void HandleApplyPointDamage(FHitResult LastHit);//í¬ì¸íŠ¸ ë°ë¯¸ì§€ë¥¼ ì¤„ì‹œ ë¸ë¦¬ê²Œì´íŠ¸ë¡œ í˜¸ì¶œë  í•¨ìˆ˜
+	UFUNCTION(BlueprintCallable, Category = "Combat")//TakeDamage í•¨ìˆ˜ ì˜¤ë²„ë¼ì´ë“œ
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
-	//µ¨¸®°ÔÀÌÆ® Á¤ÀÇ
+	//ë¸ë¦¬ê²Œì´íŠ¸ ì •ì˜
 	FDS_SkillLCooldown DSkillLCooldown;
 
 protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
-	float CharacterDamage;	//µ¥¹ÌÁö
+	float CharacterDamage;	//ë°ë¯¸ì§€
 	
 public:	
 	virtual void Tick(float DeltaTime) override;

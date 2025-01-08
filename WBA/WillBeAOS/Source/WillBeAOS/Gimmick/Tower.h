@@ -58,7 +58,7 @@ public:
 	FVector HitNormal;
 	FName BoneName;
 	FHitResult OutHit;
-	// ¿À¹ö·¦µÈ ¾×ÅÍµéÀÇ ¹è¿­ ( °ø°İ ´ë»óµé )
+	// ì˜¤ë²„ë©ëœ ì•¡í„°ë“¤ì˜ ë°°ì—´ ( ê³µê²© ëŒ€ìƒë“¤ )
 	UPROPERTY(BlueprintReadWrite, Category = SpawnActor)
 	TArray<AActor*> OverlappingActors = {};
 

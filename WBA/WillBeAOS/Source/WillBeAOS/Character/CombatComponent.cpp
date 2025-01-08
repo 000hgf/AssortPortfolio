@@ -88,10 +88,10 @@ void UCombatComponent::SetCollisionMesh(UPrimitiveComponent* PrimComp)
 
 void UCombatComponent::CollisionTrace()
 {
-	//HitResults ¹è¿­ ¼±¾ğ
+	//HitResults ë°°ì—´ ì„ ì–¸
 	TArray<FHitResult> OutHits = {};
 
-	//SphereTraceMultForObjectsÇÔ¼ö·Î Æ®·¹ÀÌ½º
+	//SphereTraceMultForObjectsí•¨ìˆ˜ë¡œ íŠ¸ë ˆì´ìŠ¤
 	bool Hit = UKismetSystemLibrary::SphereTraceMultiForObjects(
 		GetWorld(),
 		CollisionMeshComponent->GetSocketLocation(StartSocket),
@@ -115,11 +115,11 @@ void UCombatComponent::CollisionTrace()
 			AActor* HitActor = LastHit.GetActor();
 			if (HitActor && !AlreadyHitActors.Contains(HitActor))
 			{
-				// »õ·Î¿î È÷Æ® ¿ÀºêÁ§Æ®ÀÎ °æ¿ì
+				// ìƒˆë¡œìš´ íˆíŠ¸ ì˜¤ë¸Œì íŠ¸ì¸ ê²½ìš°
 				UE_LOG(LogTemp, Log, TEXT("Hit: %s"), *LastHit.GetActor()->GetName());
-				// AlreadyHitActors¿¡ Ãß°¡
+				// AlreadyHitActorsì— ì¶”ê°€
 				AlreadyHitActors.Add(HitActor);
-				//µ¨¸®°ÔÀÌÆ® ÇÔ¼ö È£Ãâ
+				//ë¸ë¦¬ê²Œì´íŠ¸ í•¨ìˆ˜ í˜¸ì¶œ
 				DelegatePointDamage.Broadcast(LastHit);
 			}
 		}

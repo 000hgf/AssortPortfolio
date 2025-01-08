@@ -44,9 +44,9 @@ AWCharacterBase::AWCharacterBase()
 void AWCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	//BeingDead µ¨¸®°ÔÀÌÆ® ¹ÙÀÎµù
+	//BeingDead ë¸ë¦¬ê²Œì´íŠ¸ ë°”ì¸ë”©
 	CombatComp->DelegateDead.BindUObject(this, &ThisClass::BeingDead);
-	//HandleApplyPointDamage ¸ÖÆ¼µ¨¸®°ÔÀÌÆ® ¹ÙÀÎµù
+	//HandleApplyPointDamage ë©€í‹°ë¸ë¦¬ê²Œì´íŠ¸ ë°”ì¸ë”©
 	CombatComp->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
 }
 		//Char->PlayAnimMontage(HitAnimMontage); 
@@ -64,7 +64,7 @@ void AWCharacterBase::Tick(float DeltaTime)
 void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 
-	// IMC ¼¼ÆÃ
+	// IMC ì„¸íŒ…
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
 		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
@@ -74,7 +74,7 @@ void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		}
 	}
 
-	// InputAction ºÙÀÌ±â
+	// InputAction ë¶™ì´ê¸°
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AWCharacterBase::Look);
@@ -85,7 +85,7 @@ void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	}
 }
 
-float AWCharacterBase::GetHpPercentage()	// HP °ÔÀÌÁö ¾÷µ¥ÀÌÆ®
+float AWCharacterBase::GetHpPercentage()	// HP ê²Œì´ì§€ ì—…ë°ì´íŠ¸
 {
 	return (CombatComp->Health / CombatComp->Max_Health);
 }
@@ -123,13 +123,13 @@ void AWCharacterBase::Behavior(const FInputActionValue& Value)
 	CombatComp->SetCollisionMesh(GetMesh());
 	if (CombatComp != nullptr)
 	{
-		//°ø°İÁßÀÌ ¾Æ´Ò½Ã
+		//ê³µê²©ì¤‘ì´ ì•„ë‹ì‹œ
 		if ((CombatComp->IsCombatEnable() == false))
 		{
-			//°ø°İÁß È°¼ºÈ­
+			//ê³µê²©ì¤‘ í™œì„±í™”
 			CombatComp->SetCombatEnable(true);
 			DSkillLCooldown.ExecuteIfBound();
-			//ÄŞº¸ ·ÎÁ÷
+			//ì½¤ë³´ ë¡œì§
 			if ((CombatComp->GetAttackCount()) < AttackMontages.Num())
 			{
 				ACharacter::PlayAnimMontage(AttackMontages[(CombatComp->GetAttackCount())]);
@@ -145,25 +145,25 @@ void AWCharacterBase::Behavior(const FInputActionValue& Value)
 
 void AWCharacterBase::BeingDead()
 {
-	// ¸®½ºÆù À§Á¬ Ãâ·Â
+	// ë¦¬ìŠ¤í° ìœ„ì ¯ ì¶œë ¥
 	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
 	if (PC)
 	{
 		PC->ShowRespawnWidget(); 
 	}
-	//Á×À¸¸é Ä«¸Ş¶ó ¿òÁ÷ÀÓ¿¡ ¸Ş½¬ µû¶ó ¿òÁ÷ÀÌÁö ¾Ê°Ô ÇÏ±â
+	//ì£½ìœ¼ë©´ ì¹´ë©”ë¼ ì›€ì§ì„ì— ë©”ì‰¬ ë”°ë¼ ì›€ì§ì´ì§€ ì•Šê²Œ í•˜ê¸°
 	this->bUseControllerRotationYaw = false;
-	////Á×À½ ¸Ş¼¼Áö Ãâ·Â
+	////ì£½ìŒ ë©”ì„¸ì§€ ì¶œë ¥
 	auto Message = FString::Printf(TEXT("Dead"));
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
-	//¹«ºê¸ÕÆ®, Äİ¸®Àü ¾ø¾Ö°í ¸ùÅ¸ÁÖ Ãâ·Â
+	//ë¬´ë¸Œë¨¼íŠ¸, ì½œë¦¬ì „ ì—†ì• ê³  ëª½íƒ€ì£¼ ì¶œë ¥
 	ACharacter::GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	ACharacter::GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ACharacter::GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	ACharacter::PlayAnimMontage(DeadAnimMontage);
 }
 
-//Æ÷ÀÎÆ® µ¥¹ÌÁö ÁÖ´Â ÇÔ¼ö
+//í¬ì¸íŠ¸ ë°ë¯¸ì§€ ì£¼ëŠ” í•¨ìˆ˜
 void AWCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
 {
 	UGameplayStatics::ApplyPointDamage(
