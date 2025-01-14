@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WEnumFile.h"
 #include "GameFramework/Actor.h"
 #include "Nexus.generated.h"
 
@@ -14,6 +15,9 @@ public:
 
 	float GetNexusHPPercent();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
+	E_TeamID NexusTeamID = E_TeamID::Neutral;
+	
 protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(VisibleAnywhere)
@@ -26,8 +30,6 @@ protected:
 	class UCombatComponent* CombatComp;
 
 public:	
-	virtual void Tick(float DeltaTime) override;
-	
 	ANexus();
 
 };

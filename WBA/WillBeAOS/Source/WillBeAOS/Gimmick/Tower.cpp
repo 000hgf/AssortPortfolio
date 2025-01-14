@@ -19,6 +19,8 @@
 
 ATower::ATower()
 {
+	bReplicates = true;           // 이 액터가 복제되도록 설정
+	
 	PrimaryActorTick.bCanEverTick = true;
 
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
@@ -40,7 +42,7 @@ ATower::ATower()
 	CapsuleCollisionComponet->SetupAttachment(GetRootComponent());
 
 	AttackStartPoint = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AttackStartPoint"));
-	AttackStartPoint->SetupAttachment(NiagaraComponent);
+	AttackStartPoint->SetupAttachment(GetRootComponent());
 
 	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
 	WidgetComponent->SetupAttachment(GetRootComponent());
@@ -68,9 +70,14 @@ void ATower::Tick(float DeltaTime)
 		TargetOfActors = OverlappingActors[0];
 
 
-		NiagaraComponent->SetVectorParameter("Beam End001", (TargetOfActors->GetActorLocation()) - AttackStartPoint->GetComponentLocation());
+		FVector BeamStart = AttackStartPoint->GetComponentLocation(); // 빔 시작 위치
+		FVector BeamEnd = TargetOfActors->GetActorLocation();         // 빔 끝 위치
+		
+		NiagaraComponent->SetVectorParameter("MyBeamStart", BeamStart);
+		NiagaraComponent->SetVectorParameter("MyBeamEnd", BeamEnd);
 		NiagaraComponent->SetVisibility(true);
 
+		
 		// 공격 2초마다 한번씩 스폰
 		Delta += DeltaTime;
 		if(Delta >= 2)
@@ -135,7 +142,9 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 void ATower::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (Cast<AWCharacterBase>(OtherActor) || Cast<AWMinionsCharacterBase>(OtherActor))
+	AWCharacterBase* EnemyChar = Cast<AWCharacterBase>(OtherActor);
+	AWMinionsCharacterBase* EnemyMinion = Cast<AWMinionsCharacterBase>(OtherActor);
+	if ((EnemyChar && EnemyChar->TeamID != TowerTeamID))
 	{
 		OverlappingActors.AddUnique(OtherActor);
 	}

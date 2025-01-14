@@ -17,7 +17,9 @@ ANexus::ANexus()
 	NexusMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("NexusMesh"));
 	NexusMeshComponent->SetupAttachment(DefaultSceneRootComponent);
 
-	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));         
+	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	
+	bReplicates = true; 
 }
 
 float ANexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -53,11 +55,5 @@ void ANexus::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-void ANexus::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 

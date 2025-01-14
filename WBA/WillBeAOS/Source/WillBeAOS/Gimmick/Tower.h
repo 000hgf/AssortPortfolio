@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WEnumFile.h"
 #include "GameFramework/Actor.h"
 #include "Tower.generated.h"
 
@@ -12,17 +13,25 @@ class UStaticMeshComponent;
 UCLASS()
 class WILLBEAOS_API ATower : public AActor
 {
+
 	GENERATED_BODY()
 	
-public:	
+public:
+	
 	ATower();
+	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
+	E_TeamID TowerTeamID = E_TeamID::Neutral;
+	
 protected:
 	virtual void BeginPlay() override;
 
 	void SetHpPercentage(float Health, float MaxHealth);
+	
 public:	
 	UPROPERTY(EditAnywhere)
 	USceneComponent* DefaultSceneRoot;
@@ -42,18 +51,18 @@ public:
 	class UCombatComponent* CombatComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UNiagaraComponent* DamagedNiagara;
-
 	UPROPERTY(BlueprintReadWrite)
 	class UStaticMesh* DamagedStaticMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UNiagaraSystem* DamageParticle;
+	
 	bool IsParticleSpawned = false;
-
+	
+public:
 	UPROPERTY(BlueprintReadWrite, Category = SpawnActor)
 	TSubclassOf<AActor> SpawnActors;
 	UPROPERTY(BlueprintReadOnly, Category = SpawnActor)
 	AActor* TargetOfActors;
-	
 	FVector HitLocation;
 	FVector HitNormal;
 	FName BoneName;
@@ -61,17 +70,19 @@ public:
 	// 오버랩된 액터들의 배열 ( 공격 대상들 )
 	UPROPERTY(BlueprintReadWrite, Category = SpawnActor)
 	TArray<AActor*> OverlappingActors = {};
-
 	ETraceTypeQuery TraceChannel;
 	TArray<AActor*> ActorsToIgnore;
 	TArray<FHitResult> OutHits;
 
-
+private:
 	UFUNCTION(BlueprintCallable)
 	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION(BlueprintCallable)
 	virtual void OnEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
+	
+public:
+	
 	float Delta;
+	
 	void spawn();
 };

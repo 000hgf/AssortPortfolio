@@ -1,5 +1,12 @@
 #pragma once
 
+UENUM(BlueprintType)
+enum class E_TeamID : uint8
+{
+	Red			UMETA(DisplayName = "Red"),
+	Blue		UMETA(DisplayName = "Blue"),
+	Neutral		UMETA(DisplayName = "Neutral")
+};
 
 UENUM(BlueprintType)
 enum class E_CharacterState : uint8

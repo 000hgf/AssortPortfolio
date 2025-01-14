@@ -7,6 +7,15 @@
 class ATower;
 class ANexus;
 
+UENUM(BlueprintType)
+enum class E_GamePlay : uint8
+{
+	GameInit,
+	ReadyCountdown,
+	Gameplaying,
+	GameResult,
+};
+
 UCLASS()
 class WILLBEAOS_API AWGameState : public AGameState
 {
@@ -16,7 +25,7 @@ public:
 	virtual void BeginPlay();
 
 	float GetNexusHP();
-
+	
 	void GetTower();//필드의 타워객체들을 받아오는 함수
 					//추후 피아식별 후 따로 받아올 예정
 	UFUNCTION(BlueprintCallable, Category = "Tower")
@@ -29,6 +38,7 @@ public:
 	bool IsGameEnd = false;
 
 	void HandleNexusDestroyed();
+	
 	void HandlePlayIsDead();
 
 protected:

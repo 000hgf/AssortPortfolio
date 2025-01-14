@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "WDelegateDefine.h"
+#include "WEnumFile.h"
 #include "GameFramework/Character.h"
 #include "WCharacterBase.generated.h"
 
@@ -16,7 +17,7 @@ class WILLBEAOS_API AWCharacterBase : public ACharacter
 
 	GENERATED_BODY()
 
-	//ì»´í¬?ŒíŠ¸
+	//ì»´í¬?ï¿½íŠ¸
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"));
 	class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"));
@@ -27,10 +28,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UWidgetComponent* WidgetComponent;
 
-
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
+	E_TeamID TeamID = E_TeamID::Blue;
+	
 public:
 	AWCharacterBase();
-	//?…ë ¥ ?ì…‹
+
+private:
+	//?ï¿½ë ¥ ?ï¿½ì…‹
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputMappingContext* IMC_Asset;
 	UPROPERTY(EditAnywhere, Category = Input)
@@ -43,18 +49,19 @@ public:
 	UInputAction* IA_Behavior;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_SkillR;
-
+	
+public:
 	UPROPERTY(BlueprintReadonly)
 	bool IsDead;
-
+	
 	UPROPERTY(BlueprintReadWrite, Category = "Health")
-	UAnimMontage* DeadAnimMontage;	//ì£½ì„???°ì¼ ëª½í?ì£?
+	UAnimMontage* DeadAnimMontage;	//ì£½ì„???ï¿½ì¼ ëª½ï¿½?ï¿½?
 	UPROPERTY(BlueprintReadWrite, Category = "Health")
-	UAnimMontage* HitAnimMontage;	//?¼ê²©???°ì¼ ëª½í?ì£?
+	UAnimMontage* HitAnimMontage;	//?ï¿½ê²©???ï¿½ì¼ ëª½ï¿½?ï¿½?
 	UPROPERTY(BlueprintReadWrite, Category = Combo)
-	TArray<UAnimMontage*> AttackMontages = {};	//ÄŞº¸¿¡ ¾²ÀÏ ¾Ö´Ô¸ùÅ¸ÁÖ ¹è¿­
+	TArray<UAnimMontage*> AttackMontages = {};	//ï¿½Şºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ô¸ï¿½Å¸ï¿½ï¿½ ï¿½è¿­
 	UPROPERTY(BlueprintReadWrite, Category = Combo)
-	UAnimMontage* SkillRMontage;//R½ºÅ³¿¡ ¾²ÀÏ ¸ùÅ¸ÁÖ
+	UAnimMontage* SkillRMontage;//Rï¿½ï¿½Å³ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½
 
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
@@ -62,24 +69,25 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void SkillR(const FInputActionValue& Value);
 
-	//?¸ë¦¬ê²Œì´???¨ìˆ˜
+	//?ï¿½ë¦¬ê²Œì´???ï¿½ìˆ˜
 	UFUNCTION(BlueprintCallable, Category = Dead)
-	void BeingDead();//ì£½ì„???¸ë¦¬ê²Œì´?¸ë¡œ ?¸ì¶œ???¨ìˆ˜
+	void BeingDead();//ì£½ì„???ï¿½ë¦¬ê²Œì´?ï¿½ë¡œ ?ï¿½ì¶œ???ï¿½ìˆ˜
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-	void HandleApplyPointDamage(FHitResult LastHit);//?¬ì¸???°ë?ì§€ë¥?ì¤„ì‹œ ?¸ë¦¬ê²Œì´?¸ë¡œ ?¸ì¶œ???¨ìˆ˜
-	UFUNCTION(BlueprintCallable, Category = "Combat")//TakeDamage ?¨ìˆ˜ ?¤ë²„?¼ì´??
+	void HandleApplyPointDamage(FHitResult LastHit);//?ï¿½ì¸???ï¿½ï¿½?ì§€ï¿½?ì¤„ì‹œ ?ï¿½ë¦¬ê²Œì´?ï¿½ë¡œ ?ï¿½ì¶œ???ï¿½ìˆ˜
+	UFUNCTION(BlueprintCallable, Category = "Combat")//TakeDamage ?ï¿½ìˆ˜ ?ï¿½ë²„?ï¿½ì´??
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
-	//?¸ë¦¬ê²Œì´???•ì˜
+	//?ï¿½ë¦¬ê²Œì´???ï¿½ì˜
 	FDS_SkillLCooldown DSkillLCooldown;
 	FDS_SkillLCooldown DSkillRCooldown;
 
 
-protected:
+private:
 	virtual void BeginPlay() override;
-
+	
+public:
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
-	float CharacterDamage;	//?°ë?ì§€
+	float CharacterDamage;	//?ï¿½ï¿½?ì§€
 	
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -87,6 +95,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UFUNCTION(BlueprintCallable)
 	float GetHpPercentage();
-	UPROPERTY(BlueprintReadWrite, Category = "Skill")//Â÷ÈÄ ¼öÁ¤
+	UPROPERTY(BlueprintReadWrite, Category = "Skill")//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	bool SkillREnable;
 };

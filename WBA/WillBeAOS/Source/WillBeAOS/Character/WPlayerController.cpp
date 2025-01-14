@@ -13,7 +13,7 @@ void AWPlayerController::BeginPlay()
 		{
 			PlayerHUD->AddToViewport();
 
-			// Possessed Ä³¸¯ÅÍ¿¡ ´ëÇÑ ÃÊ±âÈ­ ÀÛ¾÷ ¼öÇà
+			// Possessed Ä³ï¿½ï¿½ï¿½Í¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ ï¿½Û¾ï¿½ ï¿½ï¿½ï¿½ï¿½
 			if (APawn* PossessedPawn = GetPawn())
 			{
 				AWC = Cast<AWCharacterBase>(PossessedPawn);
@@ -30,7 +30,7 @@ void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 {
 	Super::GameHasEnded(EndGameFocus, bIsWinner);
 	if(PlayerHUD)
-		PlayerHUD->RemoveFromViewport();
+		PlayerHUD->RemoveFromParent();
 
 	if (bIsWinner)
 	{
@@ -54,24 +54,24 @@ void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 
 void AWPlayerController::ShowRespawnWidget()
 {
-	//HUD¼û±â±â
+	//HUDï¿½ï¿½ï¿½ï¿½ï¿½
 	if (PlayerHUD)
 	{
-		PlayerHUD->RemoveFromViewport();
+		PlayerHUD->RemoveFromParent();
 	}
 
-	//¸®½ºÆù À§Á¬ »ý¼º
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	RespawnScreen = CreateWidget(this, RespawnScreenClass);
 	if (RespawnScreen != nullptr)
 	{
 		RespawnScreen->AddToViewport();
 	}
-	//¸®½ºÆù Å¸ÀÓ ¸ÂÃß±â
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ß±ï¿½
 	CurrentRespawnTime = RespawnTime;
-	//Å¸ÀÌ¸Ó ½ÇÇà
+	//Å¸ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½
 	GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ThisClass::UpdateRespawnWidget, 1.f, true);
 }
-//Å¸ÀÌ¸Ó ÇÔ¼ö
+//Å¸ï¿½Ì¸ï¿½ ï¿½Ô¼ï¿½
 void AWPlayerController::UpdateRespawnWidget()
 {
 	if (CurrentRespawnTime > 0)
@@ -89,7 +89,7 @@ void AWPlayerController::HideRespawnWidget()
 {
 	if (RespawnScreen != nullptr)
 	{
-		RespawnScreen->RemoveFromViewport();
+		RespawnScreen->RemoveFromParent();
 	}
 }
 
@@ -98,11 +98,11 @@ void AWPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-//ºùÀÇ½Ã hudÀÇ Ä³¸¯ÅÍ ¾÷µ¥ÀÌÆ®
+//ï¿½ï¿½ï¿½Ç½ï¿½ hudï¿½ï¿½ Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 void AWPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	//HUD ´Ù½Ã »ý¼º
+	//HUD ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (PlayerHUD)
 	{
 		PlayerHUD->AddToViewport();
