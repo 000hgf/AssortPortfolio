@@ -1,29 +1,34 @@
 #include "WGameState.h"
 #include "../Gimmick/Nexus.h"
 #include "../Gimmick/Tower.h"
-#include "../Character/WCharacterBase.h"
 #include "../Character/WPlayerController.h"
+#include "Character/WPlayerState.h"
+#include "EntitySystem/MovieSceneEntitySystemRunner.h"
 #include "Kismet/GameplayStatics.h"
 
 void AWGameState::BeginPlay()
 {
     Super::BeginPlay();
+    
+    CurrentGameState = E_GamePlay::GameInit;
+    
     if (GEngine != nullptr)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Game State BeginPlay called"));
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Game State BeginPlay called"));
     }
-
-    Nexus = GetNexus();
-    if (Nexus!=nullptr)
+    
+    if (Nexus)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Found Nexus"));
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Found Nexus"));
     }
 
     GetTower();
     if (TowerArray.Num() > 0)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Found Towers"));
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Found Towers"));
     }
+    
+    StartCountdown(5);
 }
 
 ANexus* AWGameState::GetNexus()
@@ -41,9 +46,10 @@ ANexus* AWGameState::GetNexus()
 
 float AWGameState::GetNexusHP()
 {
-    if (Nexus != nullptr)
+    if (Nexus != nullptr)   
     {
         return Nexus->GetNexusHPPercent();
+        
     } return 0;
 }
 
@@ -71,8 +77,8 @@ int32 AWGameState::GetTowerNum()
 
 void AWGameState::HandleNexusDestroyed()
 {
-    IsGameEnd = true;
-
+    CurrentGameState = E_GamePlay::GameEnded;
+    
     if (GEngine)
     {
         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Nexus Destroyed!"));
@@ -88,8 +94,48 @@ void AWGameState::HandleNexusDestroyed()
     }
 }
 
-void AWGameState::HandlePlayIsDead()
+void AWGameState::AddPlayer(AWPlayerState* PlayerState)
 {
-    
+    if (PlayerState)
+    {
+        ConnectedPlayerStates.Add(PlayerState);
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Player Added"));
+    }
 }
 
+void AWGameState::RemovePlayer(AWPlayerState* PlayerState)
+{
+    if (PlayerState)
+    {
+        ConnectedPlayerStates.Remove(PlayerState);
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Player Removed"));
+    }
+}
+
+void AWGameState::StartCountdown_Implementation(int32 InitialTime)
+{
+    CountdownTime = InitialTime;
+    
+    CurrentGameState = E_GamePlay::ReadyCountdown;
+    
+    GetWorldTimerManager().SetTimer(CountdownHandle, this, &AWGameState::UpdateCountdown, 1.f, true);
+}
+
+void AWGameState::UpdateCountdown()
+{
+    if (--CountdownTime <= 0)
+    {
+        GetWorldTimerManager().ClearTimer(CountdownHandle);
+        CurrentGameState = E_GamePlay::Gameplaying;
+
+        for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+        {
+            if (AWPlayerController* PC = Cast<AWPlayerController>(It->Get()))
+            {
+                PC->OnGameStateChanged(CurrentGameState);
+            }
+        }
+        return;
+    }
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("timer"));
+}

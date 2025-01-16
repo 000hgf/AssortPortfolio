@@ -1,7 +1,9 @@
 #include "Character/WPlayerState.h"
+#include "Net/UnrealNetwork.h"
 
 AWPlayerState::AWPlayerState()
 {
+    bReplicates = true;
     // Initialize default values for the player's stats
     CPower = 10;
     CCriticalHitChance = 5; // Percentage
@@ -14,4 +16,9 @@ AWPlayerState::AWPlayerState()
     CLevel = 0;
     CAbLevel = 0;
     CGold = 0;
+}
+void AWPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+    DOREPLIFETIME(ThisClass, TeamID);
 }

@@ -23,8 +23,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
+	
+	UPROPERTY(BlueprintReadWrite, Category = "GameState")
+	class AWGameState* AWGS;
+	
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Team")
 	E_TeamID TowerTeamID = E_TeamID::Neutral;
 	
 protected:

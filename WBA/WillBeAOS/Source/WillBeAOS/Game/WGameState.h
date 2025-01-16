@@ -4,6 +4,7 @@
 #include "GameFramework/GameState.h"
 #include "WGameState.generated.h"
 
+class AWPlayerState;
 class ATower;
 class ANexus;
 
@@ -13,7 +14,7 @@ enum class E_GamePlay : uint8
 	GameInit,
 	ReadyCountdown,
 	Gameplaying,
-	GameResult,
+	GameEnded
 };
 
 UCLASS()
@@ -22,28 +23,46 @@ class WILLBEAOS_API AWGameState : public AGameState
 	GENERATED_BODY()
 	
 public:
+	
+	UPROPERTY(BlueprintReadWrite, Category = "State")
+	E_GamePlay CurrentGameState;
+	
 	virtual void BeginPlay();
 
 	float GetNexusHP();
 	
-	void GetTower();//필드의 타워객체들을 받아오는 함수
-					//추후 피아식별 후 따로 받아올 예정
+	void GetTower();
+	
 	UFUNCTION(BlueprintCallable, Category = "Tower")
 	int32 GetTowerNum();
 
 	UPROPERTY(BlueprintReadOnly, Category = "Tower")
-	TArray<ATower*> TowerArray = {};//타워 객체들
-
-	UPROPERTY(BlueprintReadWrite, Category = "State")
-	bool IsGameEnd = false;
+	TArray<ATower*> TowerArray = {};//타占쏙옙 占쏙옙체占쏙옙
 
 	void HandleNexusDestroyed();
 	
-	void HandlePlayIsDead();
+public:
+	UPROPERTY(BlueprintReadWrite, Category = "Players")
+	TArray<AWPlayerState*> ConnectedPlayerStates;
+	
+	void AddPlayer(AWPlayerState* PlayerState);
+	
+	void RemovePlayer(AWPlayerState* PlayerState);
+	
+public:
+	UFUNCTION(NetMulticast, Reliable)
+	void StartCountdown(int32 InitialTime);
+	
+protected:
+	int32 CountdownTime = 0;
+	
+	FTimerHandle CountdownHandle;
+	
+	void UpdateCountdown();
 
 protected:
-
-	ANexus* Nexus;//넥서스
-	ANexus* GetNexus();//필드의 넥서스객체들을 받아오는 함수
-						//추후 피아식별후 수정
+	ANexus* Nexus;
+	
+	ANexus* GetNexus();
+	
 };

@@ -3,6 +3,7 @@
 #include "Components/BoxComponent.h"
 #include "../Character/CombatComponent.h"
 #include "../Game/WGameState.h"
+#include "Net/UnrealNetwork.h"
 
 ANexus::ANexus()
 {
@@ -20,6 +21,12 @@ ANexus::ANexus()
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	
 	bReplicates = true; 
+}
+
+void ANexus::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, NexusTeamID);
 }
 
 float ANexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

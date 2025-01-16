@@ -4,18 +4,15 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
-#include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "../Character/WCharacterBase.h"
 #include "../Character/CombatComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
 #include "../Minions/HealthBar.h"
 #include "../Game/WGameState.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "../Character/WCharacterBase.h"
 #include "../Minions/WMinionsCharacterBase.h"
+#include "Net/UnrealNetwork.h"
 
 ATower::ATower()
 {
@@ -53,6 +50,7 @@ ATower::ATower()
 	// 특정 요소의 오버랩 함수 바인드하기 ( OverlapTrigger의 )
 	OverlapTrigger->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
 	OverlapTrigger->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlap);
+	
 }
 
 void ATower::BeginPlay()
@@ -103,6 +101,13 @@ void ATower::Tick(float DeltaTime)
 	}
 }
 
+void ATower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, TowerTeamID);
+}
+
+
 float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -123,11 +128,11 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 		if ((CombatComp->GetIsDead()))
 		{
+			AWGS = Cast<AWGameState>(GetWorld()->GetGameState());
 			//DefaultSceneRoot->SetVisibility(false, true);
-			AWGameState* WGS = GetWorld()->GetGameState<AWGameState>();
-			if (WGS != nullptr)
+			if (AWGS != nullptr)
 			{
-				WGS->TowerArray.Remove(this);
+				AWGS->TowerArray.Remove(this);
 			}
 			Destroy();
 		}

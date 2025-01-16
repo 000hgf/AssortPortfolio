@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -13,44 +11,31 @@ class WILLBEAOS_API UCombatComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-
-	///????? ???? ???
-	//???? ????
 	UPROPERTY(EditAnywhere, Category = "Collision")
 	FName StartSocket;
-	//?? ????
 	UPROPERTY(EditAnywhere, Category = "Collision")
 	FName EndSocket;
-
-	//????? ???? ????
 	UPROPERTY(VisibleDefaultsOnly)
 	bool IsCollisionEnabled = false;
-
-	//?????? ????? ????? ???????
 	UPROPERTY(VisibleDefaultsOnly)
 	UPrimitiveComponent* CollisionMeshComponent;
-	//????? ??????
 	UPROPERTY(EditAnywhere, Category = "Collision")
 	float Radius;
-	//??????? ???
 	UPROPERTY(EditAnywhere, Category = "Collision")
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes = {};
-
-	//????????? ??????? ????
+	
 	UFUNCTION()
 	void SetCollisionMesh(UPrimitiveComponent* PrimComp);
-
-	//?תפ ???? ???
+	
 	UFUNCTION(BlueprintCallable, Category = "Collision")
-	void CollisionTrace();//?תפ ?????? 
+	void CollisionTrace(); 
 	UFUNCTION(BlueprintCallable, Category = "Collsion")
-	void EnableCollision();//????? ????
+	void EnableCollision();
 	UFUNCTION(BlueprintCallable, Category = "Collision")
-	void DisableCollision();//????? ??????
+	void DisableCollision();
 	UFUNCTION(BlueprintCallable, Category = "Collision")
-	void ClearHitActor();//??????? ?עק ????
-
-	// ???????? ???
+	void ClearHitActor();
+	
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	int32 GetAttackCount();//??? ???
 	UFUNCTION(BlueprintCallable, Category = "Combat")
@@ -61,8 +46,7 @@ public:
 	bool IsCombatEnable();//?????????? ???
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void SetCombatEnable(bool Val);//?????? ????
-
-	//??¡Æ??? ???
+	
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void HandleTakeDamage(float Damage);//?????? ????
 	UFUNCTION(BlueprintCallable, Category = "Health")
@@ -70,33 +54,34 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	bool GetIsDead();
 
-	FDelegateSignature DelegateDead;//?????? ????? ?????????
-	FMDS1 DelegatePointDamage;//????? ???????? ????? ?????????
+	FDelegateSignature DelegateDead;
+	FMDS1 DelegatePointDamage;
 
 protected:
 	virtual void BeginPlay() override;
 
 public:
-	//?????? ???????? ????
 	UPROPERTY(BluePrintReadOnly, Category = "Combat")
 	bool CombatEnable = false;
-
-	//????? ???? int ?¥ו???
+	
 	UPROPERTY(BlueprintReadWrite, Category = Combo)
 	int32 AttackCount = 0;
-
-	//?תפ?? ??????? ?עק
+	
 	UPROPERTY(EditAnywhere, Category = "Collision")
 	TArray<AActor*> AlreadyHitActors = {};
 
-	UPROPERTY(BlueprintReadOnly, Category = "Health")
-	float Health = 50;
+	UPROPERTY(ReplicatedUsing = OnRep_Health ,BlueprintReadOnly, Category = "Health")
+	float Health = 10;
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float Max_Health = 100;
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
 	bool IsDead;
 
-public:	
+public:
+
+	UFUNCTION()
+	void OnRep_Health();
+	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UCombatComponent();

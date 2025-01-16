@@ -1,5 +1,6 @@
 #include "CombatComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -7,6 +8,11 @@ UCombatComponent::UCombatComponent()
 
 }
 
+void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, Health);
+}
 
 int32 UCombatComponent::GetAttackCount()
 {
@@ -46,17 +52,18 @@ void UCombatComponent::BeginPlay()
 
 void UCombatComponent::HandleTakeDamage(float WDamage)
 {
-	if (Health > 0)
-	{
-		if (WDamage > Health)
-			Health = 0;
-		Health -= WDamage;
-	}
-	if (Health <= 0)
-	{
-		SetIsDead(true);
-		DelegateDead.ExecuteIfBound();
-	}
+		if (Health > 0)
+		{
+			if (WDamage > Health)
+				Health = 0;
+			Health -= WDamage;
+		}
+	
+		if (Health <= 0)
+		{
+			SetIsDead(true);
+			DelegateDead.ExecuteIfBound();	
+		}
 }
 
 void UCombatComponent::SetIsDead(bool Val)
@@ -69,6 +76,10 @@ bool UCombatComponent::GetIsDead()
 	return IsDead;
 }
 
+void UCombatComponent::OnRep_Health()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Found Towers"));
+}
 
 // Called every frame
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

@@ -1,35 +1,11 @@
 #include "WGameMode.h"
 #include "WGameState.h"
+#include "Character/WPlayerController.h"
+#include "Character/WPlayerState.h"
 #include "Gimmick/Nexus.h"
 #include "Gimmick/Tower.h"
 #include "Gimmick/SpawnTowerPoint.h"
 #include "Kismet/GameplayStatics.h"
-
-
-void AWGameMode::PostLogin(APlayerController* NewPlayer)
-{
-	Super::PostLogin(NewPlayer);
-	
-	if (NewPlayer)
-	{
-		AllPlayerController.Add(NewPlayer);
-	}
-}
-
-void AWGameMode::BeginPlay()
-{
-	Super::BeginPlay();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Game Mode BeginPlay called"));
-	
-	WGameState = Cast<AWGameState>(GetWorld()->GetGameState());
-	if (WGameState != nullptr)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("GameState is not called"));
-	}
-
-	SpawnTower();
-	
-}
 
 void AWGameMode::SwapPlayerControllers(APlayerController* OldPC, APlayerController* NewPC)
 {
@@ -39,6 +15,36 @@ void AWGameMode::SwapPlayerControllers(APlayerController* OldPC, APlayerControll
 	{
 		AllPlayerController.Add(NewPC);
 	}
+}
+
+void AWGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+	
+	if (NewPlayer)
+	{
+		AllPlayerController.Add(Cast<AWPlayerController>(NewPlayer));
+	}
+
+	if (GetGameState<AWGameState>() != nullptr)
+	{
+		WGS = GetGameState<AWGameState>();
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("GameState is called"));
+
+		if (AWPlayerState* NewPlayerState = Cast<AWPlayerState>(NewPlayer->PlayerState))
+		{
+			WGS->AddPlayer(NewPlayerState);
+		}
+	}
+}
+
+void AWGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Game Mode BeginPlay called"));
+
+	SpawnTower();
+
 }
 
 bool AWGameMode::ReadyToStartMatch_Implementation()
@@ -55,7 +61,7 @@ void AWGameMode::HandleMatchHasStarted()
 bool AWGameMode::ReadyToEndMatch_Implementation()
 {
 	Super::ReadyToEndMatch_Implementation();
-	return WGameState != nullptr && WGameState->IsGameEnd;
+	return (WGS != nullptr) && (WGS->CurrentGameState == E_GamePlay::GameEnded);
 }
 
 void AWGameMode::HandleMatchHasEnded()
@@ -123,13 +129,34 @@ void AWGameMode::AssignTeam(AActor* Actor, int32 TeamID)
 		UE_LOG(LogTemp, Warning, TEXT("Invalid actor!"));
 		return;
 	}
-
 	TeamMap.Add(Actor, TeamID);
 	UE_LOG(LogTemp, Log, TEXT("Actor Add! %s %d"), *Actor->GetName(), TeamID);
-	
-	if (WGameState)
+	//	WGS->UpdateTeamInfo(Actor, Team	ID);
+}
+
+void AWGameMode::PlayerAssignTeam()
+{
+	E_TeamID Team = E_TeamID::Blue;
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It;++It)
 	{
-	//	WGameState->UpdateTeamInfo(Actor, TeamID);
+		if (AWPlayerController* PC = Cast<AWPlayerController>(It->Get()))
+		{
+			if (AWPlayerState* PS = Cast<AWPlayerState>(PC->PlayerState))
+			{
+				PS->SetTeamID(Team); // 플레이어 상태에 팀 지정
+				AssignTeam(PS,static_cast<int32>(PS->TeamID));
+				UE_LOG(LogTemp, Log, TEXT("Actor Add! %s %d"), *PS->GetName(), PS->TeamID);
+				Team = (Team == E_TeamID::Blue) ? E_TeamID::Red : E_TeamID::Blue; // 번갈아 가며 팀 배정
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("PlayerState not found or cast failed."));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PlayerController not found or cast failed."));
+		}
 	}
 }
 
@@ -146,15 +173,4 @@ int32 AWGameMode::GetTeam(AActor* Actor) const
 	}
 
 	return -1; // Team 정보 없음
-}
-
-void AWGameMode::RemoveTeam(AActor* Actor)
-{
-	if (!Actor)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid actor!"));
-		return;
-	}
-
-	TeamMap.Remove(Actor);//팀 정보에서 지우기
 }

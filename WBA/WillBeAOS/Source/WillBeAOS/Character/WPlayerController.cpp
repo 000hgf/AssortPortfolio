@@ -2,18 +2,19 @@
 #include "Blueprint/UserWidget.h"
 #include "WCharacterBase.h"
 #include "WCharacterHUD.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 
 void AWPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
 	if (!PlayerHUD && UserWidgetClass)
 	{
 		PlayerHUD = CreateWidget<UWCharacterHUD>(this, UserWidgetClass);
 		if (PlayerHUD)
 		{
 			PlayerHUD->AddToViewport();
-
-			// Possessed ĳ���Ϳ� ���� �ʱ�ȭ �۾� ����
+			
 			if (APawn* PossessedPawn = GetPawn())
 			{
 				AWC = Cast<AWCharacterBase>(PossessedPawn);
@@ -26,9 +27,39 @@ void AWPlayerController::BeginPlay()
 	}
 }
 
+void AWPlayerController::OnGameStateChanged(E_GamePlay CurrentGameState)
+{
+	switch (CurrentGameState)
+	{
+	case E_GamePlay::GameInit:
+		DisableInput(this);
+		break;
+    
+	case E_GamePlay::ReadyCountdown:
+		DisableInput(this);
+		// 카운트다운 UI 표시
+		break;
+    
+	case E_GamePlay::Gameplaying:
+		EnableInput(this);
+		// HUD 업데이트
+		break;
+    
+	case E_GamePlay::GameEnded:
+		GameHasEnded();
+		// 결과 화면 표시
+		break;
+    
+	default:
+		break;
+	}
+}
+
+
 void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 {
 	Super::GameHasEnded(EndGameFocus, bIsWinner);
+	
 	if(PlayerHUD)
 		PlayerHUD->RemoveFromParent();
 
@@ -54,24 +85,23 @@ void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 
 void AWPlayerController::ShowRespawnWidget()
 {
-	//HUD�����
 	if (PlayerHUD)
 	{
 		PlayerHUD->RemoveFromParent();
 	}
 
-	//������ ���� ����
+	
 	RespawnScreen = CreateWidget(this, RespawnScreenClass);
 	if (RespawnScreen != nullptr)
 	{
 		RespawnScreen->AddToViewport();
 	}
-	//������ Ÿ�� ���߱�
+	
 	CurrentRespawnTime = RespawnTime;
-	//Ÿ�̸� ����
+	
 	GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ThisClass::UpdateRespawnWidget, 1.f, true);
 }
-//Ÿ�̸� �Լ�
+
 void AWPlayerController::UpdateRespawnWidget()
 {
 	if (CurrentRespawnTime > 0)
@@ -98,15 +128,16 @@ void AWPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-//���ǽ� hud�� ĳ���� ������Ʈ
+
 void AWPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	//HUD �ٽ� ����
+	
 	if (PlayerHUD)
 	{
 		PlayerHUD->AddToViewport();
 	}
+	
 	if (APawn* PossessedPawn = InPawn)
 	{
 		AWC = Cast<AWCharacterBase>(PossessedPawn);

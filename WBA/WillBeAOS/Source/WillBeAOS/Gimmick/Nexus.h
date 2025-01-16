@@ -15,7 +15,7 @@ public:
 
 	float GetNexusHPPercent();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Team")
 	E_TeamID NexusTeamID = E_TeamID::Neutral;
 	
 protected:

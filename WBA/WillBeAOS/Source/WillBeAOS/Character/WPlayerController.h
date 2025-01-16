@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WEnumFile.h"
+#include "Game/WGameState.h"
 #include "GameFramework/PlayerController.h"
 #include "WPlayerController.generated.h"
 
@@ -31,9 +33,9 @@ class WILLBEAOS_API AWPlayerController : public APlayerController
 	class UWCharacterHUD* PlayerHUD;
 
 	UUserWidget* RespawnScreen;
-
+	
 	class AWCharacterBase* AWC;
-
+	
 public:
 	//리스폰시 필요한
 	UPROPERTY(BlueprintReadWrite)
@@ -45,12 +47,12 @@ public:
 	FTimerHandle RespawnTimerHandle;
 
 public:
-
 	//리스폰 함수(PlayerController->GameHasEnded())
 	virtual void GameHasEnded(class AActor* EndGameFocus = nullptr, bool bIsWinner = false) override;
 	void ShowRespawnWidget();
 	void UpdateRespawnWidget();
 	void HideRespawnWidget();
+	void OnGameStateChanged(E_GamePlay CurrentGameState);
 
 protected:
 	virtual void BeginPlay() override;

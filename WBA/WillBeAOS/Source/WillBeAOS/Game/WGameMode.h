@@ -14,10 +14,8 @@ public:
 	TArray<class APlayerController*> AllPlayerController;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	class AWGameState* WGameState;
+	class AWGameState* WGS;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 teamid;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
@@ -25,19 +23,17 @@ protected:
 
 public:	
 	void SpawnTower();
-
+	void PlayerAssignTeam();
 private:
 	TMap<AActor*, int32> TeamMap;      // 팀정보 맵
 
 public:
 	// 팀 할당
 	void AssignTeam(AActor* Actor, int32 TeamID);
-
+	
 	// 팀 검색
 	int32 GetTeam(AActor* Actor) const;
 
-	// 팀 제거
-	void RemoveTeam(AActor* Actor);
 	
 protected:
 	virtual void BeginPlay();
