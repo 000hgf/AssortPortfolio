@@ -105,6 +105,7 @@ void ATower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ThisClass, TowerTeamID);
+	DOREPLIFETIME(ThisClass, IsParticleSpawned);
 }
 
 
@@ -112,7 +113,7 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	float TakeDamage = DamageAmount;
-	if (CombatComp != nullptr)
+	if (HasAuthority() && CombatComp != nullptr)
 	{
 		CombatComp->HandleTakeDamage(TakeDamage);
 
@@ -121,9 +122,8 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		// 타워의 HP가 일정 이하로 떨어지면 데미지 받은 메쉬로 바꾸고 파티클 생성
 		if (CombatComp->Health <= (CombatComp->Max_Health / 2) && !IsParticleSpawned)
 		{
-			StaticMesh->SetStaticMesh(DamagedStaticMesh);
-			DamagedNiagara->SetAsset(DamageParticle);
 			IsParticleSpawned = true;
+			OnRep_IsParticleSpawned();
 		}
 
 		if ((CombatComp->GetIsDead()))
@@ -143,6 +143,15 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);*/
 
 	return DamageAmount;
+}
+
+void ATower::OnRep_IsParticleSpawned()
+{
+	if (IsParticleSpawned)
+	{
+		StaticMesh->SetStaticMesh(DamagedStaticMesh);
+		DamagedNiagara->SetAsset(DamageParticle);
+	}
 }
 
 void ATower::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
