@@ -14,9 +14,9 @@ class WILLBEAOS_API UWCharacterHUD : public UUserWidget
 public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Character")
-	class AWCharacterBase* AWC;//Ä³¸¯ÅÍ ¹Ş¾Æ¿À´Â ÇÔ¼ö
+	class AWCharacterBase* AWC;//ìºë¦­í„° ë°›ì•„ì˜¤ëŠ” í•¨ìˆ˜
 	UPROPERTY(BlueprintReadOnly, Category = "GameState")
-	class AWGameState* AWGS;//°ÔÀÓ½ºÅ×ÀÌÆ®
+	class AWGameState* AWGS;//ê²Œì„ìŠ¤í…Œì´íŠ¸
 	UPROPERTY(BlueprintReadOnly, Category = "PlayerState")
 	class AWPlayerState* AWPS;
 
@@ -29,13 +29,13 @@ public:
 	float GetHealthBarPercentage();
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget), Category = "Tower")
-	TObjectPtr<class UProgressBar>FriendTowerProgress;//¾Æ±º Å¸¿ö ÁøÇà»óÈ²
+	TObjectPtr<class UProgressBar>FriendTowerProgress;//ì•„êµ° íƒ€ì›Œ ì§„í–‰ìƒí™©
 	UFUNCTION(BlueprintPure, Category = "Tower")
-	float SetTowerProgress();//Å¸¿ö ÁøÇà»óÈ² ¹Ş¾Æ¿À´Â ÇÔ¼ö
-							 //ÃßÈÄ ÇÇ¾Æ ½Äº° ÈÄ ¼öÁ¤
+	float SetTowerProgress();//íƒ€ì›Œ ì§„í–‰ìƒí™© ë°›ì•„ì˜¤ëŠ” í•¨ìˆ˜
+							 //ì¶”í›„ í”¼ì•„ ì‹ë³„ í›„ ìˆ˜ì •
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget), Category = "Nexus")
-	TObjectPtr<class UProgressBar>FriendNexusHealth;//¾Æ±º Å¸¿ö ÁøÇà»óÈ²
+	TObjectPtr<class UProgressBar>FriendNexusHealth;//ì•„êµ° íƒ€ì›Œ ì§„í–‰ìƒí™©
 	UFUNCTION(BlueprintPure, Category = "Nexus")
 	float SetNexusHealth();
 
@@ -49,7 +49,7 @@ public:
 	//UFUNCTION(Blueprintpure, meta = (BindWidget), Category = "Aim")
 	//float CanAttackEnemy();
 
-	//½ºÅ³µ¥ÀÌÅÍ ±¸Á¶Ã¼
+	//ìŠ¤í‚¬ë°ì´í„° êµ¬ì¡°ì²´
 	struct FSkillCooldownData
 	{
 		float SkillCooldown;
@@ -65,7 +65,7 @@ public:
 	FSkillCooldownData SkillLData;
 	FSkillCooldownData SkillRData;
 
-	//ÆòÅ¸(LeftClick)ÄğÅ¸ÀÓ
+	//í‰íƒ€(LeftClick)ì¿¨íƒ€ì„
 	UPROPERTY(BlueprintReadWrite, Category = "Skill_L")
 	float SkillLCooldown = 0.5f;
 	FTimerHandle CooldownLTimerHandle;
@@ -82,7 +82,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Skill_L")
 	void UpdateSkillLTimer();
 
-	//½ºÅ³R(RightClick)ÄğÅ¸ÀÓ
+	//ìŠ¤í‚¬R(RightClick)ì¿¨íƒ€ì„
 	UPROPERTY(BlueprintReadWrite, Category = "Skill_L")
 	float SkillRCooldown = 3.0f;
 	FTimerHandle CooldownRTimerHandle;
@@ -145,6 +145,6 @@ public:
 	FText SetAbLevel();
 
 protected:
-	// À§Á¬ ÃÊ±âÈ­ ½Ã ½ÇÇàµÇ´Â ÇÔ¼ö
+	// ìœ„ì ¯ ì´ˆê¸°í™” ì‹œ ì‹¤í–‰ë˜ëŠ” í•¨ìˆ˜
 	virtual void NativeConstruct() override;
 };

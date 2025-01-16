@@ -32,8 +32,8 @@ void AWMinionsCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	CombatComponent->DelegateDead.BindUObject(this, &ThisClass::BeingDead);
-	//HandleApplyPointDamage ¸ÖÆ¼µ¨¸®°ÔÀÌÆ® ¹ÙÀÎµù
+	CombatComponent->DelegateDead.BindUObject(this, &ThisClass::NM_BeingDead);
+	//HandleApplyPointDamage ë©€í‹°ë¸ë¦¬ê²Œì´íŠ¸ ë°”ì¸ë”©
 	CombatComponent->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
 }
 
@@ -46,7 +46,7 @@ void AWMinionsCharacterBase::Tick(float DeltaTime)
 
 	SetHpPercentage(HP, MAXHP);
 
-	// °ÔÀÓÀÌ ³¡³ª¸é ·ÎÁ÷ ²÷±â
+	// ê²Œì„ì´ ëë‚˜ë©´ ë¡œì§ ëŠê¸°
 	AWGameState* WGS = Cast<AWGameState>(GetWorld()->GetGameState());
 	if (WGS && WGS->IsGameEnd)
 	{
@@ -62,18 +62,22 @@ void AWMinionsCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 }
 
-
-void AWMinionsCharacterBase::BeingDead()
+void AWMinionsCharacterBase::NM_BeingDead_Implementation()
 {
-	// AI°¡ Á×À¸¸é BT ¿¬°á ²÷±â
+	BeingDead();
+}
+
+void AWMinionsCharacterBase::BeingDead_Implementation()
+{
+	// AIê°€ ì£½ìœ¼ë©´ BT ì—°ê²° ëŠê¸°
 	AWMinionsAIController* MinionController = Cast<AWMinionsAIController>(GetController());
 	MinionController->GetBrainComponent()->StopLogic(TEXT("None"));
 
-	//Äİ¸®Àü ¾ø¾Ö±â
+	//ì½œë¦¬ì „ ì—†ì• ê¸°
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
-	// Á×´Â ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà
+	// ì£½ëŠ” ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰
 	PlayAnimMontage(DeadAnimMontage);
 }
 
@@ -87,6 +91,7 @@ void AWMinionsCharacterBase::SetHpPercentage(float Health, float MaxHealth)
 			Widget->HealthBar->SetPercent(Health / MaxHealth);
 	}
 }
+
 
 void AWMinionsCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
 {

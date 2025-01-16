@@ -2,17 +2,13 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/WidgetComponent.h"
-#include "Components/ProgressBar.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "CombatComponent.h"
-#include "Kismet/KismetArrayLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "WPlayerController.h"
-#include "WCharacterHUD.h"
 #include "Components/SceneComponent.h"
 
 
@@ -45,7 +41,7 @@ void AWCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	//BeingDead 델리게이트 바인딩
-	CombatComp->DelegateDead.BindUObject(this, &ThisClass::BeingDead);
+	CombatComp->DelegateDead.BindUObject(this, &ThisClass::NM_BeingDead);
 	//HandleApplyPointDamage 멀티델리게이트 바인딩
 	CombatComp->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
 }
@@ -81,7 +77,7 @@ void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AWCharacterBase::Move);
-		EnhancedInputComponent->BindAction(IA_Behavior, ETriggerEvent::Started, this, &AWCharacterBase::Behavior);
+		EnhancedInputComponent->BindAction(IA_Behavior, ETriggerEvent::Started, this, &AWCharacterBase::NM_Behavior);
 		EnhancedInputComponent->BindAction(IA_SkillR, ETriggerEvent::Started, this, &AWCharacterBase::SkillR);
 
 	}
@@ -120,7 +116,7 @@ void AWCharacterBase::Move(const FInputActionValue& Value)
 	}
 }
 
-void AWCharacterBase::Behavior(const FInputActionValue& Value)
+void AWCharacterBase::Behavior_Implementation()
 {
 	CombatComp->SetCollisionMesh(GetMesh());
 	if (CombatComp != nullptr)
@@ -145,22 +141,28 @@ void AWCharacterBase::Behavior(const FInputActionValue& Value)
 	}
 }
 
+void AWCharacterBase::NM_Behavior_Implementation()
+{
+	Behavior();
+}
+
+
 void AWCharacterBase::SkillR(const FInputActionValue& Value)
 {
 	if (CombatComp != nullptr)
 	{
-		//�������� �ƴҽ�
+		//�������� �ƴҽ�
 		if ((CombatComp->IsCombatEnable() == false))
 		{
 			if (SkillREnable == false) 
 			{
-				//������ Ȱ��ȭ
+				//������ Ȱ��ȭ
 				CombatComp->SetCombatEnable(true);
-				//��ųR���
+				//��ųR���
 				SkillREnable = true;
 
 				DSkillRCooldown.ExecuteIfBound();
-				//��Ÿ�� ����
+				//��Ÿ�� ����
 				if ((CombatComp->GetAttackCount()) < AttackMontages.Num())
 				{
 					ACharacter::PlayAnimMontage(SkillRMontage);
@@ -170,21 +172,28 @@ void AWCharacterBase::SkillR(const FInputActionValue& Value)
 	}
 }
 
+void AWCharacterBase::NM_BeingDead_Implementation()
+{
+	BeingDead();
+}
 
-
-void AWCharacterBase::BeingDead()
+void AWCharacterBase::BeingDead_Implementation()
 {
 	// 리스폰 위젯 출력
 	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
 	if (PC)
 	{
+		//리스폰 실행
 		PC->ShowRespawnWidget(); 
 	}
+	
 	//죽으면 카메라 움직임에 메쉬 따라 움직이지 않게 하기
 	this->bUseControllerRotationYaw = false;
+	
 	////죽음 메세지 출력
 	auto Message = FString::Printf(TEXT("Dead"));
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
+	
 	//무브먼트, 콜리전 없애고 몽타주 출력
 	ACharacter::GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	ACharacter::GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -195,15 +204,18 @@ void AWCharacterBase::BeingDead()
 //포인트 데미지 주는 함수
 void AWCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
 {
-	UGameplayStatics::ApplyPointDamage(
-		LastHit.GetActor(),
-		CharacterDamage,
-		GetOwner()->GetActorForwardVector(),
-		LastHit,
-		GetInstigatorController(),
-		this,
-		UDamageType::StaticClass()
-	);
+	if (HasAuthority())
+	{
+		UGameplayStatics::ApplyPointDamage(
+			LastHit.GetActor(),
+			CharacterDamage,
+			GetOwner()->GetActorForwardVector(),
+			LastHit,
+			GetInstigatorController(),
+			this,
+			UDamageType::StaticClass()
+		);
+	}
 }
 
 

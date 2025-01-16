@@ -33,11 +33,11 @@ public:
 	FDelegateSignature DelegateDead;
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-	void HandleApplyPointDamage(FHitResult LastHit);//Æ÷ÀÎÆ® µ¥¹ÌÁö¸¦ ÁÙ½Ã µ¨¸®°ÔÀÌÆ®·Î È£ÃâµÉ ÇÔ¼ö
+	void HandleApplyPointDamage(FHitResult LastHit);//í¬ì¸íŠ¸ ë°ë¯¸ì§€ë¥¼ ì¤„ì‹œ ë¸ë¦¬ê²Œì´íŠ¸ë¡œ í˜¸ì¶œë  í•¨ìˆ˜
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
-	float CharacterDamage;	//µ¥¹ÌÁö
+	float CharacterDamage;	//ë°ë¯¸ì§€
 
 protected:
 	virtual void BeginPlay() override;
@@ -47,7 +47,11 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(NetMulticast, Reliable)
 	void BeingDead();
 	void SetHpPercentage(float Health, float MaxHealth);
-
+	
+	//RPCë¡œ ëª¨ë“  Clientì— ì „ë‹¬
+	UFUNCTION(Server, Reliable)
+	void NM_BeingDead();
 };

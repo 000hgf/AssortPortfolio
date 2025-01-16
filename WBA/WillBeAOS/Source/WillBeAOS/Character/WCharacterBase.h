@@ -17,13 +17,14 @@ class WILLBEAOS_API AWCharacterBase : public ACharacter
 
 	GENERATED_BODY()
 
-	//컴포?�트
+	//컴포넌트
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"));
 	class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"));
 	class UCameraComponent* FollowCamera;
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"));
 	class UCombatComponent* CombatComp;
+	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UWidgetComponent* WidgetComponent;
@@ -65,12 +66,19 @@ public:
 
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
-	void Behavior(const FInputActionValue& Value);
+	UFUNCTION(NetMulticast, Reliable)
+	void Behavior();
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void SkillR(const FInputActionValue& Value);
 
+	// Multicast로 Client에 보내주는 함수
+	UFUNCTION(Server, Reliable)
+	void NM_Behavior();
+	UFUNCTION(Server, Reliable)
+	void NM_BeingDead();
+
 	//?�리게이???�수
-	UFUNCTION(BlueprintCallable, Category = Dead)
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = Dead)
 	void BeingDead();//죽을???�리게이?�로 ?�출???�수
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void HandleApplyPointDamage(FHitResult LastHit);//?�인???��?지�?줄시 ?�리게이?�로 ?�출???�수
