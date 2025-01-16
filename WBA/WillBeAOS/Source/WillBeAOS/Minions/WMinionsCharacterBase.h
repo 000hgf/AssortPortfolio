@@ -23,7 +23,7 @@ public:
 	
 public:
 	AWMinionsCharacterBase();
-
+	
 	UPROPERTY(BlueprintReadWrite, Category = Combo)
 	TArray<UAnimMontage*> AttackMontages = {};
 
@@ -46,12 +46,17 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UFUNCTION(NetMulticast, Reliable)
-	void BeingDead();
+	
 	void SetHpPercentage(float Health, float MaxHealth);
 	
-	//RPC로 모든 Client에 전달
-	UFUNCTION(Server, Reliable)
-	void NM_BeingDead();
+	//RPC로 서버에서 호출
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void NM_BeingDead();	// Multicast로 Client들에게 전달
+	
+	UFUNCTION(NetMulticast,BlueprintCallable, Reliable)
+	void NM_Minion_Attack();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* MinionAttackMontage;
 };

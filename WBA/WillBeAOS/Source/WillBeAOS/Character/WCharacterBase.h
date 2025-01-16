@@ -67,19 +67,19 @@ public:
 	void Look(const FInputActionValue& Value);
 	void Move(const FInputActionValue& Value);
 	UFUNCTION(NetMulticast, Reliable)
-	void Behavior();
+	void NM_Behavior();
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void SkillR(const FInputActionValue& Value);
 
 	// Multicast로 Client에 보내주는 함수
 	UFUNCTION(Server, Reliable)
-	void NM_Behavior();
+	void S_Behavior();
 	UFUNCTION(Server, Reliable)
-	void NM_BeingDead();
+	void S_BeingDead();
 
 	//?�리게이???�수
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = Dead)
-	void BeingDead();//죽을???�리게이?�로 ?�출???�수
+	void NM_BeingDead();//죽을???�리게이?�로 ?�출???�수
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void HandleApplyPointDamage(FHitResult LastHit);//?�인???��?지�?줄시 ?�리게이?�로 ?�출???�수
 	UFUNCTION(BlueprintCallable, Category = "Combat")//TakeDamage ?�수 ?�버?�이??

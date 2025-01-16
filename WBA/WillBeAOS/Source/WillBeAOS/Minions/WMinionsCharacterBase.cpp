@@ -28,6 +28,11 @@ AWMinionsCharacterBase::AWMinionsCharacterBase()
 	WidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 200.f));
 }
 
+void AWMinionsCharacterBase::NM_Minion_Attack_Implementation()
+{
+	PlayAnimMontage(MinionAttackMontage);
+}
+
 void AWMinionsCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -64,14 +69,12 @@ void AWMinionsCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 void AWMinionsCharacterBase::NM_BeingDead_Implementation()
 {
-	BeingDead();
-}
-
-void AWMinionsCharacterBase::BeingDead_Implementation()
-{
-	// AI가 죽으면 BT 연결 끊기
-	AWMinionsAIController* MinionController = Cast<AWMinionsAIController>(GetController());
-	MinionController->GetBrainComponent()->StopLogic(TEXT("None"));
+	if (HasAuthority())
+	{
+		// AI가 죽으면 BT 연결 끊기
+		AWMinionsAIController* MinionController = Cast<AWMinionsAIController>(GetController());
+		MinionController->GetBrainComponent()->StopLogic(TEXT("None"));
+	}
 
 	//콜리전 없애기
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -95,15 +98,18 @@ void AWMinionsCharacterBase::SetHpPercentage(float Health, float MaxHealth)
 
 void AWMinionsCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
 {
-	UGameplayStatics::ApplyPointDamage(
-		LastHit.GetActor(),
-		CharacterDamage,
-		GetOwner()->GetActorForwardVector(),
-		LastHit,
-		GetInstigatorController(),
-		this,
-		UDamageType::StaticClass()
-	);
+	if (HasAuthority())
+	{
+		UGameplayStatics::ApplyPointDamage(
+			LastHit.GetActor(),
+			CharacterDamage,
+			GetOwner()->GetActorForwardVector(),
+			LastHit,
+			GetInstigatorController(),
+			this,
+			UDamageType::StaticClass()
+		);
+	}
 }
 
 float AWMinionsCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

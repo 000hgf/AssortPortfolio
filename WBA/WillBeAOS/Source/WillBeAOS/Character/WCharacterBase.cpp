@@ -41,7 +41,7 @@ void AWCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	//BeingDead 델리게이트 바인딩
-	CombatComp->DelegateDead.BindUObject(this, &ThisClass::NM_BeingDead);
+	CombatComp->DelegateDead.BindUObject(this, &ThisClass::S_BeingDead);
 	//HandleApplyPointDamage 멀티델리게이트 바인딩
 	CombatComp->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
 }
@@ -77,7 +77,7 @@ void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AWCharacterBase::Move);
-		EnhancedInputComponent->BindAction(IA_Behavior, ETriggerEvent::Started, this, &AWCharacterBase::NM_Behavior);
+		EnhancedInputComponent->BindAction(IA_Behavior, ETriggerEvent::Started, this, &AWCharacterBase::S_Behavior);
 		EnhancedInputComponent->BindAction(IA_SkillR, ETriggerEvent::Started, this, &AWCharacterBase::SkillR);
 
 	}
@@ -116,7 +116,7 @@ void AWCharacterBase::Move(const FInputActionValue& Value)
 	}
 }
 
-void AWCharacterBase::Behavior_Implementation()
+void AWCharacterBase::NM_Behavior_Implementation()
 {
 	CombatComp->SetCollisionMesh(GetMesh());
 	if (CombatComp != nullptr)
@@ -141,9 +141,9 @@ void AWCharacterBase::Behavior_Implementation()
 	}
 }
 
-void AWCharacterBase::NM_Behavior_Implementation()
+void AWCharacterBase::S_Behavior_Implementation()
 {
-	Behavior();
+	NM_Behavior();
 }
 
 
@@ -172,12 +172,12 @@ void AWCharacterBase::SkillR(const FInputActionValue& Value)
 	}
 }
 
-void AWCharacterBase::NM_BeingDead_Implementation()
+void AWCharacterBase::S_BeingDead_Implementation()
 {
-	BeingDead();
+	NM_BeingDead();
 }
 
-void AWCharacterBase::BeingDead_Implementation()
+void AWCharacterBase::NM_BeingDead_Implementation()
 {
 	// 리스폰 위젯 출력
 	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
