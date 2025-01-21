@@ -37,12 +37,8 @@ class WILLBEAOS_API AWPlayerController : public APlayerController
 	class AWCharacterBase* AWC;
 	
 public:
-	//리스폰시 필요한
 	UPROPERTY(BlueprintReadWrite)
-	int RespawnTime = 5;
-	UPROPERTY(BlueprintReadWrite)
-	int CurrentRespawnTime;
-
+	int32 CurrentRespawnTime;
 	FTimerHandle RestartTimer;
 	FTimerHandle RespawnTimerHandle;
 

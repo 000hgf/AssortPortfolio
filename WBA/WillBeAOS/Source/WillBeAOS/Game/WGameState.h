@@ -60,6 +60,11 @@ protected:
 	
 	void UpdateCountdown();
 
+public:
+	//리스폰시 필요한
+	UPROPERTY(BlueprintReadWrite)
+	int32 RespawnTime = 5;
+	
 protected:
 	ANexus* Nexus;
 	
