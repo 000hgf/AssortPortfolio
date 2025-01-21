@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "WPlayerController.h"
 #include "Components/SceneComponent.h"
+#include "Game/WGameMode.h"
 
 
 AWCharacterBase::AWCharacterBase()
@@ -33,7 +34,6 @@ AWCharacterBase::AWCharacterBase()
 
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComp->SetCombatEnable(false);
-
 }
 
 
@@ -44,8 +44,21 @@ void AWCharacterBase::BeginPlay()
 	CombatComp->DelegateDead.BindUObject(this, &ThisClass::S_BeingDead);
 	//HandleApplyPointDamage 멀티델리게이트 바인딩
 	CombatComp->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
+
+	// 캐릭터가 controller를 가지고 있는지 확인하는 함수
+	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
+	//AController* PC = Controller;
+	if (PC)
+	{
+		auto CM = FString::Printf(TEXT("USE CONTROLLER"));
+		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Black, CM);
+	}
+	else
+	{
+		auto CM = FString::Printf(TEXT("NONE CONTROLLER"));
+		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Black, CM);
+	}
 }
-		//Char->PlayAnimMontage(HitAnimMontage); 
 
 void AWCharacterBase::Tick(float DeltaTime)
 {
@@ -174,7 +187,7 @@ void AWCharacterBase::SkillR(const FInputActionValue& Value)
 
 void AWCharacterBase::S_BeingDead_Implementation()
 {
-	NM_BeingDead();
+		NM_BeingDead();
 }
 
 void AWCharacterBase::NM_BeingDead_Implementation()
@@ -184,7 +197,7 @@ void AWCharacterBase::NM_BeingDead_Implementation()
 	if (PC)
 	{
 		//리스폰 실행
-		PC->ShowRespawnWidget(); 
+		PC->ShowRespawnWidget();
 	}
 	
 	//죽으면 카메라 움직임에 메쉬 따라 움직이지 않게 하기
@@ -199,6 +212,19 @@ void AWCharacterBase::NM_BeingDead_Implementation()
 	ACharacter::GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	ACharacter::GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	ACharacter::PlayAnimMontage(DeadAnimMontage);
+
+	//캐릭터 리스폰
+	AWGameMode* GameMode = Cast<AWGameMode>(GetWorld()->GetAuthGameMode<AGameMode>());
+	AWGameState* GameState = Cast<AWGameState>(GetWorld()->GetGameState());
+	if (PC && GameMode)
+	{
+		FTimerHandle RespawnTimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle,
+			[this, PC, GameMode]()
+			{
+				GameMode->RespawnPlayer(this, PC);
+			}, GameState->RespawnTime, false);
+	}
 }
 
 //포인트 데미지 주는 함수

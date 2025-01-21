@@ -36,8 +36,8 @@ public:
 
 	
 protected:
-	virtual void BeginPlay();
-	virtual void PostLogin(APlayerController* NewPlayer);
+	virtual void BeginPlay() override;
+	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void HandleMatchHasStarted() override;
 	virtual void HandleMatchHasEnded() override;
 	virtual bool ReadyToStartMatch_Implementation() override;
@@ -45,4 +45,9 @@ protected:
 	virtual void Logout(AController* Exiting) override;
 	virtual void SwapPlayerControllers(APlayerController* OldPC, APlayerController* NewPC) override;
 
+
+public:
+	// 스폰 함수
+	UFUNCTION()
+	void RespawnPlayer(APawn* Player, AController* PlayerController);
 };

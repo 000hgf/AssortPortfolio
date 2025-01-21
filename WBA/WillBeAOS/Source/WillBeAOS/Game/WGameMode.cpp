@@ -1,5 +1,6 @@
 #include "WGameMode.h"
 #include "WGameState.h"
+#include "Character/WCharacterBase.h"
 #include "Character/WPlayerController.h"
 #include "Character/WPlayerState.h"
 #include "Gimmick/Nexus.h"
@@ -16,6 +17,8 @@ void AWGameMode::SwapPlayerControllers(APlayerController* OldPC, APlayerControll
 		AllPlayerController.Add(NewPC);
 	}
 }
+
+
 
 void AWGameMode::PostLogin(APlayerController* NewPlayer)
 {
@@ -173,4 +176,20 @@ int32 AWGameMode::GetTeam(AActor* Actor) const
 	}
 
 	return -1; // Team 정보 없음
+}
+
+// 리스폰
+void AWGameMode::RespawnPlayer(APawn* Player, AController* PlayerController)
+{
+	if (Player == nullptr && PlayerController == nullptr)
+	{
+		return;
+	}
+	 	
+	AActor* PlayerStart = FindPlayerStart(PlayerController);
+	if (PlayerStart)
+	{
+		AWCharacterBase* RespawnChar = GetWorld()->SpawnActor<AWCharacterBase>(Player->GetClass(), PlayerStart->GetActorLocation(), PlayerStart->GetActorRotation());
+		PlayerController->Possess(RespawnChar);
+	}
 }

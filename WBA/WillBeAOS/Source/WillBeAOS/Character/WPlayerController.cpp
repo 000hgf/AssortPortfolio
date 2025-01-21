@@ -8,7 +8,7 @@ void AWPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
-	if (!PlayerHUD && UserWidgetClass)
+	if (IsLocalController() && !PlayerHUD && UserWidgetClass)
 	{
 		PlayerHUD = CreateWidget<UWCharacterHUD>(this, UserWidgetClass);
 		if (PlayerHUD)
@@ -96,15 +96,16 @@ void AWPlayerController::ShowRespawnWidget()
 	{
 		RespawnScreen->AddToViewport();
 	}
-	
-	CurrentRespawnTime = RespawnTime;
+
+	AWGameState* GameState = Cast<AWGameState>(GetWorld()->GetGameState());
+	CurrentRespawnTime = GameState->RespawnTime;
 	
 	GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle, this, &ThisClass::UpdateRespawnWidget, 1.f, true);
 }
 
 void AWPlayerController::UpdateRespawnWidget()
 {
-	if (CurrentRespawnTime > 0)
+	if (CurrentRespawnTime > 1)
 	{
 		CurrentRespawnTime--;
 	}
