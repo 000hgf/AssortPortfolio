@@ -11,6 +11,7 @@ UCombatComponent::UCombatComponent()
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
 	DOREPLIFETIME(ThisClass, Health);
 }
 
@@ -74,11 +75,6 @@ void UCombatComponent::SetIsDead(bool Val)
 bool UCombatComponent::GetIsDead()
 {
 	return IsDead;
-}
-
-void UCombatComponent::OnRep_Health()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Found Towers"));
 }
 
 // Called every frame

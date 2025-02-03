@@ -58,6 +58,8 @@ void ATower::BeginPlay()
 	Super::BeginPlay();
 }
 
+
+
 void ATower::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -85,19 +87,6 @@ void ATower::Tick(float DeltaTime)
 			GetWorld()->SpawnActor<AActor>(SpawnActors, AttackStartPoint->GetComponentTransform(), SpawnParams);
 			Delta = 0;
 		}
-
-		// 나의 고생들...
-		//FTimerHandle handle;
-		//FActorSpawnParameters SpawnParams;
-		//FTimerDelegate TimerCallback;
-
-		//TimerCallback.BindLambda(
-		//	[this, SpawnParams]
-		//	{
-		//		GetWorld()->SpawnActor<AActor>(SpawnActors, AttackStartPoint->GetComponentTransform(), SpawnParams);
-		//	});
-		//GetWorld()->GetTimerManager().SetTimer(handle, TimerCallback, 3.0f, false);
-		////GetWorldTimerManager().SetTimer(handle, &ATower::spawn(), 3.f, false);
 	}
 }
 
@@ -116,7 +105,7 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	{
 		CombatComp->HandleTakeDamage(TakeDamage);
 
-		SetHpPercentage((CombatComp->Health), (CombatComp->Max_Health));
+		S_SetHpPercentage((CombatComp->Health), (CombatComp->Max_Health));
 
 		// 타워의 HP가 일정 이하로 떨어지면 데미지 받은 메쉬로 바꾸고 파티클 생성
 		if (CombatComp->Health <= (CombatComp->Max_Health / 2) && !IsParticleSpawned)
@@ -137,10 +126,6 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 			Destroy();
 		}
 	}
-	/*auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"),
-		TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
-
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);*/
 
 	return DamageAmount;
 }
@@ -174,7 +159,12 @@ void ATower::spawn()
 	GetWorld()->SpawnActor<AActor>(SpawnActors, AttackStartPoint->GetComponentTransform(), SpawnParams);
 }
 
-void ATower::SetHpPercentage(float Health, float MaxHealth)
+void ATower::S_SetHpPercentage_Implementation(float Health, float MaxHealth)
+{
+	SetHpPercentage(Health, MaxHealth);
+}
+
+void ATower::SetHpPercentage_Implementation(float Health, float MaxHealth)
 {
 	auto Widget = Cast<UHealthBar>(WidgetComponent->GetWidget());
 

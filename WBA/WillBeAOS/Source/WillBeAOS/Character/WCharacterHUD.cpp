@@ -1,4 +1,6 @@
 #include "WCharacterHUD.h"
+
+#include "CombatComponent.h"
 #include "WCharacterBase.h"
 #include "GameFramework/PlayerState.h"
 #include "WPlayerState.h"
@@ -6,6 +8,7 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Game/WGameState.h"
+
 
 void UWCharacterHUD::NativeConstruct()
 {
@@ -288,4 +291,14 @@ FText UWCharacterHUD::SetAbLevel()
 		return FText::FromString(AbString);
 	}
 	return FText();
+}
+
+FText UWCharacterHUD::SetHP()
+{
+	if (AWC)
+	{
+		FString HPString = FString::Printf(TEXT("%.f/%.f"), AWC->GetHPInfo(), AWC->GetMaxHPInfo());
+		return FText::FromString(HPString);
+	}
+	return FText::FromString(TEXT("0/0"));
 }

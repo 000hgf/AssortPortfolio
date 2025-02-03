@@ -70,18 +70,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Collision")
 	TArray<AActor*> AlreadyHitActors = {};
 
-	UPROPERTY(ReplicatedUsing = OnRep_Health ,BlueprintReadOnly, Category = "Health")
+	UPROPERTY(Replicated ,BlueprintReadOnly, Category = "Health")
 	float Health = 10;
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float Max_Health = 100;
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
 	bool IsDead;
 
-public:
-
-	UFUNCTION()
-	void OnRep_Health();
-	
+public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UCombatComponent();

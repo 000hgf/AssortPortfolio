@@ -143,6 +143,11 @@ public:
 	UTextBlock* AbilityLevel;
 	UFUNCTION(Blueprintpure, meta = (BindWidget), Category = "Stat")
 	FText SetAbLevel();
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget), Category = "Stat")
+	UTextBlock* CurrentHP;
+	UFUNCTION(Blueprintpure, meta = (BindWidget), Category = "Stat")
+	FText SetHP();
+	
 
 protected:
 	// 위젯 초기화 시 실행되는 함수

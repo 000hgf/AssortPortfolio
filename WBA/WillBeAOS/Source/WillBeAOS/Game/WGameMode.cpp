@@ -181,15 +181,20 @@ int32 AWGameMode::GetTeam(AActor* Actor) const
 // 리스폰
 void AWGameMode::RespawnPlayer(APawn* Player, AController* PlayerController)
 {
-	if (Player == nullptr && PlayerController == nullptr)
+	if (!Player || !PlayerController)
 	{
 		return;
 	}
-	 	
+	
 	AActor* PlayerStart = FindPlayerStart(PlayerController);
 	if (PlayerStart)
 	{
-		AWCharacterBase* RespawnChar = GetWorld()->SpawnActor<AWCharacterBase>(Player->GetClass(), PlayerStart->GetActorLocation(), PlayerStart->GetActorRotation());
-		PlayerController->Possess(RespawnChar);
+		AWCharacterBase* RespawnChar = GetWorld()->SpawnActor<AWCharacterBase>(Player->GetClass(), PlayerStart->GetActorLocation(), FRotator(0,0,0));
+		AWPlayerController* PC = Cast<AWPlayerController>(PlayerController);
+		
+		if (PC)
+		{
+			PC->OnPossess(RespawnChar);
+		}
 	}
 }

@@ -49,7 +49,7 @@ void AWMinionsCharacterBase::Tick(float DeltaTime)
 	float HP = CombatComponent->Health;
 	float MAXHP = CombatComponent->Max_Health;
 
-	SetHpPercentage(HP, MAXHP);
+	S_SetHpPercentage(HP, MAXHP);
 
 	// 게임이 끝나면 로직 끊기
 	AWGameState* WGS = Cast<AWGameState>(GetWorld()->GetGameState());
@@ -65,6 +65,22 @@ void AWMinionsCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerIn
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AWMinionsCharacterBase::S_SetHpPercentage_Implementation(float Health, float MaxHealth)
+{
+	SetHpPercentage(Health, MaxHealth);
+}
+
+void AWMinionsCharacterBase::SetHpPercentage_Implementation(float Health, float MaxHealth)
+{
+	auto Widget = Cast<UHealthBar>(WidgetComponent->GetWidget());
+
+	if (Widget != nullptr)
+	{
+		if (MaxHealth != 0)
+			Widget->HealthBar->SetPercent(Health / MaxHealth);
+	}
 }
 
 void AWMinionsCharacterBase::NM_BeingDead_Implementation()
@@ -83,18 +99,6 @@ void AWMinionsCharacterBase::NM_BeingDead_Implementation()
 	// 죽는 애니메이션 실행
 	PlayAnimMontage(DeadAnimMontage);
 }
-
-void AWMinionsCharacterBase::SetHpPercentage(float Health, float MaxHealth)
-{
-	auto Widget = Cast<UHealthBar>(WidgetComponent->GetWidget());
-
-	if (Widget != nullptr)
-	{
-		if (MaxHealth != 0)
-			Widget->HealthBar->SetPercent(Health / MaxHealth);
-	}
-}
-
 
 void AWMinionsCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
 {

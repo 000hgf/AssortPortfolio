@@ -3,26 +3,35 @@
 #include "WCharacterBase.h"
 #include "WCharacterHUD.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 void AWPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
-	if (IsLocalController() && !PlayerHUD && UserWidgetClass)
+
+	if (IsLocalController())
+	{
+		CreateGamePlayHUD(GetPawn());
+	}
+}
+
+void AWPlayerController::CreateGamePlayHUD(APawn* PlayerChar)
+{
+	if (!IsValid(PlayerHUD))
 	{
 		PlayerHUD = CreateWidget<UWCharacterHUD>(this, UserWidgetClass);
-		if (PlayerHUD)
+
+		PlayerHUD->AddToViewport();
+		PlayerHUD->UpdateCharacter(Cast<AWCharacterBase>(PlayerChar));
+	}
+	else
+	{
+		if (!PlayerHUD->IsInViewport())
 		{
 			PlayerHUD->AddToViewport();
-			
-			if (APawn* PossessedPawn = GetPawn())
-			{
-				AWC = Cast<AWCharacterBase>(PossessedPawn);
-				if (AWC)
-				{
-					PlayerHUD->UpdateCharacter(AWC);
-				}
-			}
+			PlayerHUD->UpdateCharacter(Cast<AWCharacterBase>(PlayerChar));
 		}
 	}
 }
@@ -85,6 +94,14 @@ void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 
 void AWPlayerController::ShowRespawnWidget()
 {
+	if (!IsLocalController())
+	{
+		return;
+	}
+
+	FString PossessedPawn = GetPawn()->GetName();
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, PossessedPawn);
+	
 	if (PlayerHUD)
 	{
 		PlayerHUD->RemoveFromParent();
@@ -105,6 +122,11 @@ void AWPlayerController::ShowRespawnWidget()
 
 void AWPlayerController::UpdateRespawnWidget()
 {
+	if (!IsLocalController())
+	{
+		return;
+	}
+	
 	if (CurrentRespawnTime > 1)
 	{
 		CurrentRespawnTime--;
@@ -131,20 +153,24 @@ void AWPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 
 void AWPlayerController::OnPossess(APawn* InPawn)
-{
+{	
 	Super::OnPossess(InPawn);
-	
-	if (PlayerHUD)
+
+	if (IsLocalController())
+	{
+		CreateGamePlayHUD(InPawn);
+	}
+	/*if (PlayerHUD)
 	{
 		PlayerHUD->AddToViewport();
-	}
-	
-	if (APawn* PossessedPawn = InPawn)
-	{
-		AWC = Cast<AWCharacterBase>(PossessedPawn);
-		if (AWC && PlayerHUD)
+
+		if (InPawn)
 		{
-			PlayerHUD->UpdateCharacter(AWC);
+			AWC = Cast<AWCharacterBase>(InPawn);
+			if (AWC)
+			{
+				PlayerHUD->UpdateCharacter(AWC);
+			}
 		}
-	}
+	}*/
 }

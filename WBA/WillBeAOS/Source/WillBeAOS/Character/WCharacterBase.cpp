@@ -41,33 +41,14 @@ void AWCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	//BeingDead 델리게이트 바인딩
-	CombatComp->DelegateDead.BindUObject(this, &ThisClass::S_BeingDead);
+	CombatComp->DelegateDead.BindUObject(this, &ThisClass::BeingDead);
 	//HandleApplyPointDamage 멀티델리게이트 바인딩
 	CombatComp->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
-
-	// 캐릭터가 controller를 가지고 있는지 확인하는 함수
-	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
-	//AController* PC = Controller;
-	if (PC)
-	{
-		auto CM = FString::Printf(TEXT("USE CONTROLLER"));
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Black, CM);
-	}
-	else
-	{
-		auto CM = FString::Printf(TEXT("NONE CONTROLLER"));
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Black, CM);
-	}
 }
 
 void AWCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	//float HP = CombatComp->Health;
-	//float MAXHP = CombatComp->Max_Health;
-
-	//SetHpPercentage(HP, MAXHP);
 }
 
 void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -99,6 +80,18 @@ void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 float AWCharacterBase::GetHpPercentage()	// HP 게이지 업데이트
 {
 	return (CombatComp->Health / CombatComp->Max_Health);
+}
+
+float AWCharacterBase::GetHPInfo()
+{
+	HP = CombatComp->Health;
+	return HP;
+}
+
+float AWCharacterBase::GetMaxHPInfo()
+{
+	MaxHP = CombatComp->Max_Health;
+	return MaxHP;
 }
 
 void AWCharacterBase::Look(const FInputActionValue& Value)
@@ -185,16 +178,16 @@ void AWCharacterBase::SkillR(const FInputActionValue& Value)
 	}
 }
 
-void AWCharacterBase::S_BeingDead_Implementation()
+void AWCharacterBase::BeingDead()
 {
-		NM_BeingDead();
-}
+	////죽음 메세지 출력
+	auto Message = FString::Printf(TEXT("Dead"));
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
 
-void AWCharacterBase::NM_BeingDead_Implementation()
-{
-	// 리스폰 위젯 출력
 	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
-	if (PC)
+	
+	// 리스폰 위젯 출력
+	if (PC != nullptr)
 	{
 		//리스폰 실행
 		PC->ShowRespawnWidget();
@@ -203,28 +196,43 @@ void AWCharacterBase::NM_BeingDead_Implementation()
 	//죽으면 카메라 움직임에 메쉬 따라 움직이지 않게 하기
 	this->bUseControllerRotationYaw = false;
 	
-	////죽음 메세지 출력
-	auto Message = FString::Printf(TEXT("Dead"));
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
-	
-	//무브먼트, 콜리전 없애고 몽타주 출력
-	ACharacter::GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-	ACharacter::GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	ACharacter::GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	ACharacter::PlayAnimMontage(DeadAnimMontage);
+	S_BeingDead(PC, this);
+}
 
+void AWCharacterBase::S_BeingDead_Implementation(AWPlayerController* PC, APawn* Player)
+{
 	//캐릭터 리스폰
-	AWGameMode* GameMode = Cast<AWGameMode>(GetWorld()->GetAuthGameMode<AGameMode>());
 	AWGameState* GameState = Cast<AWGameState>(GetWorld()->GetGameState());
-	if (PC && GameMode)
+	AWGameMode* GameMode = Cast<AWGameMode>(GetWorld()->GetAuthGameMode());
+	if (PC, GameState, GameMode)
 	{
 		FTimerHandle RespawnTimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle,
-			[this, PC, GameMode]()
+			[Player, PC, GameMode]()
 			{
-				GameMode->RespawnPlayer(this, PC);
+				GameMode->RespawnPlayer(Player, PC);
 			}, GameState->RespawnTime, false);
 	}
+	
+	NM_BeingDead();
+}
+
+void AWCharacterBase::NM_BeingDead_Implementation()
+{
+	// BeingDead를 받는 객체가 무엇인지 판별하기 위한 함수
+	//GetWorld()->SpawnActor<APawn>(SpawnsearchLocation, GetTransform());
+	
+	//무브먼트, 콜리전 없애고 몽타주 출력
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	PlayAnimMontage(DeadAnimMontage);
+}
+
+void AWCharacterBase::C_BeingDead_Implementation(AWPlayerController* PC)
+{
+	
+
 }
 
 //포인트 데미지 주는 함수

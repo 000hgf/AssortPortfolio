@@ -30,6 +30,7 @@ class WILLBEAOS_API AWPlayerController : public APlayerController
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> UserWidgetClass;
 
+public:
 	class UWCharacterHUD* PlayerHUD;
 
 	UUserWidget* RespawnScreen;
@@ -50,8 +51,12 @@ public:
 	void HideRespawnWidget();
 	void OnGameStateChanged(E_GamePlay CurrentGameState);
 
+	void CreateGamePlayHUD(APawn* PlayerChar);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	virtual void OnPossess(APawn* InPawn);
+
+public:
+	virtual void OnPossess(APawn* InPawn) override;
 };

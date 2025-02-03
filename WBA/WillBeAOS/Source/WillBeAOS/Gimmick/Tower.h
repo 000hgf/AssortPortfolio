@@ -33,7 +33,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION(NetMulticast, Reliable)
 	void SetHpPercentage(float Health, float MaxHealth);
+	UFUNCTION(Server, Reliable)
+	void S_SetHpPercentage(float Health, float MaxHealth);
 	
 public:	
 	UPROPERTY(EditAnywhere)

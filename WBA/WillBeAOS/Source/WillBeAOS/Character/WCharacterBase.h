@@ -30,6 +30,8 @@ public:
 	UWidgetComponent* WidgetComponent;
 
 public:
+	float HP;
+	float MaxHP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
 	E_TeamID TeamID = E_TeamID::Blue;
 	
@@ -75,7 +77,14 @@ public:
 	UFUNCTION(Server, Reliable)
 	void S_Behavior();
 	UFUNCTION(Server, Reliable)
-	void S_BeingDead();
+	void S_BeingDead(class AWPlayerController* PC, APawn* Player);
+
+	// 일반 죽는 함수(죽는 클라이언트 본인만 실행되도록)
+	void BeingDead();
+	// 클라이언트
+	UFUNCTION(Client, Reliable)
+	void C_BeingDead(AWPlayerController* PC);
+
 
 	//?�리게이???�수
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = Dead)
@@ -101,8 +110,16 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	float GetHpPercentage();
+	UFUNCTION(BlueprintPure)
+	float GetHPInfo();
+	UFUNCTION(BlueprintPure)
+	float GetMaxHPInfo();
 	UPROPERTY(BlueprintReadWrite, Category = "Skill")//���� ����
 	bool SkillREnable;
+
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<APawn> SpawnsearchLocation;
 };

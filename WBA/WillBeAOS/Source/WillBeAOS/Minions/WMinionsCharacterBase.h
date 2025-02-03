@@ -46,8 +46,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+
+	UFUNCTION(NetMulticast, Reliable)
 	void SetHpPercentage(float Health, float MaxHealth);
+	UFUNCTION(Server, Reliable)
+	void S_SetHpPercentage(float Health, float MaxHealth);
 	
 	//RPC로 서버에서 호출
 	
