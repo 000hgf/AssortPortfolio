@@ -1,12 +1,8 @@
 #include "WCharacterHUD.h"
-
-#include "CombatComponent.h"
 #include "WCharacterBase.h"
-#include "GameFramework/PlayerState.h"
 #include "WPlayerState.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
-#include "Kismet/GameplayStatics.h"
 #include "../Game/WGameState.h"
 
 
@@ -21,18 +17,53 @@ void UWCharacterHUD::NativeConstruct()
 	{
 		AWC->DSkillLCooldown.BindUObject(this, &ThisClass::SetSkillLTimer);
 	}
-
+	
 	APlayerController* PlayerController = GetOwningPlayer();
 	if (PlayerController)
 	{
-		AWPS = Cast<AWPlayerState>(PlayerController->PlayerState);
+		AWPS = PlayerController->GetPlayerState<AWPlayerState>();
+
+		if (AWPS)
+		{
+			auto Message = FString::Printf(TEXT("PlayerState 가져오기 성공: %s"), *AWPS->GetName());
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, Message);
+		}
+		else
+		{
+			auto Message = FString::Printf(TEXT("PlayerState가 NULL. 0.5초 후 재시도."));
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, Message);
+			GetWorld()->GetTimerManager().SetTimer(ErrorTimerHandle, this, &UWCharacterHUD::TryGetPlayerState, 0.5f, false);
+		}
 	}
+
+	UpdateCharacter();
 }
 
-void UWCharacterHUD::UpdateCharacter(AWCharacterBase* Char)
+void UWCharacterHUD::TryGetPlayerState()
 {
-	AWC = Char;
+	APlayerController* PlayerController = GetOwningPlayer();
+	if (PlayerController)
+	{
+		AWPS = PlayerController->GetPlayerState<AWPlayerState>();
 
+		if (AWPS)
+		{
+			auto Message = FString::Printf(TEXT("PlayerState 가져오기 성공: %s"), *AWPS->GetName());
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, Message);
+			UpdateCharacter();  // ✅ UI 업데이트
+			return;
+		}
+	}
+	
+	auto Message = FString::Printf(TEXT("여전히 PlayerState가 NULL. 0.5초 후 재시도."));
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, Message);
+	GetWorld()->GetTimerManager().SetTimer(ErrorTimerHandle, this, &UWCharacterHUD::TryGetPlayerState, 0.5f, false);
+}
+
+void UWCharacterHUD::UpdateCharacter()
+{
+	AWC = Cast<AWCharacterBase>(GetOwningPlayerPawn());
+	
 	if (AWC)
 	{
 		AWC->DSkillLCooldown.BindUObject(this, &ThisClass::SetSkillLTimer);
@@ -47,58 +78,21 @@ void UWCharacterHUD::UpdateCharacter(AWCharacterBase* Char)
 	SkillRData.SkillCooldown = SkillRCooldown;
 	SkillRData.SkillProgress = Skill_RProgress;
 	SkillRData.SkillTimer = Skill_RTimer;
+
+	// init 스탯
+	SetState();
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ThisClass::SetState, 0.5f, true);
 }
 
 float UWCharacterHUD::GetHealthBarPercentage()
 {
-	if (AWC != nullptr)
+	if (AWPS == nullptr)
 	{
-		if (AWC->GetHpPercentage() == 0)
-		{
-			SetVisibility(ESlateVisibility::Hidden);
-		}
-		return AWC->GetHpPercentage();
+		return 0.0f;
 	}
-	else return 0.0f;
+		
+	return /*AWPS->GetHPPercentage();*/ AWPS->GetHP() / AWPS->GetMaxHP();
 }
-
-
-float UWCharacterHUD::SetTowerProgress()
-{
-	if (AWGS != nullptr)
-	{
-		if (AWGS->GetTowerNum() == 0)
-		{
-			FriendTowerProgress->SetVisibility(ESlateVisibility::Hidden);
-		}
-		return (AWGS->GetTowerNum()/6.0f);
-	}
-	else return 0.5f;
-}
-
-float UWCharacterHUD::SetNexusHealth()
-{
-	if (AWGS != nullptr)
-	{
-		return AWGS->GetNexusHP();
-	}
-	return 0.0f;
-}
-
-FText UWCharacterHUD::UpdateGameTimer()
-{
-	float CurrentGameTime = AWGS->GetServerWorldTimeSeconds();
-	float OneGametime = 45 * 60;
-	float RestGameTime = OneGametime - CurrentGameTime;
-
-	FString TimeString = FString::Printf(TEXT("%d : %02d"), static_cast<int32>(RestGameTime/60) , static_cast<int32>(FMath::Fmod(RestGameTime, 60)));
-	return FText::FromString(TimeString);
-}
-
-//float UWCharacterHUD::CanAttackEnemy()
-//{
-//	return 0.0f;
-//}
 
 void UWCharacterHUD::SetSkillTimer(FSkillCooldownData& SkillData)
 {
@@ -193,24 +187,37 @@ void UWCharacterHUD::UpdateSkillRTimer()
 	}
 }
 
-FText UWCharacterHUD::SetPower()
+void UWCharacterHUD::SetState()
 {
 	if (AWPS)
 	{
 		FString PowerString = FString::Printf(TEXT("Attack: %d"), AWPS->CPower);
-		return FText::FromString(PowerString);
+		Power->SetText(FText::FromString(PowerString));
+
+		FString AHString = FString::Printf(TEXT("AddHealth: %d"), AWPS->CAdditionalHealth);
+		AdditionalHealth->SetText(FText::FromString(AHString));
+
+		FString DefenceString = FString::Printf(TEXT("Def: %d"), AWPS->CDefense);
+		Defence->SetText(FText::FromString(DefenceString));
+
+		FString SpeedString = FString::Printf(TEXT("Speed: %.1f"), AWPS->CSpeed);
+		Speed->SetText(FText::FromString(SpeedString));
+
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 	}
-	return FText::FromString(TEXT("Attack: 0"));
 }
 
-FText UWCharacterHUD::SetCC()
+void UWCharacterHUD::SetPower()
 {
 	if (AWPS)
 	{
-		FString CCString = FString::Printf(TEXT("Crit: % d"), AWPS->CCriticalHitChance);
-		return FText::FromString(CCString);
+		FString PowerString = FString::Printf(TEXT("Attack: %d"), AWPS->CPower);
+		Power->SetText(FText::FromString(PowerString));
 	}
-	return FText::FromString(TEXT("Crit: 0"));
+	else
+	{
+		Power->SetText(FText::FromString("Attack: 0"));
+	}
 }
 
 FText UWCharacterHUD::SetAH()
@@ -241,16 +248,6 @@ FText UWCharacterHUD::SetSpeed()
 		return FText::FromString(SpeedString);
 	}
 	return FText::FromString(TEXT("Speed: 0"));
-}
-
-FText UWCharacterHUD::SetCR()
-{
-	if (AWPS)
-	{
-		FString CRString = FString::Printf(TEXT("Cooldown: %.1f"), AWPS->CCooldownReduction);
-		return FText::FromString(CRString);
-	}
-	return FText::FromString(TEXT("Cooldown: 0"));
 }
 
 FText UWCharacterHUD::SetLevel()
@@ -295,9 +292,9 @@ FText UWCharacterHUD::SetAbLevel()
 
 FText UWCharacterHUD::SetHP()
 {
-	if (AWC)
+	if (AWPS)
 	{
-		FString HPString = FString::Printf(TEXT("%.f/%.f"), AWC->GetHPInfo(), AWC->GetMaxHPInfo());
+		FString HPString = FString::Printf(TEXT("%.f/%.f"), AWPS->GetHP(), AWPS->GetMaxHP());
 		return FText::FromString(HPString);
 	}
 	return FText::FromString(TEXT("0/0"));

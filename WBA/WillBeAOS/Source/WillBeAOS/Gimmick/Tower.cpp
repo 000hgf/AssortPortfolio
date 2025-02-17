@@ -12,6 +12,7 @@
 #include "../Minions/HealthBar.h"
 #include "../Game/WGameState.h"
 #include "../Minions/WMinionsCharacterBase.h"
+#include "Game/WGameMode.h"
 #include "Net/UnrealNetwork.h"
 
 ATower::ATower()
@@ -51,6 +52,11 @@ ATower::ATower()
 	OverlapTrigger->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
 	OverlapTrigger->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlap);
 	
+}
+
+int32 ATower::GetGoldReward() const
+{
+	return GoldReward;
 }
 
 void ATower::BeginPlay()
@@ -100,6 +106,9 @@ void ATower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	LastHitBy = EventInstigator;
+	
 	float TakeDamage = DamageAmount;
 	if (CombatComp != nullptr)
 	{
@@ -113,6 +122,12 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 			StaticMesh->SetStaticMesh(DamagedStaticMesh);
 			DamagedNiagara->SetAsset(DamageParticle);
 			IsParticleSpawned = true;
+
+			AWGameMode* GameMode = Cast<AWGameMode>(GetWorld()->GetAuthGameMode());
+			if (GameMode)
+			{
+				GameMode->OnObjectKilled(this, LastHitBy);
+			}
 		}
 
 		if ((CombatComp->GetIsDead()))
@@ -123,6 +138,13 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 			{
 				AWGS->TowerArray.Remove(this);
 			}
+
+			AWGameMode* GameMode = Cast<AWGameMode>(GetWorld()->GetAuthGameMode());
+			if (GameMode)
+			{
+				GameMode->OnObjectKilled(this, LastHitBy);
+			}
+			
 			Destroy();
 		}
 	}
@@ -134,7 +156,7 @@ void ATower::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 {
 	AWCharacterBase* EnemyChar = Cast<AWCharacterBase>(OtherActor);
 	AWMinionsCharacterBase* EnemyMinion = Cast<AWMinionsCharacterBase>(OtherActor);
-	if ((EnemyChar && EnemyChar->TeamID != TowerTeamID))
+	if ((EnemyChar && EnemyChar->TeamID != TowerTeamID) || EnemyMinion)
 	{
 		OverlappingActors.AddUnique(OtherActor);
 	}

@@ -1,9 +1,8 @@
 #include "WPlayerController.h"
 #include "Blueprint/UserWidget.h"
-#include "WCharacterBase.h"
 #include "WCharacterHUD.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
-#include "Net/UnrealNetwork.h"
+#include "UI/TowerNexusHPWidget.h"
 
 void AWPlayerController::BeginPlay()
 {
@@ -11,30 +10,32 @@ void AWPlayerController::BeginPlay()
 	
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
 
-	if (IsLocalController())
+	if (IsLocalController() && GameStateClass && UserWidgetClass)
 	{
-		CreateGamePlayHUD(GetPawn());
-	}
-}
-
-void AWPlayerController::CreateGamePlayHUD(APawn* PlayerChar)
-{
-	if (!IsValid(PlayerHUD))
-	{
-		PlayerHUD = CreateWidget<UWCharacterHUD>(this, UserWidgetClass);
-
-		PlayerHUD->AddToViewport();
-		PlayerHUD->UpdateCharacter(Cast<AWCharacterBase>(PlayerChar));
-	}
-	else
-	{
-		if (!PlayerHUD->IsInViewport())
+		// 월드 게임 플레이 관련
+		if (!IsValid(GamePlayHUD))
 		{
-			PlayerHUD->AddToViewport();
-			PlayerHUD->UpdateCharacter(Cast<AWCharacterBase>(PlayerChar));
+			GamePlayHUD = CreateWidget<UTowerNexusHPWidget>(this, GameStateClass);
+
+			if (GamePlayHUD)
+				GamePlayHUD->AddToViewport();
+		}
+
+		// 유저 위젯 관련
+		if (!PlayerHUD)
+		{
+			PlayerHUD = CreateWidget<UWCharacterHUD>(this, UserWidgetClass);
+			if (PlayerHUD)
+				PlayerHUD->AddToViewport();
 		}
 	}
 }
+
+void AWPlayerController::OnPossess(APawn* InPawn)
+{	
+	Super::OnPossess(InPawn);
+}
+
 
 void AWPlayerController::OnGameStateChanged(E_GamePlay CurrentGameState)
 {
@@ -68,6 +69,9 @@ void AWPlayerController::OnGameStateChanged(E_GamePlay CurrentGameState)
 void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 {
 	Super::GameHasEnded(EndGameFocus, bIsWinner);
+
+	if (GamePlayHUD)
+		GamePlayHUD->RemoveFromParent();
 	
 	if(PlayerHUD)
 		PlayerHUD->RemoveFromParent();
@@ -98,20 +102,14 @@ void AWPlayerController::ShowRespawnWidget()
 	{
 		return;
 	}
-
-	FString PossessedPawn = GetPawn()->GetName();
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, PossessedPawn);
 	
-	if (PlayerHUD)
+	if (!RespawnScreen || !RespawnScreen->IsInViewport())
 	{
-		PlayerHUD->RemoveFromParent();
-	}
-
-	
-	RespawnScreen = CreateWidget(this, RespawnScreenClass);
-	if (RespawnScreen != nullptr)
-	{
-		RespawnScreen->AddToViewport();
+		RespawnScreen = CreateWidget(GetWorld(), RespawnScreenClass);
+		if (RespawnScreen)
+		{
+			RespawnScreen->AddToViewport(1); // ZOrder 조정
+		}
 	}
 
 	AWGameState* GameState = Cast<AWGameState>(GetWorld()->GetGameState());
@@ -143,34 +141,11 @@ void AWPlayerController::HideRespawnWidget()
 	if (RespawnScreen != nullptr)
 	{
 		RespawnScreen->RemoveFromParent();
+		RespawnScreen = nullptr;
 	}
 }
 
 void AWPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-}
-
-
-void AWPlayerController::OnPossess(APawn* InPawn)
-{	
-	Super::OnPossess(InPawn);
-
-	if (IsLocalController())
-	{
-		CreateGamePlayHUD(InPawn);
-	}
-	/*if (PlayerHUD)
-	{
-		PlayerHUD->AddToViewport();
-
-		if (InPawn)
-		{
-			AWC = Cast<AWCharacterBase>(InPawn);
-			if (AWC)
-			{
-				PlayerHUD->UpdateCharacter(AWC);
-			}
-		}
-	}*/
 }

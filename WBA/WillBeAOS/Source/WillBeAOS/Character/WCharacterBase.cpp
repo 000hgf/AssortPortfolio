@@ -9,8 +9,10 @@
 #include "CombatComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "WPlayerController.h"
+#include "WPlayerState.h"
 #include "Components/SceneComponent.h"
 #include "Game/WGameMode.h"
+#include "Net/UnrealNetwork.h"
 
 
 AWCharacterBase::AWCharacterBase()
@@ -40,8 +42,6 @@ AWCharacterBase::AWCharacterBase()
 void AWCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	//BeingDead 델리게이트 바인딩
-	CombatComp->DelegateDead.BindUObject(this, &ThisClass::BeingDead);
 	//HandleApplyPointDamage 멀티델리게이트 바인딩
 	CombatComp->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
 }
@@ -49,6 +49,12 @@ void AWCharacterBase::BeginPlay()
 void AWCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	AWPlayerState* PState = GetPlayerState<AWPlayerState>();
+	if (PState)
+	{
+		CharacterDamage = PState->CPower;
+	}
 }
 
 void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -75,23 +81,6 @@ void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(IA_SkillR, ETriggerEvent::Started, this, &AWCharacterBase::SkillR);
 
 	}
-}
-
-float AWCharacterBase::GetHpPercentage()	// HP 게이지 업데이트
-{
-	return (CombatComp->Health / CombatComp->Max_Health);
-}
-
-float AWCharacterBase::GetHPInfo()
-{
-	HP = CombatComp->Health;
-	return HP;
-}
-
-float AWCharacterBase::GetMaxHPInfo()
-{
-	MaxHP = CombatComp->Max_Health;
-	return MaxHP;
 }
 
 void AWCharacterBase::Look(const FInputActionValue& Value)
@@ -180,23 +169,14 @@ void AWCharacterBase::SkillR(const FInputActionValue& Value)
 
 void AWCharacterBase::BeingDead()
 {
-	////죽음 메세지 출력
+	//죽음 메세지 출력
 	auto Message = FString::Printf(TEXT("Dead"));
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
 
 	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
 	
-	// 리스폰 위젯 출력
-	if (PC != nullptr)
-	{
-		//리스폰 실행
-		PC->ShowRespawnWidget();
-	}
-	
-	//죽으면 카메라 움직임에 메쉬 따라 움직이지 않게 하기
-	this->bUseControllerRotationYaw = false;
-	
-	S_BeingDead(PC, this);
+	C_BeingDead(PC);	// 클라에서 실행하는 것
+	S_BeingDead(PC, this);	// 서버에서 실행하는 것
 }
 
 void AWCharacterBase::S_BeingDead_Implementation(AWPlayerController* PC, APawn* Player)
@@ -204,7 +184,7 @@ void AWCharacterBase::S_BeingDead_Implementation(AWPlayerController* PC, APawn* 
 	//캐릭터 리스폰
 	AWGameState* GameState = Cast<AWGameState>(GetWorld()->GetGameState());
 	AWGameMode* GameMode = Cast<AWGameMode>(GetWorld()->GetAuthGameMode());
-	if (PC, GameState, GameMode)
+	if (PC && GameState && GameMode && HasAuthority())
 	{
 		FTimerHandle RespawnTimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimerHandle,
@@ -219,9 +199,6 @@ void AWCharacterBase::S_BeingDead_Implementation(AWPlayerController* PC, APawn* 
 
 void AWCharacterBase::NM_BeingDead_Implementation()
 {
-	// BeingDead를 받는 객체가 무엇인지 판별하기 위한 함수
-	//GetWorld()->SpawnActor<APawn>(SpawnsearchLocation, GetTransform());
-	
 	//무브먼트, 콜리전 없애고 몽타주 출력
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -231,8 +208,15 @@ void AWCharacterBase::NM_BeingDead_Implementation()
 
 void AWCharacterBase::C_BeingDead_Implementation(AWPlayerController* PC)
 {
-	
+	// 클라에서 리스폰 위젯 출력
+	if (PC != nullptr)
+	{
+		//리스폰 실행
+		PC->ShowRespawnWidget();
+	}
 
+	//죽으면 카메라 움직임에 메쉬 따라 움직이지 않게 하기
+	this->bUseControllerRotationYaw = false;
 }
 
 //포인트 데미지 주는 함수
@@ -252,16 +236,19 @@ void AWCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
 	}
 }
 
-
+// 데미지 받는 함수
 float AWCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	float TakeDamage = DamageAmount;
-	CombatComp->HandleTakeDamage(TakeDamage);
-	//auto Message = FString::Printf(TEXT("%f points of Damage/ %s /Instigator: %s"), TakeDamage, *DamageCauser->GetName(), *EventInstigator->GetPawn()->GetName());
-	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
+
+	if (HasAuthority())
+	{
+		AWPlayerState* PS = Cast<AWPlayerState>(GetPlayerState());
+		if (PS)
+		{
+			PS->Server_ApplyDamage(DamageAmount);
+		}
+	}
 
 	return DamageAmount;
 }
-
-

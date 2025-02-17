@@ -1,11 +1,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WCharacterHUD.h"
 #include "WEnumFile.h"
 #include "Game/WGameState.h"
 #include "GameFramework/PlayerController.h"
 #include "WPlayerController.generated.h"
 
+class AWCharacterBase;
+class UWCharacterHUD;
+class UTowerNexusHPWidget;
 class UUserWidget;
 
 UCLASS()
@@ -30,12 +34,17 @@ class WILLBEAOS_API AWPlayerController : public APlayerController
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> UserWidgetClass;
 
+	//WorldGameState(Tower, Nexus, GameTime)
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> GameStateClass;
+
 public:
-	class UWCharacterHUD* PlayerHUD;
+	UWCharacterHUD* PlayerHUD;
+	UTowerNexusHPWidget* GamePlayHUD;
 
 	UUserWidget* RespawnScreen;
-	
-	class AWCharacterBase* AWC;
+
+	AWCharacterBase* AWC;
 	
 public:
 	UPROPERTY(BlueprintReadWrite)
@@ -50,8 +59,6 @@ public:
 	void UpdateRespawnWidget();
 	void HideRespawnWidget();
 	void OnGameStateChanged(E_GamePlay CurrentGameState);
-
-	void CreateGamePlayHUD(APawn* PlayerChar);
 
 protected:
 	virtual void BeginPlay() override;

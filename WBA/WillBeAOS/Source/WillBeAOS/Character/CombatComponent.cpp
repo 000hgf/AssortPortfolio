@@ -5,7 +5,8 @@
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
+	
+	SetIsReplicatedByDefault(true);
 }
 
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const
@@ -63,7 +64,7 @@ void UCombatComponent::HandleTakeDamage(float WDamage)
 		if (Health <= 0)
 		{
 			SetIsDead(true);
-			DelegateDead.ExecuteIfBound();	
+			DelegateDead.ExecuteIfBound();
 		}
 }
 

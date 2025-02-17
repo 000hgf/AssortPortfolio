@@ -30,8 +30,6 @@ public:
 	UWidgetComponent* WidgetComponent;
 
 public:
-	float HP;
-	float MaxHP;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
 	E_TeamID TeamID = E_TeamID::Blue;
 	
@@ -72,7 +70,7 @@ public:
 	void NM_Behavior();
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void SkillR(const FInputActionValue& Value);
-
+	
 	// Multicast로 Client에 보내주는 함수
 	UFUNCTION(Server, Reliable)
 	void S_Behavior();
@@ -104,18 +102,12 @@ private:
 	
 public:
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
-	float CharacterDamage;	//?��?지
+	float CharacterDamage;
 	
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	UFUNCTION(BlueprintPure)
-	float GetHpPercentage();
-	UFUNCTION(BlueprintPure)
-	float GetHPInfo();
-	UFUNCTION(BlueprintPure)
-	float GetMaxHPInfo();
 	UPROPERTY(BlueprintReadWrite, Category = "Skill")//���� ����
 	bool SkillREnable;
 

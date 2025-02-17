@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Destructible.h"
 #include "GameFramework/Character.h"
-#include "WDelegateDefine.h"
 #include "WMinionsCharacterBase.generated.h"
 
 class UAnimMontage;
@@ -11,7 +11,7 @@ class UWidgetComponent;
 class UProgressBar;
 
 UCLASS()
-class WILLBEAOS_API AWMinionsCharacterBase : public ACharacter
+class WILLBEAOS_API AWMinionsCharacterBase : public ACharacter, public IDestructible
 {
 	GENERATED_BODY()
 
@@ -29,8 +29,13 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category = Dead)
 	UAnimMontage* DeadAnimMontage;
+	
+	AController* LastHitBy;		// 마지막 타격 주체 저장
 
-	FDelegateSignature DelegateDead;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rewards")
+	int32 GoldReward = 30;
+
+	virtual int32 GetGoldReward() const override;
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void HandleApplyPointDamage(FHitResult LastHit);//포인트 데미지를 줄시 델리게이트로 호출될 함수
@@ -38,7 +43,7 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
 	float CharacterDamage;	//데미지
-
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -52,8 +57,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void S_SetHpPercentage(float Health, float MaxHealth);
 	
-	//RPC로 서버에서 호출
-	
+	UFUNCTION()
+	void Dead();
 	UFUNCTION(NetMulticast, Reliable)
 	void NM_BeingDead();	// Multicast로 Client들에게 전달
 	

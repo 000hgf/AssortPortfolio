@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
+#include "Destructible.h"
 #include "WGameMode.generated.h"
 
 UCLASS(config = Game)
@@ -10,6 +11,8 @@ class WILLBEAOS_API AWGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
+	AWGameMode();
+	
 	UPROPERTY(BlueprintReadWrite)
 	TArray<class APlayerController*> AllPlayerController;
 	
@@ -48,6 +51,10 @@ protected:
 
 public:
 	// 스폰 함수
-	UFUNCTION()
+	UFUNCTION(Server, Reliable)
 	void RespawnPlayer(APawn* Player, AController* PlayerController);
+
+	// 몬스터 사망시 이벤트
+	UFUNCTION()
+	void OnObjectKilled(TScriptInterface<IDestructible> DestroyedObject, AController* Killer);
 };

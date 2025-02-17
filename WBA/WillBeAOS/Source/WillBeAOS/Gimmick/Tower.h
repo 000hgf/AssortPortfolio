@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Destructible.h"
 #include "WEnumFile.h"
 #include "GameFramework/Actor.h"
 #include "Tower.generated.h"
@@ -11,7 +12,7 @@ class USphereComponent;
 class UStaticMeshComponent;
 
 UCLASS()
-class WILLBEAOS_API ATower : public AActor
+class WILLBEAOS_API ATower : public AActor, public IDestructible
 {
 
 	GENERATED_BODY()
@@ -29,6 +30,11 @@ public:
 	
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Team")
 	E_TeamID TowerTeamID = E_TeamID::Neutral;
+
+	virtual int32 GetGoldReward() const override;
+	int32 GoldReward = 50;
+
+	AController* LastHitBy;
 	
 protected:
 	virtual void BeginPlay() override;

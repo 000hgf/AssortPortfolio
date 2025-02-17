@@ -8,6 +8,11 @@
 #include "Gimmick/SpawnTowerPoint.h"
 #include "Kismet/GameplayStatics.h"
 
+AWGameMode::AWGameMode()
+{
+	PlayerStateClass = AWPlayerState::StaticClass();
+}
+
 void AWGameMode::SwapPlayerControllers(APlayerController* OldPC, APlayerController* NewPC)
 {
 	Super::SwapPlayerControllers(OldPC, NewPC);
@@ -45,9 +50,20 @@ void AWGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Game Mode BeginPlay called"));
-
+	
 	SpawnTower();
 
+	FString CurrentLevel = UGameplayStatics::GetCurrentLevelName(GetWorld());
+	if (CurrentLevel == "L_Portfolio")
+	{
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (PC)
+		{
+			PC->SetShowMouseCursor(false);
+			FInputModeGameOnly InputMode;
+			PC->SetInputMode(InputMode);
+		}
+	}
 }
 
 bool AWGameMode::ReadyToStartMatch_Implementation()
@@ -84,6 +100,7 @@ void AWGameMode::Logout(AController* Exiting)
 //-----------------------------------------------------------
 //스폰 타워
 //-----------------------------------------------------------
+
 
 void AWGameMode::SpawnTower()
 {
@@ -179,7 +196,7 @@ int32 AWGameMode::GetTeam(AActor* Actor) const
 }
 
 // 리스폰
-void AWGameMode::RespawnPlayer(APawn* Player, AController* PlayerController)
+void AWGameMode::RespawnPlayer_Implementation(APawn* Player, AController* PlayerController)
 {
 	if (!Player || !PlayerController)
 	{
@@ -195,6 +212,23 @@ void AWGameMode::RespawnPlayer(APawn* Player, AController* PlayerController)
 		if (PC)
 		{
 			PC->OnPossess(RespawnChar);
+
+			AWPlayerState* PS = PC->GetPlayerState<AWPlayerState>();
+			if (PS)
+			{
+				PS->SetHP(PS->GetMaxHP());
+			}
 		}
+	}
+}
+
+void AWGameMode::OnObjectKilled(TScriptInterface<IDestructible> DestroyedObject, AController* Killer)
+{
+	if (!DestroyedObject || !Killer) { return; }
+
+	AWPlayerState* PlayerState = Killer->GetPlayerState<AWPlayerState>();
+	if (PlayerState)
+	{
+		PlayerState->Server_AddGold(DestroyedObject->GetGoldReward());
 	}
 }
