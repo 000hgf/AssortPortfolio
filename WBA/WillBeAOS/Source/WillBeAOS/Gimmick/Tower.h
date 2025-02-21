@@ -68,12 +68,9 @@ public:
 	class UStaticMesh* DamagedStaticMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UNiagaraSystem* DamageParticle;
-
-	UPROPERTY(ReplicatedUsing=OnRep_IsParticleSpawned, BlueprintReadWrite)
+	
 	bool IsParticleSpawned = false;
 
-	UFUNCTION()
-	void OnRep_IsParticleSpawned();
 public:
 	UPROPERTY(BlueprintReadWrite, Category = SpawnActor)
 	TSubclassOf<AActor> SpawnActors;

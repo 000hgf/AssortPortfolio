@@ -78,7 +78,7 @@ void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AWCharacterBase::Move);
-		EnhancedInputComponent->BindAction(IA_Behavior, ETriggerEvent::Started, this, &AWCharacterBase::S_Behavior);
+		EnhancedInputComponent->BindAction(IA_Behavior, ETriggerEvent::Started, this, &AWCharacterBase::Attack);
 		EnhancedInputComponent->BindAction(IA_SkillR, ETriggerEvent::Started, this, &AWCharacterBase::SkillR);
 
 	}
@@ -112,7 +112,19 @@ void AWCharacterBase::Move(const FInputActionValue& Value)
 	}
 }
 
-void AWCharacterBase::NM_Behavior_Implementation()
+void AWCharacterBase::Attack()
+{
+	if (HasAuthority())
+	{
+		Behavior();
+	}
+	else
+	{
+		S_Behavior();
+	}
+}
+
+void AWCharacterBase::Behavior()
 {
 	CombatComp->SetCollisionMesh(GetMesh());
 	if (CombatComp != nullptr)
@@ -126,7 +138,7 @@ void AWCharacterBase::NM_Behavior_Implementation()
 			//콤보 로직
 			if ((CombatComp->GetAttackCount()) < AttackMontages.Num())
 			{
-				ACharacter::PlayAnimMontage(AttackMontages[(CombatComp->GetAttackCount())]);
+				NM_Behavior(CombatComp->GetAttackCount());
 				CombatComp->AddAttackCount(1);
 				if (CombatComp->GetAttackCount() >= AttackMontages.Num())
 				{
@@ -139,9 +151,13 @@ void AWCharacterBase::NM_Behavior_Implementation()
 
 void AWCharacterBase::S_Behavior_Implementation()
 {
-	NM_Behavior();
+	Behavior();
 }
 
+void AWCharacterBase::NM_Behavior_Implementation(int32 Combo)
+{
+	ACharacter::PlayAnimMontage(AttackMontages[Combo]);
+}
 
 void AWCharacterBase::SkillR(const FInputActionValue& Value)
 {
@@ -223,7 +239,7 @@ void AWCharacterBase::C_BeingDead_Implementation(AWPlayerController* PC)
 //포인트 데미지 주는 함수
 void AWCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
 {
-	if (HasAuthority())
+if (HasAuthority())
 	{
 		AWPlayerController* PC = Cast<AWPlayerController>(GetController());
 		if (PC)

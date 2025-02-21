@@ -63,11 +63,13 @@ void AWPlayerState::SetHealth_Implementation(int32 Health)
 
     HP += Health;
     MaxHP += Health;
-    C_SetHealth(HP, MaxHP);
+    C_SetHealth(HP, MaxHP, CAdditionalHealth);
 }
 
-void AWPlayerState::C_SetHealth_Implementation(int32 NewHP, int32 NewMaxHP)
+void AWPlayerState::C_SetHealth_Implementation(int32 NewHP, int32 NewMaxHP, int32 NewAddHealth)
 {
+    CAdditionalHealth = NewAddHealth;
+    
     HP = NewHP;
     MaxHP = NewMaxHP;
 }
@@ -117,5 +119,4 @@ void AWPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
     DOREPLIFETIME(ThisClass, TeamID);
-    DOREPLIFETIME(ThisClass, CAdditionalHealth);
 }

@@ -44,7 +44,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void SetHealth(int32 Health);
 	UFUNCTION(Client, Reliable)
-	void C_SetHealth(int32 NewHP, int32 NewMaxHP);
+	void C_SetHealth(int32 NewHP, int32 NewMaxHP, int32 NewAddHealth);
     // Defense power
     UPROPERTY(BlueprintReadWrite, Category = "Stats")
     int32 CDefense;
