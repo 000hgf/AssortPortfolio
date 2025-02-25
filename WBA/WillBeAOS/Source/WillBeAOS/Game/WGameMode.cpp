@@ -232,3 +232,23 @@ void AWGameMode::OnObjectKilled(TScriptInterface<IDestructible> DestroyedObject,
 		PlayerState->Server_AddGold(DestroyedObject->GetGoldReward());
 	}
 }
+
+void AWGameMode::OnNexusDestroyed()
+{
+	if (!HasAuthority()) return;
+
+	AWGameState* GS = GetGameState<AWGameState>();
+	if (GS)
+	{
+		GS->SetGamePlayEnd();
+	}
+
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		AWPlayerController* PC = Cast<AWPlayerController>(It->Get());
+		if (PC)
+		{
+			PC->GameEnded(1);
+		}
+	}
+}

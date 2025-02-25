@@ -57,4 +57,7 @@ public:
 	// 몬스터 사망시 이벤트
 	UFUNCTION()
 	void OnObjectKilled(TScriptInterface<IDestructible> DestroyedObject, AController* Killer);
+
+	// 넥서스 파괴
+	void OnNexusDestroyed();
 };

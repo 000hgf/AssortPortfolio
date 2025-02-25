@@ -9,6 +9,8 @@ UCLASS()
 class WILLBEAOS_API ANexus : public AActor
 {
 	GENERATED_BODY()
+
+	int NexusHP;
 	
 public:	
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
@@ -26,7 +28,7 @@ protected:
 	class UBoxComponent* BoxCollisionComponet;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* NexusMeshComponent;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UCombatComponent* CombatComp;
 
 public:	

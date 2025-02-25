@@ -44,6 +44,11 @@ protected:
 	void SetHpPercentage(float Health, float MaxHealth);
 	UFUNCTION(Server, Reliable)
 	void S_SetHpPercentage(float Health, float MaxHealth);
+
+	UFUNCTION(Server, Reliable)
+	void S_SetDamaged();
+	UFUNCTION(NetMulticast, Reliable)
+	void NM_SetDamaged();
 	
 public:	
 	UPROPERTY(EditAnywhere)

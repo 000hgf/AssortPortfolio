@@ -75,23 +75,9 @@ int32 AWGameState::GetTowerNum()
     return TowerArray.Num();
 }
 
-void AWGameState::HandleNexusDestroyed()
+void AWGameState::SetGamePlayEnd()
 {
     CurrentGameState = E_GamePlay::GameEnded;
-    
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Nexus Destroyed!"));
-    }
-
-    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-    {
-        AWPlayerController* PC = Cast<AWPlayerController>(It->Get());
-        if (PC)
-        {
-            PC->GameHasEnded(nullptr, true);
-        }
-    }
 }
 
 void AWGameState::AddPlayer(AWPlayerState* PlayerState)

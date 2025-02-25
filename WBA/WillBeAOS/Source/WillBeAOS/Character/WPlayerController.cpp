@@ -158,18 +158,23 @@ void AWPlayerController::RecallToBase_Implementation()
 	}
 }
 
-void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
+void AWPlayerController::GameEnded_Implementation(bool bIsWinner)
 {
-	Super::GameHasEnded(EndGameFocus, bIsWinner);
-
+	if (!IsLocalController()) return;
+	
 	if (GamePlayHUD)
 		GamePlayHUD->RemoveFromParent();
 	
 	if(PlayerHUD)
 		PlayerHUD->RemoveFromParent();
 
-	if (bIsWinner)
+	if (bIsWinner)	// 본인의 팀 ID == bIsWinner로 바꾸기
 	{
+		FInputModeUIOnly InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetWidgetToFocus(nullptr);
+
+		SetInputMode(InputMode);
 		SetShowMouseCursor(true);
 		UUserWidget* WinScreen = CreateWidget(this, WinScreenClass);
 		if (WinScreen != nullptr)
@@ -179,6 +184,11 @@ void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 	}
 	else
 	{
+		FInputModeUIOnly InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		InputMode.SetWidgetToFocus(nullptr);
+
+		SetInputMode(InputMode);
 		SetShowMouseCursor(true);
 		UUserWidget* LoseScreen = CreateWidget(this, LoseScreenClass);
 		if (LoseScreen != nullptr)

@@ -39,7 +39,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Tower")
 	TArray<ATower*> TowerArray = {};//Ÿ�� ��ü��
 
-	void HandleNexusDestroyed();
+	void SetGamePlayEnd();
 	
 public:
 	UPROPERTY(BlueprintReadWrite, Category = "Players")

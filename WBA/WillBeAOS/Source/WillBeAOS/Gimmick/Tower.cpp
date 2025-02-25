@@ -64,8 +64,6 @@ void ATower::BeginPlay()
 	Super::BeginPlay();
 }
 
-
-
 void ATower::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -107,6 +105,8 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	if (!HasAuthority()) return 0;
+
 	LastHitBy = EventInstigator;
 	
 	float TakeDamage = DamageAmount;
@@ -119,8 +119,8 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		// 타워의 HP가 일정 이하로 떨어지면 데미지 받은 메쉬로 바꾸고 파티클 생성
 		if (CombatComp->Health <= (CombatComp->Max_Health / 2) && !IsParticleSpawned)
 		{
-			StaticMesh->SetStaticMesh(DamagedStaticMesh);
-			DamagedNiagara->SetAsset(DamageParticle);
+			S_SetDamaged();
+			
 			IsParticleSpawned = true;
 
 			AWGameMode* GameMode = Cast<AWGameMode>(GetWorld()->GetAuthGameMode());
@@ -195,4 +195,15 @@ void ATower::SetHpPercentage_Implementation(float Health, float MaxHealth)
 		if (MaxHealth != 0)
 			Widget->HealthBar->SetPercent(Health / MaxHealth);
 	}
+}
+
+void ATower::S_SetDamaged_Implementation()
+{
+	NM_SetDamaged();
+}
+
+void ATower::NM_SetDamaged_Implementation()
+{
+	StaticMesh->SetStaticMesh(DamagedStaticMesh);
+	DamagedNiagara->SetAsset(DamageParticle);
 }

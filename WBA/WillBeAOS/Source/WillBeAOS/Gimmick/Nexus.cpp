@@ -2,7 +2,7 @@
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
 #include "../Character/CombatComponent.h"
-#include "../Game/WGameState.h"
+#include "Game/WGameMode.h"
 #include "Net/UnrealNetwork.h"
 
 ANexus::ANexus()
@@ -23,6 +23,14 @@ ANexus::ANexus()
 	bReplicates = true; 
 }
 
+void ANexus::BeginPlay()
+{
+	Super::BeginPlay();
+
+	NexusHP = 200;
+	CombatComp->Health = NexusHP;
+}
+
 void ANexus::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -32,35 +40,36 @@ void ANexus::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 float ANexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	float TakeDamage = DamageAmount;
-	if (CombatComp != nullptr)
+		
+	if (HasAuthority())
 	{
-		CombatComp->HandleTakeDamage(TakeDamage);
-
-		if ((CombatComp->GetIsDead()))
+		float TakeDamage = DamageAmount;
+		
+		if (CombatComp != nullptr)
 		{
-			//DefaultSceneRootComponent->SetVisibility(false, true);
-			AWGameState* WGameState = GetWorld()->GetGameState<AWGameState>();
-			if (WGameState!=nullptr)
+			CombatComp->HandleTakeDamage(TakeDamage);
+
+			if (CombatComp->GetIsDead())
 			{
-				WGameState->HandleNexusDestroyed();
+				AWGameMode* GM = Cast<AWGameMode>(GetWorld()->GetAuthGameMode());
+				if (GM)
+				{
+					GM->OnNexusDestroyed();
+				}
+				
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]() {Destroy(); GetWorld()->GetTimerManager().ClearTimer(TimerHandle); }, 1.5f, false);
 			}
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]() {Destroy(); GetWorld()->GetTimerManager().ClearTimer(TimerHandle); }, 1.5f, false);
 		}
+
+		return DamageAmount;
 	}
 
-	return DamageAmount;
+	return 0;
 }
 
 float ANexus::GetNexusHPPercent()
 {
 	return CombatComp->Health/CombatComp->Max_Health;
-}
-
-void ANexus::BeginPlay()
-{
-	Super::BeginPlay();
-	
 }
 

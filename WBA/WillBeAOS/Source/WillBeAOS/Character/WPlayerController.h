@@ -74,7 +74,8 @@ public:
 	UUserWidget* RecallWidet;
 	
 	//리스폰 함수(PlayerController->GameHasEnded())
-	virtual void GameHasEnded(class AActor* EndGameFocus = nullptr, bool bIsWinner = false) override;
+	UFUNCTION(NetMulticast, Reliable)
+	void GameEnded(bool bIsWinner);
 	void ShowRespawnWidget();
 	void UpdateRespawnWidget();
 	void HideRespawnWidget();
