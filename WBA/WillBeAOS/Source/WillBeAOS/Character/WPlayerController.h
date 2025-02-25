@@ -56,6 +56,23 @@ public:
 	FTimerHandle RespawnTimerHandle;
 
 public:
+	// ---- 귀환 관련 함수 ----
+	bool IsRecalling = false;
+	FTimerHandle RecallTimerHandle;
+	UPROPERTY(BlueprintReadWrite)
+	float RecallTime = 8.f;
+
+	void StartRecall();
+	void CancelRecall();
+	void CompleteRecall();
+	UFUNCTION(Server, Reliable)
+	void RecallToBase();
+
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+	TSubclassOf<UUserWidget> RecallWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = UI)
+	UUserWidget* RecallWidet;
+	
 	//리스폰 함수(PlayerController->GameHasEnded())
 	virtual void GameHasEnded(class AActor* EndGameFocus = nullptr, bool bIsWinner = false) override;
 	void ShowRespawnWidget();

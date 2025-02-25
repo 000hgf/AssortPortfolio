@@ -50,6 +50,8 @@ private:
 	UInputAction* IA_Behavior;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_SkillR;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* IA_Recall;
 	
 public:
 	UPROPERTY(BlueprintReadonly)
@@ -68,6 +70,20 @@ public:
 	void Move(const FInputActionValue& Value);
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void SkillR(const FInputActionValue& Value);
+	void UpdateAcceleration();
+
+	// ---- 귀환 관련 함수 ----
+	void CallRecall();
+
+	UPROPERTY(EditAnywhere, Category = "Recall")
+	UAnimMontage* StartRecallMontage;
+	UPROPERTY(EditAnywhere, Category = "Recall")
+	UAnimMontage* CompleteRecallMontage;
+
+	UFUNCTION(Server, Reliable)
+	void ServerPlayMontage(UAnimMontage* Montage);
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiPlayMontage(UAnimMontage* Montage);
 	
 	// ---- Attack 관련 함수 ----
 	void Attack();

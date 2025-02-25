@@ -1,8 +1,13 @@
 #include "WPlayerController.h"
+
+#include "WCharacterBase.h"
 #include "Blueprint/UserWidget.h"
 #include "WCharacterHUD.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Game/WGameMode.h"
 #include "UI/TowerNexusHPWidget.h"
+
+class AWGameMode;
 
 void AWPlayerController::BeginPlay()
 {
@@ -65,6 +70,93 @@ void AWPlayerController::OnGameStateChanged(E_GamePlay CurrentGameState)
 	}
 }
 
+
+void AWPlayerController::StartRecall()
+{
+	if (IsRecalling) return;
+
+	IsRecalling = true;
+	UE_LOG(LogTemp, Warning, TEXT("귀환 시작!"));
+
+	if (!RecallWidet)
+	{
+		RecallWidet = CreateWidget<UUserWidget>(this, RecallWidgetClass);
+		if (RecallWidet)
+		{
+			RecallWidet->AddToViewport();
+		}
+	}
+
+	AWCharacterBase* PlayerChar = Cast<AWCharacterBase>(GetPawn());
+	if (PlayerChar)
+	{
+		if (PlayerChar)
+		{
+			PlayerChar->ServerPlayMontage(PlayerChar->StartRecallMontage);
+		}
+	}
+
+	GetWorldTimerManager().SetTimer(RecallTimerHandle, this, &ThisClass::CompleteRecall, RecallTime, false);
+}
+
+void AWPlayerController::CancelRecall()
+{
+	if (!IsRecalling) return;
+
+	IsRecalling = false;
+	GetWorldTimerManager().ClearTimer(RecallTimerHandle);
+
+	if (RecallWidet && RecallWidet->IsInViewport())
+	{
+		RecallWidet->RemoveFromParent();
+		RecallWidet = nullptr;
+	}
+
+	AWCharacterBase* PlayerChar = Cast<AWCharacterBase>(GetPawn());
+	if (PlayerChar)
+	{
+		PlayerChar->StopAnimMontage();
+	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("귀환 취소됨!"));
+}
+
+void AWPlayerController::CompleteRecall()
+{
+	if (!IsRecalling) return;
+
+	IsRecalling = false;
+	UE_LOG(LogTemp, Warning, TEXT("귀환 성공함"));
+	
+	if (RecallWidet && RecallWidet->IsInViewport())
+	{
+		RecallWidet->RemoveFromParent();
+		RecallWidet = nullptr;
+	}
+	
+	AWCharacterBase* PlayerChar = Cast<AWCharacterBase>(GetPawn());
+	if (PlayerChar)
+	{
+		PlayerChar->ServerPlayMontage(PlayerChar->CompleteRecallMontage);
+	}
+	
+	RecallToBase();
+	SetControlRotation(FRotator(0, 0, 0));
+	//SetActorRotation(FRotator(0, 0, 0));		// 캐릭터가 컨트롤러가 바라보는 방향에 묶여있음
+	
+	GetWorldTimerManager().ClearTimer(RecallTimerHandle);
+}
+
+void AWPlayerController::RecallToBase_Implementation()
+{
+	AWGameMode* GM = Cast<AWGameMode>(GetWorld()->GetAuthGameMode());
+	if (GM)
+	{
+		AActor* PlayerStart = GM->FindPlayerStart(this);
+		AWCharacterBase* PlayerChar = Cast<AWCharacterBase>(GetCharacter());
+		PlayerChar->SetActorLocation(PlayerStart->GetActorLocation());
+	}
+}
 
 void AWPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 {

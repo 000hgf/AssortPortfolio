@@ -44,6 +44,12 @@ void AWCharacterBase::BeginPlay()
 	Super::BeginPlay();
 	//HandleApplyPointDamage 멀티델리게이트 바인딩
 	CombatComp->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
+
+	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
+	if (PC)
+	{
+		PC->SetControlRotation(FRotator(0, 0, 0));
+	}
 }
 
 void AWCharacterBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -56,6 +62,14 @@ void AWCharacterBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>
 void AWCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	AWPlayerState* PS = Cast<AWPlayerState>(GetPlayerState());
+	if (PS)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = PS->CSpeed;
+	}
+
+	UpdateAcceleration();
 }
 
 void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -80,7 +94,7 @@ void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AWCharacterBase::Move);
 		EnhancedInputComponent->BindAction(IA_Behavior, ETriggerEvent::Started, this, &AWCharacterBase::Attack);
 		EnhancedInputComponent->BindAction(IA_SkillR, ETriggerEvent::Started, this, &AWCharacterBase::SkillR);
-
+		EnhancedInputComponent->BindAction(IA_Recall, ETriggerEvent::Started, this, &ThisClass::CallRecall);
 	}
 }
 
@@ -97,6 +111,12 @@ void AWCharacterBase::Look(const FInputActionValue& Value)
 
 void AWCharacterBase::Move(const FInputActionValue& Value)
 {
+	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
+	if (PC && PC->IsRecalling)
+	{
+		PC->CancelRecall();
+	}
+	
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
@@ -114,6 +134,12 @@ void AWCharacterBase::Move(const FInputActionValue& Value)
 
 void AWCharacterBase::Attack()
 {
+	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
+	if (PC && PC->IsRecalling)
+	{
+		PC->CancelRecall();
+	}
+	
 	if (HasAuthority())
 	{
 		Behavior();
@@ -181,6 +207,38 @@ void AWCharacterBase::SkillR(const FInputActionValue& Value)
 				}
 			}
 		}
+	}
+}
+
+void AWCharacterBase::UpdateAcceleration()
+{
+	float CurrentSpeed = GetCharacterMovement()->Velocity.Size();
+	float MaxSpeed = GetCharacterMovement()->MaxWalkSpeed;
+
+	// 현재 속도에 비례해서 가속도를 조정 (최대 속도가 높을수록 가속도 증가)
+	float NewAcceleration = FMath::Lerp(2048.0f, 5000.0f, CurrentSpeed / MaxSpeed);
+	GetCharacterMovement()->MaxAcceleration = NewAcceleration;
+}
+
+void AWCharacterBase::CallRecall()
+{
+	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
+	if (PC)
+	{
+		PC->StartRecall();
+	}
+}
+
+void AWCharacterBase::ServerPlayMontage_Implementation(UAnimMontage* Montage)
+{
+	MultiPlayMontage(Montage);
+}
+
+void AWCharacterBase::MultiPlayMontage_Implementation(UAnimMontage* Montage)
+{
+	if (Montage)
+	{
+		PlayAnimMontage(Montage);
 	}
 }
 

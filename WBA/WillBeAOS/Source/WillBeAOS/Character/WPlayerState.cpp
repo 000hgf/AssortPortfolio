@@ -46,7 +46,7 @@ float AWPlayerState::GetHPPercentage()
     return HP / MaxHP;
 }
 
-void AWPlayerState::SetPower_Implementation(int32 Power)
+void AWPlayerState::AddPower_Implementation(int32 Power)
 {
     CPower += Power;
     C_SetPower(CPower);
@@ -57,7 +57,7 @@ void AWPlayerState::C_SetPower_Implementation(int32 NewPower)
     CPower = NewPower;
 }
 
-void AWPlayerState::SetHealth_Implementation(int32 Health)
+void AWPlayerState::AddHealth_Implementation(int32 Health)
 {
     CAdditionalHealth += Health;
 
@@ -74,12 +74,36 @@ void AWPlayerState::C_SetHealth_Implementation(int32 NewHP, int32 NewMaxHP, int3
     MaxHP = NewMaxHP;
 }
 
+void AWPlayerState::AddDefence_Implementation(float Defence)
+{
+    CDefense += Defence;
+    C_SetDefence(CDefense);
+}
+
+void AWPlayerState::C_SetDefence_Implementation(float NewDefence)
+{
+    CDefense = NewDefence;
+}
+
+void AWPlayerState::AddSpeed_Implementation(float Speed)
+{
+    CSpeed += Speed;
+    C_SetSpeed(CSpeed);
+}
+
+void AWPlayerState::C_SetSpeed_Implementation(float NewSpeed)
+{
+    CSpeed = NewSpeed;
+}
+
 void AWPlayerState::Server_ApplyDamage_Implementation(int32 Damage)
 {
     if (HP > 0)
     {
-        if (HP > Damage)
-            NM_SetHP(HP -= Damage);
+        const float Reduction = CDefense / (CDefense + 100.f);
+        const int32 FinalDamage = StaticCast<int32>(Damage * (1.f - Reduction));
+        if (HP > FinalDamage)
+            NM_SetHP(HP -= FinalDamage);
         else
             NM_SetHP(0);
         
@@ -103,11 +127,6 @@ void AWPlayerState::Server_AddGold_Implementation(int Amount)
 {
     CGold += Amount;
     C_AddGold(CGold);
-}
-
-bool AWPlayerState::Server_AddGold_Validate(int Amount)
-{
-    return Amount > 0;
 }
 
 void AWPlayerState::C_AddGold_Implementation(int NewGold)
