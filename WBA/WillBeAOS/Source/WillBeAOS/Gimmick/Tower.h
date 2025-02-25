@@ -1,10 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Destructible.h"
 #include "WEnumFile.h"
+#include "Character/AOSActor.h"
 #include "GameFramework/Actor.h"
-#include "Iris/ReplicationSystem/ReplicationSystemTypes.h"
 #include "Tower.generated.h"
 
 class USceneComponent;
@@ -12,34 +11,20 @@ class UCapsuleComponent;
 class USphereComponent;
 class UStaticMeshComponent;
 
+#define GOLDAMOUNT 50
 UCLASS()
-class WILLBEAOS_API ATower : public AActor, public IDestructible
+class WILLBEAOS_API ATower : public AAOSActor
 {
 
 	GENERATED_BODY()
 	
 public:
-	
 	ATower();
-	
-	virtual void Tick(float DeltaTime) override;
-
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 	
 	UPROPERTY(BlueprintReadWrite, Category = "GameState")
 	class AWGameState* AWGS;
 	
-	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Team")
-	E_TeamID TowerTeamID = E_TeamID::Neutral;
-
-	virtual int32 GetGoldReward() const override;
-	int32 GoldReward = 50;
-
-	AController* LastHitBy;
-	
-protected:
-	virtual void BeginPlay() override;
-
+protected://체력관련
 	UFUNCTION(NetMulticast, Reliable)
 	void SetHpPercentage(float Health, float MaxHealth);
 	UFUNCTION(Server, Reliable)
@@ -49,6 +34,11 @@ protected:
 	void S_SetDamaged();
 	UFUNCTION(NetMulticast, Reliable)
 	void NM_SetDamaged();
+	
+public://스폰
+	float Delta;
+	
+	void spawn();
 	
 public:	
 	UPROPERTY(EditAnywhere)
@@ -76,7 +66,7 @@ public:
 	
 	bool IsParticleSpawned = false;
 
-public:
+public://타격 관련
 	UPROPERTY(BlueprintReadWrite, Category = SpawnActor)
 	TSubclassOf<AActor> SpawnActors;
 	UPROPERTY(BlueprintReadOnly, Category = SpawnActor)
@@ -91,16 +81,20 @@ public:
 	ETraceTypeQuery TraceChannel;
 	TArray<AActor*> ActorsToIgnore;
 	TArray<FHitResult> OutHits;
+	
+	AController* LastHitBy;
+
+public:
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	
+public:
+	virtual void Tick(float DeltaTime) override;
 
 private:
 	UFUNCTION(BlueprintCallable)
 	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION(BlueprintCallable)
 	virtual void OnEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	virtual void BeginPlay() override;
 	
-public:
-	
-	float Delta;
-	
-	void spawn();
 };

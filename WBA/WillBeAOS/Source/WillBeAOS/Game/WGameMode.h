@@ -16,6 +16,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	TArray<class APlayerController*> AllPlayerController;
 	
+	UPROPERTY(BlueprintReadWrite)
+	TMap<FString, FPlayerValue> MatchedPlayers;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class AWGameState* WGS;
 
@@ -26,6 +29,9 @@ protected:
 
 public:	
 	void SpawnTower();
+
+	void GetPlayerNameFromInstance();
+	
 	void PlayerAssignTeam();
 private:
 	TMap<AActor*, int32> TeamMap;      // 팀정보 맵

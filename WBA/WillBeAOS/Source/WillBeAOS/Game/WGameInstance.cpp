@@ -16,6 +16,7 @@ void UWGameInstance::SaveMatchPlayerTeam(FString PlayerName, int32 TeamID, TSubc
 	if (!PlayerName.IsEmpty())
 	{
 		MatchPlayerTeams.Add(PlayerName, FPlayerValue(TeamID,false,PawnClass));
+		UE_LOG(LogTemp, Warning, TEXT("🔹 저장된 플레이어: %s, 팀 ID: %d, 폰 클래스: %s"), *PlayerName, TeamID, *PawnClass->GetClass()->GetName());
 	}
 	else
 	{

@@ -50,7 +50,12 @@ void AOutGameMode::PostLogin(APlayerController* NewPlayer)
 	Super::PostLogin(NewPlayer);
 	
 	PlayerReadyStatus.Add(NewPlayer, false);
-	UpdatePlayerCount();
+	
+	AOutGameState* OutGameState = GetGameState<AOutGameState>();
+	if (OutGameState)
+	{
+		OutGameState->PlayerControllers.Add(Cast<AOutPlayerController>(NewPlayer));
+	}
 }
 
 bool AOutGameMode::AreAllPlayersReady()
@@ -83,9 +88,9 @@ void AOutGameMode::CheckMatchAndStartGame()
 	// 모든 플레이어가 준비되었으면 맵 변경
 	if (AreAllPlayersReady())
 	{
-		UpdateMatchIsReady(AreAllPlayersReady());
-		
 		SavePlayerTeamsToGameInstance();
+
+		UpdateMatchIsReady(true);
 		
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("MapChange is called"));
 		GetWorldTimerManager().SetTimer(MatchStartTimerHandle, this, &ThisClass::ChangeToNextMap, 5.0, false);
@@ -123,15 +128,6 @@ void AOutGameMode::ChangeToNextMap()
 	GetWorld()->ServerTravel(NextMap);
 }
 
-void AOutGameMode::UpdatePlayerCount()
-{
-	AOutGameState* OutGameState = GetGameState<AOutGameState>();
-	if (OutGameState)
-	{
-		OutGameState->CurrentPlayerCount = PlayerReadyStatus.Num();
-	}
-}
-
 void AOutGameMode::UpdateMatchIsReady(bool Matched)
 {
 	AOutGameState* OutGameState = GetGameState<AOutGameState>();
@@ -148,7 +144,6 @@ void AOutGameMode::Logout(AController* Exiting)
 	if (APlayerController* ExitingPC = Cast<APlayerController>(Exiting))
 	{
 		PlayerReadyStatus.Remove(ExitingPC);
-		UpdatePlayerCount();
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Exiting Controller InValid!"));
 }

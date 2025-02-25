@@ -10,6 +10,7 @@
 #include "HealthBar.h"
 #include "../Game/WGameState.h"
 #include "Game/WGameMode.h"
+#include "Net/UnrealNetwork.h"
 
 
 AWMinionsCharacterBase::AWMinionsCharacterBase()
@@ -23,6 +24,8 @@ AWMinionsCharacterBase::AWMinionsCharacterBase()
 	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthBar"));
 	WidgetComponent->SetupAttachment(GetMesh());
 	WidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 200.f));
+
+	SetGoldReward(KILLGOLD);
 }
 
 void AWMinionsCharacterBase::BeginPlay()
@@ -51,12 +54,6 @@ void AWMinionsCharacterBase::Tick(float DeltaTime)
 		if(MinionController)
 			MinionController->GetBrainComponent()->StopLogic(TEXT("None"));
 	}
-}
-
-void AWMinionsCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void AWMinionsCharacterBase::S_SetHpPercentage_Implementation(float Health, float MaxHealth)
@@ -108,11 +105,6 @@ void AWMinionsCharacterBase::NM_BeingDead_Implementation()
 	PlayAnimMontage(DeadAnimMontage);
 }
 
-int32 AWMinionsCharacterBase::GetGoldReward() const
-{
-	return GoldReward;
-}
-
 void AWMinionsCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
 {
 	if (HasAuthority())
@@ -140,4 +132,10 @@ float AWMinionsCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const&
 	SetHpPercentage((CombatComponent->Health), (CombatComponent->Max_Health));
 
 	return DamageAmount;
+}
+
+void AWMinionsCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass,TrackNum);
 }

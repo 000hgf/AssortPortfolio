@@ -12,8 +12,10 @@ AMinionsSpawner::AMinionsSpawner()
 void AMinionsSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GetWorld()->GetTimerManager().SetTimer(InitGameTimerHandle, this, &ThisClass::SpawnMinions, 1.f, false);
+	if (Test)
+	{
+		GetWorld()->GetTimerManager().SetTimer(InitGameTimerHandle, this, &ThisClass::SpawnMinions, 1.f, false);
+	}
 }
 
 void AMinionsSpawner::SpawnMinions_Implementation()
@@ -25,6 +27,9 @@ void AMinionsSpawner::SpawnMinions_Implementation()
 	AWMinionsCharacterBase* SpawnMinion = GetWorld()->SpawnActor<AWMinionsCharacterBase>(SpawnMinionsClass, GetActorLocation(), GetActorRotation());
 	if (SpawnMinion)
 	{
+		SpawnMinion->TeamID = TeamID;
+		SpawnMinion->TrackNum = TrackNum;
+		SpawnMinion->SetTrackPoint();
 		SpawnMinion->SpawnDefaultController();
 	}
 

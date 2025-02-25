@@ -8,15 +8,6 @@ class AWPlayerState;
 class ATower;
 class ANexus;
 
-UENUM(BlueprintType)
-enum class E_GamePlay : uint8
-{
-	GameInit,
-	ReadyCountdown,
-	Gameplaying,
-	GameEnded
-};
-
 UCLASS()
 class WILLBEAOS_API AWGameState : public AGameState
 {

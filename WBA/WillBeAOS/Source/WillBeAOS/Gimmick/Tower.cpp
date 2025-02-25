@@ -5,7 +5,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "NiagaraComponent.h"
-#include "../Character/WCharacterBase.h"
 #include "../Character/CombatComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
@@ -13,7 +12,6 @@
 #include "../Game/WGameState.h"
 #include "../Minions/WMinionsCharacterBase.h"
 #include "Game/WGameMode.h"
-#include "Net/UnrealNetwork.h"
 
 ATower::ATower()
 {
@@ -51,12 +49,8 @@ ATower::ATower()
 	// 특정 요소의 오버랩 함수 바인드하기 ( OverlapTrigger의 )
 	OverlapTrigger->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
 	OverlapTrigger->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlap);
-	
-}
 
-int32 ATower::GetGoldReward() const
-{
-	return GoldReward;
+	SetGoldReward(GOLDAMOUNT);
 }
 
 void ATower::BeginPlay()
@@ -93,13 +87,6 @@ void ATower::Tick(float DeltaTime)
 		}
 	}
 }
-
-void ATower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ThisClass, TowerTeamID);
-}
-
 
 float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -154,9 +141,8 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 void ATower::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	AWCharacterBase* EnemyChar = Cast<AWCharacterBase>(OtherActor);
-	AWMinionsCharacterBase* EnemyMinion = Cast<AWMinionsCharacterBase>(OtherActor);
-	if ((EnemyChar && EnemyChar->TeamID != TowerTeamID) || EnemyMinion)
+	AAOSCharacter* EnemyChar = Cast<AAOSCharacter>(OtherActor);
+	if ((EnemyChar && EnemyChar->TeamID != TeamID))
 	{
 		OverlappingActors.AddUnique(OtherActor);
 	}

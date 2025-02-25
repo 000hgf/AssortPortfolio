@@ -1,9 +1,10 @@
 #include "WGameMode.h"
+
+#include "WGameInstance.h"
 #include "WGameState.h"
 #include "Character/WCharacterBase.h"
 #include "Character/WPlayerController.h"
 #include "Character/WPlayerState.h"
-#include "Gimmick/Nexus.h"
 #include "Gimmick/Tower.h"
 #include "Gimmick/SpawnTowerPoint.h"
 #include "Kismet/GameplayStatics.h"
@@ -52,18 +53,17 @@ void AWGameMode::BeginPlay()
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Game Mode BeginPlay called"));
 	
 	SpawnTower();
-
-	FString CurrentLevel = UGameplayStatics::GetCurrentLevelName(GetWorld());
-	if (CurrentLevel == "L_Portfolio")
-	{
-		APlayerController* PC = GetWorld()->GetFirstPlayerController();
-		if (PC)
-		{
-			PC->SetShowMouseCursor(false);
-			FInputModeGameOnly InputMode;
-			PC->SetInputMode(InputMode);
-		}
-	}
+	
+	GetPlayerNameFromInstance();
+	
+	//나중에 플레이어 컨트롤러에 써먹기
+		// APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		// if (PC)
+		// {
+		// 	PC->SetShowMouseCursor(false);
+		// 	FInputModeGameOnly InputMode;
+		// 	PC->SetInputMode(InputMode);
+		// }
 }
 
 bool AWGameMode::ReadyToStartMatch_Implementation()
@@ -122,17 +122,30 @@ void AWGameMode::SpawnTower()
 				SpawnParams
 			);
 			
-			if (ATower* SpawnedTower = Cast<ATower>(Tower))
+			if (AAOSActor* SpawnedActor = Cast<AAOSActor>(Tower))
 			{
-				SpawnedTower->SetReplicates(true);
-				SpawnedTower->TowerTeamID = SpawnPoint->TeamID;
-				AssignTeam(SpawnedTower,static_cast<int32>(SpawnedTower->TowerTeamID));
+				SpawnedActor->SetReplicates(true);
+				SpawnedActor->SetTeamID(SpawnPoint->TeamID);
+				AssignTeam(SpawnedActor,static_cast<int32>(SpawnedActor->TeamID));
 			}
-			else if (ANexus* SpawnedNexus = Cast<ANexus>(Tower))
-			{	
-				SpawnedNexus->SetReplicates(true);
-				SpawnedNexus->NexusTeamID = SpawnPoint->TeamID;
-				AssignTeam(SpawnedNexus,static_cast<int32>(SpawnedNexus->NexusTeamID));
+		}
+	}
+}
+
+void AWGameMode::GetPlayerNameFromInstance()
+{
+	UWGameInstance* WGI = Cast<UWGameInstance>(GetGameInstance());
+	if (WGI)
+	{
+		TMap<FString, FPlayerValue> MatchedMap = WGI->GetMatchTeam();
+		for (auto& It : MatchedMap)
+		{
+			FString PlayerName = It.Key;
+			int32 TeamID = It.Value.TeamValue;
+			if (!PlayerName.IsEmpty())
+			{
+				MatchedPlayers.Add(PlayerName, FPlayerValue(TeamID, false,It.Value.WPawnClass));
+				UE_LOG(LogTemp, Log, TEXT("🔹 불러온 PlayerController: %s, TeamID: %d"), *PlayerName, TeamID);
 			}
 		}
 	}
@@ -156,17 +169,15 @@ void AWGameMode::AssignTeam(AActor* Actor, int32 TeamID)
 
 void AWGameMode::PlayerAssignTeam()
 {
-	E_TeamID Team = E_TeamID::Blue;
+	TArray<AWPlayerState*> AllPlayerStates;
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It;++It)
 	{
 		if (AWPlayerController* PC = Cast<AWPlayerController>(It->Get()))
 		{
 			if (AWPlayerState* PS = Cast<AWPlayerState>(PC->PlayerState))
 			{
-				PS->SetTeamID(Team); // 플레이어 상태에 팀 지정
-				AssignTeam(PS,static_cast<int32>(PS->TeamID));
-				UE_LOG(LogTemp, Log, TEXT("Actor Add! %s %d"), *PS->GetName(), PS->TeamID);
-				Team = (Team == E_TeamID::Blue) ? E_TeamID::Red : E_TeamID::Blue; // 번갈아 가며 팀 배정
+				AllPlayerStates.Add(PS);
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *PS->GetPlayerName());
 			}
 			else
 			{
@@ -176,6 +187,23 @@ void AWGameMode::PlayerAssignTeam()
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("PlayerController not found or cast failed."));
+		}
+	}
+	
+	for (AWPlayerState* PS : AllPlayerStates)
+	{
+		for (auto It : MatchedPlayers)
+		{
+			UE_LOG(LogTemp, Log, TEXT(" %s %d"), *It.Key, It.Value.TeamValue);
+			if (PS && PS->GetName().Contains(It.Key)) // 특정 이름 패턴을 가진 경우만 처리
+			{
+				PS->SetTeamID(static_cast<E_TeamID>(It.Value.TeamValue));
+				UE_LOG(LogTemp, Log, TEXT("Assigned %s to Team %d"), *PS->GetName(), PS->TeamID);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("PlayerState is not same with matchname."));
+			}
 		}
 	}
 }
