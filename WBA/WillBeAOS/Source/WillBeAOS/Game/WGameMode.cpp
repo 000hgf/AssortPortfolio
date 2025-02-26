@@ -75,10 +75,6 @@ void AWGameMode::SetPlayerSpawners(class AWPlayerState* PlayerState)
 		{
 			PlayerState->PlayerSpawner = It;
 		}
-		else
-		{
-			
-		}
 	}
 }
 

@@ -1,5 +1,6 @@
 #include "OutGameMode.h"
 #include "OutGameState.h"
+#include "WEnumFile.h"
 #include "WGameInstance.h"
 
 AOutGameMode::AOutGameMode()
@@ -108,7 +109,7 @@ void AOutGameMode::SavePlayerTeamsToGameInstance()
 			if (PC)
 			{
 				APlayerState* PS = PC->PlayerState;
-				WGI->SavePlayerTeam(PS, 0);
+				WGI->SavePlayerTeam(PS, E_TeamID::Neutral);
 			}
 		}
 	}

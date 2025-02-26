@@ -20,7 +20,7 @@ void AOutPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("PlayerController BeginPlay."), *GetName());
+	UE_LOG(LogTemp, Warning, TEXT("PlayerController BeginPlay."));
 
 	
 	if (IsLocalController() && MainMenuClass != nullptr)

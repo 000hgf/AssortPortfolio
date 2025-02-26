@@ -87,7 +87,7 @@ void AWGameState::GetPlayerNameFromInstance()
             for (auto& It : MatchedMap)
             {
                 FString PlayerName = It.Key;
-                int32 TeamID = It.Value.TeamValue;
+                E_TeamID TeamID = It.Value.TeamValue;
                 if (!PlayerName.IsEmpty())
                 {
                     MatchedPlayers.Add(PlayerName, FPlayerValue(TeamID, false, It.Value.WPawnClass));
