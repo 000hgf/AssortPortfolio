@@ -56,6 +56,11 @@ public:	//체력관련
 	void SetHpPercentage(float Health, float MaxHealth);
 	UFUNCTION(Server, Reliable)
 	void S_SetHpPercentage(float Health, float MaxHealth);
+	UFUNCTION(Server, Reliable)
+	void S_SetHPbarColor();
+	UFUNCTION(NetMulticast, Reliable)
+	void SetHPbarColor(FLinearColor HealthBarColor);
+	void RetrySetHPbarColor(FLinearColor HealthBarColor);
 
 public: //죽을 때
 	UPROPERTY(BlueprintReadWrite, Category = Dead)

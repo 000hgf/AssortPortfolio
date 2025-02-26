@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AOSCharacter.h"
 #include "WDelegateDefine.h"
 #include "WEnumFile.h"
 #include "GameFramework/Character.h"
@@ -12,7 +13,7 @@ class UAnimMontage;
 class UWidgetComponent;
 
 UCLASS()
-class WILLBEAOS_API AWCharacterBase : public ACharacter
+class WILLBEAOS_API AWCharacterBase : public AAOSCharacter
 {
 
 	GENERATED_BODY()
@@ -28,10 +29,6 @@ class WILLBEAOS_API AWCharacterBase : public ACharacter
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UWidgetComponent* WidgetComponent;
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
-	E_TeamID TeamID = E_TeamID::Blue;
 	
 public:
 	AWCharacterBase();

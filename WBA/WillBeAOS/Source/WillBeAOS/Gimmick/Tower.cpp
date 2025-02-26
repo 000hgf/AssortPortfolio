@@ -183,6 +183,31 @@ void ATower::SetHpPercentage_Implementation(float Health, float MaxHealth)
 	}
 }
 
+void ATower::SetHPbarColor_Implementation()
+{
+	UHealthBar* Widget = Cast<UHealthBar>(WidgetComponent->GetWidget());
+	if (!Widget) return;
+	
+	FLinearColor HealthBarColor;
+	switch (TeamID)
+	{
+	case E_TeamID::Red:
+		HealthBarColor = FLinearColor::Red;
+		break;
+	case E_TeamID::Blue:
+		HealthBarColor = FLinearColor::Blue;
+		break;
+	case E_TeamID::Neutral:
+		HealthBarColor = FLinearColor::Yellow;
+		break;
+	}
+	
+	if (Widget->HealthBar)
+	{
+		Widget->HealthBar->SetFillColorAndOpacity(HealthBarColor);
+	}
+}
+
 void ATower::S_SetDamaged_Implementation()
 {
 	NM_SetDamaged();

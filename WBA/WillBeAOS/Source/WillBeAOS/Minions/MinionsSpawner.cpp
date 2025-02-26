@@ -31,9 +31,10 @@ void AMinionsSpawner::SpawnMinions_Implementation()
 		SpawnMinion->TrackNum = TrackNum;
 		SpawnMinion->SetTrackPoint();
 		SpawnMinion->SpawnDefaultController();
+		SpawnMinion->S_SetHPbarColor();
 	}
 
-	if (SpawnCount < 1)
+	if (SpawnCount < 3)
 	{
 		GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &ThisClass::SpawnMinions, 1.f, false);
 	}

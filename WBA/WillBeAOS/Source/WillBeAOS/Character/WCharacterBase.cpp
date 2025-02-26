@@ -1,4 +1,6 @@
 #include "WCharacterBase.h"
+
+#include "AOSActor.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -14,6 +16,8 @@
 #include "Game/WGameMode.h"
 #include "Net/UnrealNetwork.h"
 
+
+class AAOSActor;
 
 AWCharacterBase::AWCharacterBase()
 {
@@ -297,8 +301,21 @@ void AWCharacterBase::C_BeingDead_Implementation(AWPlayerController* PC)
 //포인트 데미지 주는 함수
 void AWCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
 {
-if (HasAuthority())
+	if (HasAuthority())
 	{
+		// ----- 같은팀 캐릭터, 미니언 타격 무효 -----
+		AAOSCharacter* HitCharacter = Cast<AAOSCharacter>(LastHit.GetActor());
+		if (HitCharacter)
+		{
+			if (this->TeamID == HitCharacter->TeamID) return;
+		}
+		// ----- 같은팀 타워, 넥서스 타격 무효 -----
+		AAOSActor* HitObject = Cast<AAOSActor>(LastHit.GetActor());
+		if (HitObject)
+		{
+			if (this->TeamID == HitObject->TeamID) return;
+		}
+		
 		AWPlayerController* PC = Cast<AWPlayerController>(GetController());
 		if (PC)
 		{
