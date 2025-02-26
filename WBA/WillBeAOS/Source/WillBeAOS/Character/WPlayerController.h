@@ -41,21 +41,14 @@ class WILLBEAOS_API AWPlayerController : public APlayerController
 public:
 	UWCharacterHUD* PlayerHUD;
 	UTowerNexusHPWidget* GamePlayHUD;
-
 	UUserWidget* RespawnScreen;
-
 	AWCharacterBase* AWC;
-
+	
+public:	//상점 관련
 	UPROPERTY(BlueprintReadWrite, Category = "Store")
 	bool IsOpenedStore;
+public:
 	
-public:
-	UPROPERTY(BlueprintReadWrite)
-	int32 CurrentRespawnTime;
-	FTimerHandle RestartTimer;
-	FTimerHandle RespawnTimerHandle;
-
-public:
 	// ---- 귀환 관련 함수 ----
 	bool IsRecalling = false;
 	FTimerHandle RecallTimerHandle;
@@ -71,20 +64,26 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = UI)
 	TSubclassOf<UUserWidget> RecallWidgetClass;
 	UPROPERTY(EditDefaultsOnly, Category = UI)
-	UUserWidget* RecallWidet;
+	UUserWidget* RecallWidget;
 	
-	//리스폰 함수(PlayerController->GameHasEnded())
+
+public://리스폰
+	UPROPERTY(BlueprintReadWrite)
+	int32 CurrentRespawnTime;
+	FTimerHandle RestartTimer;
+	FTimerHandle RespawnTimerHandle;
+public://리스폰 함수(PlayerController->GameHasEnded())
 	UFUNCTION(NetMulticast, Reliable)
 	void GameEnded(bool bIsWinner);
 	void ShowRespawnWidget();
 	void UpdateRespawnWidget();
 	void HideRespawnWidget();
+	
 	void OnGameStateChanged(E_GamePlay CurrentGameState);
-
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
 public:
 	virtual void OnPossess(APawn* InPawn) override;
 };

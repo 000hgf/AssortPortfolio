@@ -123,7 +123,7 @@ float ATower::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 			//DefaultSceneRoot->SetVisibility(false, true);
 			if (AWGS != nullptr)
 			{
-				AWGS->TowerArray.Remove(this);
+				AWGS->RemoveTower(this);
 			}
 
 			AWGameMode* GameMode = Cast<AWGameMode>(GetWorld()->GetAuthGameMode());

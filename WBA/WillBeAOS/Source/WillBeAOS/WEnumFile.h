@@ -43,7 +43,9 @@ enum class E_MovementSpeed : uint8
 UENUM(BlueprintType)
 enum class E_GamePlay : uint8
 {
+	Nothing,
 	GameInit,
+	PlayerReady,
 	ReadyCountdown,
 	Gameplaying,
 	GameEnded

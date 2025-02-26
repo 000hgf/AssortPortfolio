@@ -44,6 +44,8 @@ void AWMinionsCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!HasAuthority()) return;
+	
 	float HP = CombatComponent->Health;
 	float MAXHP = CombatComponent->Max_Health;
 

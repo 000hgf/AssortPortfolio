@@ -1,13 +1,10 @@
 #include "WPlayerController.h"
-
 #include "WCharacterBase.h"
 #include "Blueprint/UserWidget.h"
 #include "WCharacterHUD.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Game/WGameMode.h"
 #include "UI/TowerNexusHPWidget.h"
-
-class AWGameMode;
 
 void AWPlayerController::BeginPlay()
 {
@@ -46,10 +43,6 @@ void AWPlayerController::OnGameStateChanged(E_GamePlay CurrentGameState)
 {
 	switch (CurrentGameState)
 	{
-	case E_GamePlay::GameInit:
-		DisableInput(this);
-		break;
-    
 	case E_GamePlay::ReadyCountdown:
 		DisableInput(this);
 		// 카운트다운 UI 표시
@@ -70,7 +63,6 @@ void AWPlayerController::OnGameStateChanged(E_GamePlay CurrentGameState)
 	}
 }
 
-
 void AWPlayerController::StartRecall()
 {
 	if (IsRecalling) return;
@@ -78,12 +70,12 @@ void AWPlayerController::StartRecall()
 	IsRecalling = true;
 	UE_LOG(LogTemp, Warning, TEXT("귀환 시작!"));
 
-	if (!RecallWidet)
+	if (!RecallWidget)
 	{
-		RecallWidet = CreateWidget<UUserWidget>(this, RecallWidgetClass);
-		if (RecallWidet)
+		RecallWidget = CreateWidget<UUserWidget>(this, RecallWidgetClass);
+		if (RecallWidget)
 		{
-			RecallWidet->AddToViewport();
+			RecallWidget->AddToViewport();
 		}
 	}
 
@@ -106,10 +98,10 @@ void AWPlayerController::CancelRecall()
 	IsRecalling = false;
 	GetWorldTimerManager().ClearTimer(RecallTimerHandle);
 
-	if (RecallWidet && RecallWidet->IsInViewport())
+	if (RecallWidget && RecallWidget->IsInViewport())
 	{
-		RecallWidet->RemoveFromParent();
-		RecallWidet = nullptr;
+		RecallWidget->RemoveFromParent();
+		RecallWidget = nullptr;
 	}
 
 	AWCharacterBase* PlayerChar = Cast<AWCharacterBase>(GetPawn());
@@ -128,10 +120,10 @@ void AWPlayerController::CompleteRecall()
 	IsRecalling = false;
 	UE_LOG(LogTemp, Warning, TEXT("귀환 성공함"));
 	
-	if (RecallWidet && RecallWidet->IsInViewport())
+	if (RecallWidget && RecallWidget->IsInViewport())
 	{
-		RecallWidet->RemoveFromParent();
-		RecallWidet = nullptr;
+		RecallWidget->RemoveFromParent();
+		RecallWidget = nullptr;
 	}
 	
 	AWCharacterBase* PlayerChar = Cast<AWCharacterBase>(GetPawn());

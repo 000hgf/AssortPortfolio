@@ -10,8 +10,6 @@ ASelectGameMode::ASelectGameMode()
 	{
 		Destroy();
 	}
-	
-	bUseSeamlessTravel = true;
 }
 
 void ASelectGameMode::BeginPlay()

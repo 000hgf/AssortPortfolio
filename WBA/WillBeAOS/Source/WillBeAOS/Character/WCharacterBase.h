@@ -128,8 +128,5 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UPROPERTY(BlueprintReadWrite, Category = "Skill")//���� ����
 	bool SkillREnable;
-
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<APawn> SpawnsearchLocation;
+	
 };
