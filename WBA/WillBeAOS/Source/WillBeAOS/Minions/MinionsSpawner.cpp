@@ -1,7 +1,5 @@
 #include "Minions/MinionsSpawner.h"
-
 #include "WMinionsCharacterBase.h"
-#include "Game/WGameMode.h"
 
 AMinionsSpawner::AMinionsSpawner()
 {
@@ -12,6 +10,10 @@ AMinionsSpawner::AMinionsSpawner()
 void AMinionsSpawner::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AMinionsSpawner::StartSpawnMinions()
+{
 	if (Test)
 	{
 		GetWorld()->GetTimerManager().SetTimer(InitGameTimerHandle, this, &ThisClass::SpawnMinions, 1.f, false);

@@ -4,7 +4,8 @@
 #include "WCharacterHUD.h"
 #include "WPlayerState.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
-#include "Game/WGameMode.h"
+#include "Gimmick/PlayerSpawner.h"
+#include "Net/UnrealNetwork.h"
 #include "UI/TowerNexusHPWidget.h"
 
 void AWPlayerController::BeginPlay()
@@ -72,6 +73,11 @@ void AWPlayerController::OnGameStateChanged(E_GamePlay CurrentGameState)
 	default:
 		break;
 	}
+}
+
+void AWPlayerController::OnRep_Countdown()
+{	
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("GameCountdown %d"),CountdownTime));
 }
 
 void AWPlayerController::StartRecall()
@@ -144,20 +150,19 @@ void AWPlayerController::CompleteRecall()
 	}
 	
 	RecallToBase();
-	SetControlRotation(FRotator(0, 0, 0));
-	//SetActorRotation(FRotator(0, 0, 0));		// 캐릭터가 컨트롤러가 바라보는 방향에 묶여있음
 	
 	GetWorldTimerManager().ClearTimer(RecallTimerHandle);
 }
 
 void AWPlayerController::RecallToBase_Implementation()
 {
-	AWGameMode* GM = Cast<AWGameMode>(GetWorld()->GetAuthGameMode());
-	if (GM)
+	if (AWPlayerState* WPlayerState = GetPlayerState<AWPlayerState>())
 	{
-		AActor* PlayerStart = GM->FindPlayerStart(this);
-		AWCharacterBase* PlayerChar = Cast<AWCharacterBase>(GetCharacter());
-		PlayerChar->SetActorLocation(PlayerStart->GetActorLocation());
+		if (AWCharacterBase* PlayerChar = Cast<AWCharacterBase>(GetCharacter()))
+		{
+			PlayerChar->SetActorLocation(WPlayerState->PlayerSpawner->GetActorLocation());
+			SetControlRotation(WPlayerState->PlayerSpawner->GetActorRotation());
+		}
 	}
 }
 
@@ -253,4 +258,11 @@ void AWPlayerController::HideRespawnWidget()
 void AWPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+}
+
+void AWPlayerController::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, CountdownTime);
 }

@@ -56,7 +56,24 @@ public://GameInit 단계
 	
 public: //PlayerReady단계
 	void SpawnPlayer();
+
+	void CheckPlayerSpawned(AWPlayerController* WPlayerController);
+
+	int32 CheckSpawnedPlayers = 0;
+
+public:
+	int32 CountdownTime = 0;
+protected:
+	void ServerCountdown();
+public:
+	void SetCountdownTime(int32 NewCount);
 	
+public:
+	void SetGameStart();
+public://리스폰 관련
+	UPROPERTY(BlueprintReadWrite)
+	int32 RespawnTime = 5;
+
 public://타워 관련
 	void AddTowerArray(AAOSActor* SpawnedActor);
 	
@@ -82,19 +99,6 @@ protected://넥서스
 public:
 	float GetBlueNexusHP();
 	float GetRedNexusHP();
-	
-public://카운트 다운
-	UFUNCTION(NetMulticast, Reliable)
-	void StartCountdown(int32 InitialTime);
-	
-protected:
-	int32 CountdownTime = 0;
-	FTimerHandle CountdownHandle;
-	void UpdateCountdown();
-
-public://리스폰 관련
-	UPROPERTY(BlueprintReadWrite)
-	int32 RespawnTime = 5;
 	
 protected:
 	virtual void BeginPlay();

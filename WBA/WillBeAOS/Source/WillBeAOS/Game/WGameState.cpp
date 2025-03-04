@@ -62,11 +62,13 @@ void AWGameState::GamePlayStateChanged(E_GamePlay NewState)
 
     case E_GamePlay::ReadyCountdown:
         UE_LOG(LogTemp, Log, TEXT("Countdown before game starts!"));
+        ServerCountdown();
         break;
 
     case E_GamePlay::Gameplaying:
+        UE_LOG(LogTemp, Log, TEXT("Game has started!"));
         //미니언 스폰
-            UE_LOG(LogTemp, Log, TEXT("Game has started!"));
+        SetGameStart();
         break;
 
     case E_GamePlay::GameEnded://넥서스 파괴 후
@@ -140,6 +142,7 @@ bool AWGameState::IsAllPlayerIsReady()
                 if (PS->GetPlayerName() == It.Key)
                 {
                     SetPlayerState(PS,It.Value);
+                    ConnectedPlayerStates.Add(PS);
                     NumPlayers++;
                 }
                 else
@@ -176,41 +179,57 @@ void AWGameState::SpawnPlayer()
     }
 }
 
+void AWGameState::CheckPlayerSpawned(AWPlayerController* WPlayerController)
+{
+    UE_LOG(LogTemp, Log, TEXT("CheckPlayerSpawned %s"),*WPlayerController->GetName());
+    CheckSpawnedPlayers++;
+    
+    if (CheckSpawnedPlayers == MatchedPlayers.Num())
+    {
+        SetGamePlay(E_GamePlay::ReadyCountdown);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("All Players are not Spawned"));
+    }
+}
+
+
 void AWGameState::RemovePlayer(AWPlayerController* WPlayerController)
 {
     if (WPlayerController)
     {
         PlayerControllers.Remove(WPlayerController);
+        ConnectedPlayerStates.Remove(WPlayerController->GetPlayerState<AWPlayerState>());
         UE_LOG(LogTemp,Warning,TEXT("Player Removed"));
     }
 }
 
-void AWGameState::StartCountdown_Implementation(int32 InitialTime)
+void AWGameState::ServerCountdown()
 {
-    CountdownTime = InitialTime;
-    
-    CurrentGameState = E_GamePlay::ReadyCountdown;
-    
-    GetWorldTimerManager().SetTimer(CountdownHandle, this, &AWGameState::UpdateCountdown, 1.f, true);
+    WGameMode->SetGSPlayerControllers();
+    WGameMode->StartCountdown(6);
 }
 
-void AWGameState::UpdateCountdown()
+void AWGameState::SetCountdownTime(int32 NewCount)
 {
-    if (--CountdownTime <= 0)
+    CountdownTime = NewCount;
+    for (auto It :PlayerControllers)
     {
-        GetWorldTimerManager().ClearTimer(CountdownHandle);
-        CurrentGameState = E_GamePlay::Gameplaying;
-
-        for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-        {
-            if (AWPlayerController* PC = Cast<AWPlayerController>(It->Get()))
-            {
-                PC->OnGameStateChanged(CurrentGameState);
-            }
-        }
-        return;
+        It->CountdownTime = NewCount;
     }
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("timer"));
+}
+
+void AWGameState::SetGameStart()
+{
+    for (auto& It : PlayerControllers)
+    {
+        It->OnGameStateChanged(E_GamePlay::Gameplaying);
+    }
+    //벽 파괴
+    WGameMode->DestroyWall();
+    //미니언 스폰
+    WGameMode->SpawnMinions();
 }
 
 void AWGameState::AddTowerArray(AAOSActor* SpawnedActor)

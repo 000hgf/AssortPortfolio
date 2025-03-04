@@ -8,7 +8,9 @@
 #include "Gimmick/PlayerSpawner.h"
 #include "Gimmick/Tower.h"
 #include "Gimmick/SpawnTowerPoint.h"
+#include "Gimmick/StartWall.h"
 #include "Kismet/GameplayStatics.h"
+#include "Minions/MinionsSpawner.h"
 
 AWGameMode::AWGameMode()
 {
@@ -32,6 +34,7 @@ void AWGameMode::BeginPlay()
 
 void AWGameMode::PostLogin(APlayerController* NewPlayer)
 {
+	Super::PostLogin(NewPlayer);
 	UE_LOG(LogTemp,Log,TEXT("PostLogin %s"),*NewPlayer->GetName());
 	
 	AWPlayerController* WPlayerController = Cast<AWPlayerController>(NewPlayer);
@@ -44,7 +47,6 @@ void AWGameMode::PostLogin(APlayerController* NewPlayer)
 			WGS->CheckPlayerIsReady();
 		}
 	}
-	Super::PostLogin(NewPlayer);
 }
 
 void AWGameMode::SetGSPlayerControllers()
@@ -116,6 +118,55 @@ void AWGameMode::SpawnTower()
 //팀 관련 함수
 //-----------------------------------------------------------
 
+void AWGameMode::StartCountdown(int32 InitialTime)
+{
+	UE_LOG(LogTemp, Log, TEXT("ServerCountdown"));
+	CountdownTime = InitialTime;
+	GetWorldTimerManager().SetTimer(CountdownHandle, this, &AWGameMode::UpdateCountdown, 1.f, true);
+}
+
+void AWGameMode::UpdateCountdown()
+{
+	CountdownTime--;
+	
+	if (CountdownTime <= 0)
+	{
+		GetWorldTimerManager().ClearTimer(CountdownHandle);
+		WGS->SetGamePlay(E_GamePlay::Gameplaying);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("UpdateCountdown %d"),CountdownTime);
+		WGS->SetCountdownTime(CountdownTime);	
+	}
+}
+
+void AWGameMode::DestroyWall()
+{
+	TArray<AActor*> Walls;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),AStartWall::StaticClass(), Walls);
+	for (auto WallActor : Walls)
+	{
+		WallActor->Destroy();
+	}
+}
+
+void AWGameMode::SpawnMinions()
+{	
+	TArray<AActor*> MinionSpawnPoints;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),AMinionsSpawner::StaticClass(), MinionSpawnPoints);
+	if (MinionSpawnPoints.Num() > 0)
+	{
+	for (auto It:MinionSpawnPoints)
+		{
+			if (AMinionsSpawner* MinionsSpawner = Cast<AMinionsSpawner>(It))
+			{
+				MinionsSpawner->StartSpawnMinions();	
+			}
+		}
+	}
+}
+
 void AWGameMode::AssignTeam(AActor* Actor, int32 TeamID)
 {
 	if (!Actor)
@@ -178,11 +229,16 @@ void AWGameMode::RespawnPlayer(APawn* Player, AController* PlayerController)
 						AChar_Wraith* RespawnWraith = Cast<AChar_Wraith>(RespawnChar);
 						if (RespawnWraith)
 						{
-							PC->OnPossess(RespawnWraith);	
+							PC->OnPossess(RespawnWraith);
+							PC->OnGameStateChanged(E_GamePlay::ReadyCountdown);
+							WGS->CheckPlayerSpawned(PC);
+							UE_LOG(LogTemp, Log, TEXT("첫 스폰!"));
 						}
 						else
 						{
 							PC->OnPossess(RespawnChar);
+							WGS->CheckPlayerSpawned(PC);
+							UE_LOG(LogTemp, Log, TEXT("첫 스폰!"));
 						}
 					}
 					
@@ -190,7 +246,6 @@ void AWGameMode::RespawnPlayer(APawn* Player, AController* PlayerController)
 					{
 						UE_LOG(LogTemp, Warning, TEXT("RespawnChar is null!"));
 					}
-					UE_LOG(LogTemp, Log, TEXT("첫 스폰!"));
 				}
 					else
 					{

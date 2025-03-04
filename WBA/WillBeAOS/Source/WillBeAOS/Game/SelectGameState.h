@@ -4,7 +4,6 @@
 #include "GameFramework/GameState.h"
 #include "SelectGameState.generated.h"
 
-#define SELECTTIME 20.0f;
 
 UCLASS()
 class WILLBEAOS_API ASelectGameState : public AGameState
@@ -25,7 +24,7 @@ public:
 	FText UserNickName;
 
 	UPROPERTY(ReplicatedUsing = OnRep_SelectTime, BlueprintReadWrite)
-	float SelectTime = SELECTTIME;
+	float SelectTime = 20;
 	
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void M_UpdateTeamSlot();

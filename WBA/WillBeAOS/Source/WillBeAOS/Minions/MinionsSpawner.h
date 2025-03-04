@@ -25,6 +25,8 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	int32 SpawnCount = 0;
+
+	void StartSpawnMinions();
 	UFUNCTION(Server, Reliable)
 	void SpawnMinions();
 

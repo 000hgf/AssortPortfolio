@@ -32,9 +32,21 @@ public:
 	void GetPlayerSpawners();
 	void SetPlayerSpawners(AWPlayerState* PlayerState);
 
+protected:
+	int32 CountdownTime = 0;
+	FTimerHandle CountdownHandle;
+public:
+	void StartCountdown(int32 InitialTime);
+	void UpdateCountdown();
+
+public:
+	void DestroyWall();
+public:
+	FTimerHandle SpawnMinionsTimerHandle;
+	void SpawnMinions();
+	
 private:
 	TMap<AActor*, int32> TeamMap;      // 팀정보 맵
-
 public:
 	// 팀 할당
 	void AssignTeam(AActor* Actor, int32 TeamID);

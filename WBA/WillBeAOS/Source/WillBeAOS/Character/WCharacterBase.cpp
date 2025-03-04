@@ -78,7 +78,6 @@ void AWCharacterBase::Tick(float DeltaTime)
 
 void AWCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-
 	// IMC 세팅
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{

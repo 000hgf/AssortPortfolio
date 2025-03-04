@@ -42,7 +42,12 @@ public:
 	UWCharacterHUD* PlayerHUD;
 	UTowerNexusHPWidget* GamePlayHUD;
 	UUserWidget* RespawnScreen;
-	
+
+public:
+	UPROPERTY(ReplicatedUsing = OnRep_Countdown, BlueprintReadOnly, Category = "UI")
+	int32 CountdownTime;
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void OnRep_Countdown();
 public:	//상점 관련
 	UPROPERTY(BlueprintReadWrite, Category = "Store")
 	bool IsOpenedStore;
