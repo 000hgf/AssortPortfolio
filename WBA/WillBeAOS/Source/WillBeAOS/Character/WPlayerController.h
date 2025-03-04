@@ -42,13 +42,12 @@ public:
 	UWCharacterHUD* PlayerHUD;
 	UTowerNexusHPWidget* GamePlayHUD;
 	UUserWidget* RespawnScreen;
-	AWCharacterBase* AWC;
 	
 public:	//상점 관련
 	UPROPERTY(BlueprintReadWrite, Category = "Store")
 	bool IsOpenedStore;
-public:
 	
+public:
 	// ---- 귀환 관련 함수 ----
 	bool IsRecalling = false;
 	FTimerHandle RecallTimerHandle;

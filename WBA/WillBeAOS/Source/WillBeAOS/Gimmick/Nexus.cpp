@@ -3,7 +3,6 @@
 #include "Components/BoxComponent.h"
 #include "../Character/CombatComponent.h"
 #include "Game/WGameMode.h"
-#include "Net/UnrealNetwork.h"
 
 ANexus::ANexus()
 {

@@ -167,12 +167,14 @@ void AWGameMode::RespawnPlayer(APawn* Player, AController* PlayerController)
 					return;
 				}
 				
-				APawn* Respawnpawn = GetWorld()->SpawnActor<APawn>(PS->SelectedPawnClass, PS->PlayerSpawner->GetActorLocation(), FRotator(0,0,0));
+				APawn* Respawnpawn = GetWorld()->SpawnActor<APawn>(PS->SelectedPawnClass, PS->PlayerSpawner->GetActorLocation(), PS->PlayerSpawner->GetActorRotation());
 				if (Respawnpawn)
 				{
 					AWCharacterBase* RespawnChar = Cast<AWCharacterBase>(Respawnpawn);
 					if (RespawnChar)
 					{
+						UE_LOG(LogTemp, Log, TEXT("Player Spawner %s, %d"),*PC->GetName(),PS->TeamID);
+
 						AChar_Wraith* RespawnWraith = Cast<AChar_Wraith>(RespawnChar);
 						if (RespawnWraith)
 						{
@@ -183,6 +185,7 @@ void AWGameMode::RespawnPlayer(APawn* Player, AController* PlayerController)
 							PC->OnPossess(RespawnChar);
 						}
 					}
+					
 					else
 					{
 						UE_LOG(LogTemp, Warning, TEXT("RespawnChar is null!"));
@@ -196,7 +199,7 @@ void AWGameMode::RespawnPlayer(APawn* Player, AController* PlayerController)
 				}
 				else
 				{
-					AWCharacterBase* RespawnChar = GetWorld()->SpawnActor<AWCharacterBase>(Player->GetClass(), PS->PlayerSpawner->GetActorLocation(), FRotator(0,0,0));
+					AWCharacterBase* RespawnChar = GetWorld()->SpawnActor<AWCharacterBase>(Player->GetClass(), PS->PlayerSpawner->GetActorLocation(), PS->PlayerSpawner->GetActorRotation());
 
 					PC->OnPossess(RespawnChar);
 					

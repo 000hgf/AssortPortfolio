@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WEnumFile.h"
 #include "Character/AOSActor.h"
 #include "GameFramework/Actor.h"
 #include "Tower.generated.h"
