@@ -351,5 +351,6 @@ float AWCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 		}
 	}
 
+	ServerPlayMontage(HitAnimMontage);
 	return DamageAmount;
 }

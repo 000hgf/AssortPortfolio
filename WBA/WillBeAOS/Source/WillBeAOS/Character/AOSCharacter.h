@@ -13,7 +13,7 @@ class WILLBEAOS_API AAOSCharacter : public ACharacter, public IDestructible
 public:
 	AAOSCharacter();
 
-	UPROPERTY(Replicated,EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	E_TeamID TeamID;
 
 	virtual E_TeamID GetTeamID() const override{return TeamID;}

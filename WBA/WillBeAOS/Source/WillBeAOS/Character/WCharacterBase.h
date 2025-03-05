@@ -107,7 +107,7 @@ public:
 	void HandleApplyPointDamage(FHitResult LastHit);//?�인???��?지�?줄시 ?�리게이?�로 ?�출???�수
 	UFUNCTION(BlueprintCallable, Category = "Combat")//TakeDamage ?�수 ?�버?�이??
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
-
+	
 	//?�리게이???�의
 	FDS_SkillLCooldown DSkillLCooldown;
 	FDS_SkillLCooldown DSkillRCooldown;
