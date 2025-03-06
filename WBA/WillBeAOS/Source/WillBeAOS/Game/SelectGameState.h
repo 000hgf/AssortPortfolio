@@ -13,24 +13,15 @@ class WILLBEAOS_API ASelectGameState : public AGameState
 public:
 	
 	class ASelectPlayerController* SelectPC;
-	
-	UPROPERTY(ReplicatedUsing = OnRep_WidgetID, BlueprintReadWrite)
-	int32 WidgetID;
-
-	UPROPERTY(ReplicatedUsing = OnRep_UncheckWidgetID, BlueprintReadWrite)
-	int32 UncheckWidgetID;
-
-	UPROPERTY(Replicated, BlueprintReadWrite)
-	FText UserNickName;
 
 	UPROPERTY(ReplicatedUsing = OnRep_SelectTime, BlueprintReadWrite)
 	float SelectTime = 20;
 	
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void M_UpdateTeamSlot();
+	void M_UpdateTeamSlot(int32 WidgetID, const FText& UserNickName);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void M_UnCheckTeamSlot();
+	void M_UnCheckTeamSlot(int32 UnCheckWidgetID);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void M_UpdateCharName(int32 MWidgetID, const FText& MCharName);
@@ -40,12 +31,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-	UFUNCTION()
-	void OnRep_WidgetID();
-	
-	UFUNCTION()
-	void OnRep_UncheckWidgetID();
 
 	UFUNCTION()
 	void OnRep_SelectTime();

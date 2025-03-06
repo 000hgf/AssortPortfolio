@@ -2,7 +2,7 @@
 
 AStartWall::AStartWall()
 {
-	bReplicates = true;
+	SetReplicates(true);
 	PrimaryActorTick.bCanEverTick = true;
 }
 

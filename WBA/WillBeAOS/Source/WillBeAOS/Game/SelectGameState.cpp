@@ -1,5 +1,4 @@
 #include "SelectGameState.h"
-#include "SelectGameMode.h"
 #include "SelectPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"	
@@ -18,17 +17,19 @@ void ASelectGameState::BeginPlay()
 }
 
 
-void ASelectGameState::M_UpdateTeamSlot_Implementation()
+void ASelectGameState::M_UpdateTeamSlot_Implementation(int32 WidgetID, const FText& UserNickName)
 {
-	UE_LOG(LogTemp, Error, TEXT("ASelectGameStateM_UpdateTeamSlot"));
-	SelectPC->UpdateTeamSlot(WidgetID,UserNickName);
+	if (SelectPC)
+	{
+		SelectPC->UpdateTeamSlot(WidgetID,UserNickName);
+	}
 }
 
-void ASelectGameState::M_UnCheckTeamSlot_Implementation()
+void ASelectGameState::M_UnCheckTeamSlot_Implementation(int32 UnCheckWidgetID)
 {
 	UE_LOG(LogTemp, Error, TEXT("ASelectGameStateM_UnCheckTeamSlot"));
 
-	SelectPC->UnCheckTeamSlot(UncheckWidgetID);
+	SelectPC->UnCheckTeamSlot(UnCheckWidgetID);
 }
 
 void ASelectGameState::M_UpdateCharName_Implementation(int32 MWidgetID, const FText& MCharName)
@@ -47,28 +48,7 @@ void ASelectGameState::UpdateChar(int32 MWidgetID, const FText& MCharName)
 void ASelectGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ASelectGameState,WidgetID);
-	DOREPLIFETIME(ASelectGameState,UncheckWidgetID);
 	DOREPLIFETIME(ASelectGameState,SelectTime);
-	DOREPLIFETIME(ASelectGameState,UserNickName);
-}
-
-void ASelectGameState::OnRep_WidgetID()
-{
-	UE_LOG(LogTemp, Error, TEXT("ASelectGameStateOnRep_WidgetID()"));
-
-	M_UpdateTeamSlot();
-}
-
-void ASelectGameState::OnRep_UncheckWidgetID()
-{
-	UE_LOG(LogTemp, Error, TEXT("ASelectGameStateOnRep_UncheckWidgetID()"));
-
-	if (UncheckWidgetID != 0)
-	{
-		M_UnCheckTeamSlot();
-	}
-	else return;
 }
 
 void ASelectGameState::OnRep_SelectTime()

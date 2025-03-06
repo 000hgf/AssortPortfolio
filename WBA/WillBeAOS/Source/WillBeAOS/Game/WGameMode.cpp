@@ -147,7 +147,7 @@ void AWGameMode::DestroyWall()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(),AStartWall::StaticClass(), Walls);
 	for (auto WallActor : Walls)
 	{
-		WallActor->Destroy();
+		if (WallActor->HasAuthority()) {WallActor->Destroy();}
 	}
 }
 

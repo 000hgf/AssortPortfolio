@@ -58,16 +58,20 @@ void ASelectGameMode::UpdateCharName(int32 MWidgetID, FText MCharName)
 void ASelectGameMode::SetTeamSlotIsChecked(int32 TeamID, int32 UncheckTeamID, FText UserNickName)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("GameModeSetTeamSlotIsChecked"));
-	SelectGS->UncheckWidgetID = UncheckTeamID;
-	SetUserData(TeamID, UserNickName);
+	if (UncheckTeamID == 0)
+	{
+		SelectGS->M_UpdateTeamSlot(TeamID, UserNickName);
+	}
+	else
+	{
+		SelectGS->M_UnCheckTeamSlot(UncheckTeamID);
+		SelectGS->M_UpdateTeamSlot(TeamID, UserNickName);	
+	}
 }
 
 void ASelectGameMode::SetUserData(int32 MWidgetID, FText MUserNickName)
 {
 	UE_LOG(LogTemp, Log, TEXT("GameModeSetUserData!"));
-
-	SelectGS->UserNickName = MUserNickName;
-	SelectGS->WidgetID = MWidgetID;
 }
 
 void ASelectGameMode::DecreaseTimer()
