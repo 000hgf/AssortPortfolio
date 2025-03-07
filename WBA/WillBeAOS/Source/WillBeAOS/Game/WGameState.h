@@ -77,11 +77,9 @@ public://리스폰 관련
 public://타워 관련
 	void AddTowerArray(AAOSActor* SpawnedActor);
 	
-	void GetTower();
-	
-	UPROPERTY(BlueprintReadOnly, Category = "Tower")
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Tower")
 	TArray<ATower*> BlueTowerArray = {};
-	UPROPERTY(BlueprintReadOnly, Category = "Tower")
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Tower")
 	TArray<ATower*> RedTowerArray = {};
 	
 	UFUNCTION(BlueprintCallable, Category = "Tower")
@@ -89,11 +87,13 @@ public://타워 관련
 	UFUNCTION(BlueprintCallable, Category = "Tower")
 	int32 GetRedTowerNum();
 	
-	UFUNCTION(BlueprintCallable, Category = "Tower")
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, Category = "Tower")
 	void RemoveTower(ATower* WTower);
 
 protected://넥서스
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Tower")
 	ANexus* BlueNexus;
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Tower")
 	ANexus* RedNexus;
 
 public:

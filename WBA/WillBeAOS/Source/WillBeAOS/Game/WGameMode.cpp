@@ -254,7 +254,7 @@ void AWGameMode::RespawnPlayer(APawn* Player, AController* PlayerController)
 				}
 				else
 				{
-					AWCharacterBase* RespawnChar = GetWorld()->SpawnActor<AWCharacterBase>(Player->GetClass(), PS->PlayerSpawner->GetActorLocation(), PS->PlayerSpawner->GetActorRotation());
+					APawn* RespawnChar = GetWorld()->SpawnActor<APawn>(PS->SelectedPawnClass, PS->PlayerSpawner->GetActorLocation(), PS->PlayerSpawner->GetActorRotation());
 
 					PC->OnPossess(RespawnChar);
 					

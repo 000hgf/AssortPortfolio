@@ -21,7 +21,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget), Category = "Tower")
 	TObjectPtr<class UProgressBar>FriendTowerProgress;//아군 타워 진행상황
 	UFUNCTION(BlueprintPure, Category = "Tower")
-	float SetTowerProgress();//타워 진행상황 받아오는 함수
+	float SetBlueTowerProgress();//타워 진행상황 받아오는 함수
 	//추후 피아 식별 후 수정
 	
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget), Category = "Nexus")

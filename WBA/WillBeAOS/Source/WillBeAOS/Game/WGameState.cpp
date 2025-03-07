@@ -1,4 +1,4 @@
-    #include "WGameState.h"
+#include "WGameState.h"
 #include "WGameInstance.h"
 #include "WGameMode.h"
 #include "WStructure.h"
@@ -6,7 +6,7 @@
 #include "../Gimmick/Tower.h"
 #include "../Character/WPlayerController.h"
 #include "Character/WPlayerState.h"
-#include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 class UWGameInstance;
 
@@ -23,8 +23,6 @@ void AWGameState::BeginPlay()
     {
         SetGamePlay(E_GamePlay::GameInit);
     }
-
-    GetTower();
 }
 
 void AWGameState::UpdateGMTimer()
@@ -282,33 +280,6 @@ float AWGameState::GetRedNexusHP()
     } return 0;
 }
 
-void AWGameState::GetTower()
-{
-    TArray<AActor*> GetTowers = {};
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATower::StaticClass(),GetTowers);
-    if (GetTowers.Num() > 0)
-    {
-        for (AActor* Actor : GetTowers)
-        {
-            if (ATower* Tower = Cast<ATower>(Actor))
-            {
-                if (Tower->TeamID == E_TeamID::Red)
-                {
-                    RedTowerArray.Add(Tower);
-                }
-                else if (Tower->TeamID == E_TeamID::Blue)
-                {
-                    BlueTowerArray.Add(Tower);
-                }
-                else
-                {
-                    UE_LOG(LogTemp,Log,TEXT("Tower is not Found"));
-                }
-            }
-        }
-    }
-}
-
 int32 AWGameState::GetBlueTowerNum()
 {
     return BlueTowerArray.Num();
@@ -319,7 +290,7 @@ int32 AWGameState::GetRedTowerNum()
     return RedTowerArray.Num();
 }
 
-void AWGameState::RemoveTower(ATower* WTower)
+void AWGameState::RemoveTower_Implementation(ATower* WTower)
 {
     if (WTower->TeamID == E_TeamID::Red)
     {
@@ -333,4 +304,14 @@ void AWGameState::RemoveTower(ATower* WTower)
     {
         UE_LOG(LogTemp,Warning,TEXT("Tower is not Found or Netural"));
     }
+}
+
+void AWGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps)const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+    DOREPLIFETIME(ThisClass,BlueTowerArray);
+    DOREPLIFETIME(ThisClass,RedTowerArray);
+    DOREPLIFETIME(ThisClass,BlueNexus);
+    DOREPLIFETIME(ThisClass,RedNexus);
+
 }

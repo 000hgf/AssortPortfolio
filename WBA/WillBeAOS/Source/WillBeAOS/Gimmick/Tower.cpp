@@ -15,8 +15,6 @@
 
 ATower::ATower()
 {
-	bReplicates = true;           // 이 액터가 복제되도록 설정
-	
 	PrimaryActorTick.bCanEverTick = true;
 
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
@@ -64,9 +62,7 @@ void ATower::Tick(float DeltaTime)
 
 	if (OverlappingActors.IsValidIndex(0))
 	{
-
 		TargetOfActors = OverlappingActors[0];
-
 
 		FVector BeamStart = AttackStartPoint->GetComponentLocation(); // 빔 시작 위치
 		FVector BeamEnd = TargetOfActors->GetActorLocation();         // 빔 끝 위치

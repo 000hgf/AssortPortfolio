@@ -8,7 +8,6 @@
 #include "Components/WidgetComponent.h"
 #include "Components/ProgressBar.h"
 #include "HealthBar.h"
-#include "InputBehavior.h"
 #include "../Game/WGameState.h"
 #include "Character/WCharacterBase.h"
 #include "Game/WGameMode.h"

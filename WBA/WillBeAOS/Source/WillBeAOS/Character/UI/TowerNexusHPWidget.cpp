@@ -9,7 +9,7 @@ void UTowerNexusHPWidget::NativeConstruct()
 	AWGS = GetWorld()->GetGameState<AWGameState>();
 }
 
-float UTowerNexusHPWidget::SetTowerProgress()
+float UTowerNexusHPWidget::SetBlueTowerProgress()
 {
 	if (AWGS != nullptr)
 	{
@@ -17,9 +17,9 @@ float UTowerNexusHPWidget::SetTowerProgress()
 		{
 			FriendTowerProgress->SetVisibility(ESlateVisibility::Hidden);
 		}
-		return (AWGS->GetBlueTowerNum()/6.0f); // 6.0f -> 타워 MAX_NUM으로 변경
+		else {return (AWGS->GetBlueTowerNum()/6.0f);} // 6.0f -> 타워 MAX_NUM으로 변경
 	}
-	return 0.5f;
+	return 0.0f;
 }
 
 float UTowerNexusHPWidget::SetNexusHealth()
@@ -39,9 +39,9 @@ float UTowerNexusHPWidget::SetRedTowerProgress()
 		{
 			FriendTowerProgress->SetVisibility(ESlateVisibility::Hidden);
 		}
-		return (AWGS->RedTowerArray.Num()/6.0f); // 6.0f -> 타워 MAX_NUM으로 변경
+		else {return (AWGS->RedTowerArray.Num()/6.0f);} // 6.0f -> 타워 MAX_NUM으로 변경
 	}
-	return 0.5f;
+	return 0.0f;
 }
 
 float UTowerNexusHPWidget::SetRedNexusHealth()
