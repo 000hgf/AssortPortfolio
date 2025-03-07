@@ -10,6 +10,7 @@
 #include "HealthBar.h"
 #include "../Game/WGameState.h"
 #include "Character/WCharacterBase.h"
+#include "Character/WPlayerController.h"
 #include "Game/WGameMode.h"
 #include "Gimmick/Tower.h"
 #include "Net/UnrealNetwork.h"
@@ -37,11 +38,33 @@ void AWMinionsCharacterBase::BeginPlay()
 	CombatComponent->DelegateDead.BindUObject(this, &ThisClass::Dead);
 	//HandleApplyPointDamage 멀티델리게이트 바인딩
 	CombatComponent->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
+
+	FindPlayerPC();
 }
 
 void AWMinionsCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (PlayerController && WidgetComponent)
+	{
+		PlayerChar = Cast<AWCharacterBase>(PlayerController->GetPawn());
+
+		if (!PlayerChar) return;
+		
+		float Distance = FVector::Dist(PlayerChar->GetActorLocation(), GetActorLocation());
+
+		if (Distance > MaxVisibleDistance)
+		{
+			WidgetComponent->SetVisibility(false);
+		}
+		else
+		{
+			WidgetComponent->SetVisibility(true);
+			float ScaleFactor = FMath::Clamp(1.0f - (Distance / MaxVisibleDistance), MinWidgetScale, MaxWidgetScale);
+			WidgetComponent->SetRelativeScale3D(FVector(ScaleFactor));
+		}
+	}
 
 	if (!HasAuthority()) return;
 	
@@ -57,6 +80,16 @@ void AWMinionsCharacterBase::Tick(float DeltaTime)
 		AWMinionsAIController* MinionController = Cast<AWMinionsAIController>(GetController());
 		if(MinionController)
 			MinionController->GetBrainComponent()->StopLogic(TEXT("None"));
+	}
+}
+
+void AWMinionsCharacterBase::FindPlayerPC()
+{
+	PlayerController = Cast<AWPlayerController>(GetWorld()->GetFirstPlayerController());
+	FTimerHandle PCTimerManager;
+	if (!PlayerController)
+	{
+		GetWorldTimerManager().SetTimer(PCTimerManager, this, &ThisClass::FindPlayerPC, 0.2f, true);
 	}
 }
 

@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{A2A91BC6-4746-D449-2E32-978C885DF12D}",
+	"EngineAssociation": "{0C1B2E17-4503-F843-3976-E083063221BF}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -26,6 +26,14 @@
 		},
 		{
 			"Name": "CascadeToNiagaraConverter",
+			"Enabled": true
+		},
+		{
+			"Name": "Landmass",
+			"Enabled": true
+		},
+		{
+			"Name": "Water",
 			"Enabled": true
 		}
 	]

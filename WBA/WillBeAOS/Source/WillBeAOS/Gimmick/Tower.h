@@ -2,7 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "Character/AOSActor.h"
+#include "Character/WCharacterBase.h"
 #include "GameFramework/Actor.h"
+#include "Minions/HealthBar.h"
 #include "Tower.generated.h"
 
 class USceneComponent;
@@ -16,6 +18,13 @@ class WILLBEAOS_API ATower : public AAOSActor
 {
 
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = "Color")
+	FLinearColor BlueTeamColor;
+	UPROPERTY(EditAnywhere, Category = "Color")
+	FLinearColor RedTeamColor;
+	UPROPERTY(EditAnywhere, Category = "Color")
+	FLinearColor DefaultColor;
 	
 public:
 	ATower();
@@ -24,13 +33,16 @@ public:
 	class AWGameState* AWGS;
 	
 protected://체력관련
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void SetHpPercentage(float Health, float MaxHealth);
 	UFUNCTION(Server, Reliable)
 	void S_SetHpPercentage(float Health, float MaxHealth);
 public:
+	UFUNCTION(Server, Reliable)
+	void S_SetHPbarColor();
 	UFUNCTION(NetMulticast, Reliable)
-	void SetHPbarColor();
+	void SetHPbarColor(FLinearColor HealthBarColor);
 
 	UFUNCTION(Server, Reliable)
 	void S_SetDamaged();
@@ -49,7 +61,7 @@ public:
 	UCapsuleComponent* CapsuleCollisionComponet;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UNiagaraComponent* NiagaraComponent;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USphereComponent* OverlapTrigger;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* StaticMesh;
@@ -59,19 +71,17 @@ public:
 	class UWidgetComponent* WidgetComponent;
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* CombatComp;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UNiagaraComponent* DamagedNiagara;
 	UPROPERTY(BlueprintReadWrite)
 	class UStaticMesh* DamagedStaticMesh;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UNiagaraSystem* DamageParticle;
+	UFUNCTION(BlueprintNativeEvent)
+	void DamagedParticle();
 	
 	bool IsParticleSpawned = false;
 
 public://타격 관련
 	UPROPERTY(BlueprintReadWrite, Category = SpawnActor)
 	TSubclassOf<AActor> SpawnActors;
-	UPROPERTY(BlueprintReadOnly, Category = SpawnActor)
+	UPROPERTY(BlueprintReadOnly, Category = SpawnActor, Replicated)
 	AActor* TargetOfActors;
 	FVector HitLocation;
 	FVector HitNormal;
@@ -85,6 +95,27 @@ public://타격 관련
 	TArray<FHitResult> OutHits;
 	
 	AController* LastHitBy;
+
+public:
+	// ----- HP 위젯 조절 함수 -----
+	UPROPERTY(EditAnywhere, Category = "UI")
+	float MaxVisibleDistance = 5000.f;		// 최대 가시 거리
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	float MinWidgetScale = 0.2f;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	float MaxWidgetScale = 1.f;
+
+	AWCharacterBase* PlayerChar;
+	AWPlayerController* PlayerController;
+
+	UFUNCTION()
+	void FindPlayerPC();
+
+	// 타겟 빔
+	UFUNCTION(NetMulticast, Reliable)
+	void NM_BeamToTarget(FVector TargetLocation);
 
 public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);

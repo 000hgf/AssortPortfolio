@@ -47,7 +47,7 @@ float ANexus::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 				AWGameMode* GM = Cast<AWGameMode>(GetWorld()->GetAuthGameMode());
 				if (GM)
 				{
-					GM->OnNexusDestroyed();
+					GM->OnNexusDestroyed(TeamID);
 				}
 				
 				FTimerHandle TimerHandle;

@@ -47,6 +47,8 @@ void AWPlayerController::OnPossess(APawn* InPawn)
 			PlayerChar->TeamID = WPlayerState->TeamID;
 			UE_LOG(LogTemp, Log, TEXT("AWPlayerController::OnPossess %d"),PlayerChar->TeamID);
 		}
+
+		
 	}
 }
 
@@ -166,7 +168,7 @@ void AWPlayerController::RecallToBase_Implementation()
 	}
 }
 
-void AWPlayerController::GameEnded_Implementation(bool bIsWinner)
+void AWPlayerController::GameEnded_Implementation(E_TeamID LoseTeam)
 {
 	if (!IsLocalController()) return;
 	
@@ -176,7 +178,13 @@ void AWPlayerController::GameEnded_Implementation(bool bIsWinner)
 	if(PlayerHUD)
 		PlayerHUD->RemoveFromParent();
 
-	if (bIsWinner)	// 본인의 팀 ID == bIsWinner로 바꾸기
+	AWPlayerState* PS = GetPlayerState<AWPlayerState>();
+	if (PS)
+	{
+		PlayerTeamID = PS->TeamID;
+	}
+	
+	if (PlayerTeamID != LoseTeam)
 	{
 		FInputModeUIOnly InputMode;
 		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);

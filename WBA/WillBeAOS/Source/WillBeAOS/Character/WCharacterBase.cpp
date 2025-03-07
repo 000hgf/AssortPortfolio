@@ -137,6 +137,8 @@ void AWCharacterBase::Move(const FInputActionValue& Value)
 
 void AWCharacterBase::Attack()
 {
+	if (IsDead == true) return;
+	
 	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
 	if (PC && PC->IsRecalling)
 	{
@@ -245,8 +247,19 @@ void AWCharacterBase::MultiPlayMontage_Implementation(UAnimMontage* Montage)
 	}
 }
 
+void AWCharacterBase::SpawnHitEffect_Implementation(FVector HitLocation)
+{
+}
+
+void AWCharacterBase::NM_SpawnHitEffect_Implementation(FVector HitLocation)
+{
+	SpawnHitEffect(HitLocation);
+}
+
 void AWCharacterBase::BeingDead()
 {
+	IsDead = true;
+	
 	//죽음 메세지 출력
 	auto Message = FString::Printf(TEXT("Dead"));
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Red, Message);
@@ -258,7 +271,7 @@ void AWCharacterBase::BeingDead()
 }
 
 void AWCharacterBase::S_BeingDead_Implementation(AWPlayerController* PC, APawn* Player)
-{
+{	
 	//캐릭터 리스폰
 	AWGameState* GameState = Cast<AWGameState>(GetWorld()->GetGameState());
 	AWGameMode* GameMode = Cast<AWGameMode>(GetWorld()->GetAuthGameMode());
@@ -314,6 +327,8 @@ void AWCharacterBase::HandleApplyPointDamage(FHitResult LastHit)
 		{
 			if (this->TeamID == HitObject->TeamID) return;
 		}
+
+		NM_SpawnHitEffect(LastHit.Location);
 		
 		AWPlayerController* PC = Cast<AWPlayerController>(GetController());
 		if (PC)
@@ -351,6 +366,6 @@ float AWCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 		}
 	}
 
-	ServerPlayMontage(HitAnimMontage);
+	//ServerPlayMontage(HitAnimMontage);
 	return DamageAmount;
 }

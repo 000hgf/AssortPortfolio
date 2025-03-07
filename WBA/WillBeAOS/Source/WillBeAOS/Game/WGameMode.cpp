@@ -109,6 +109,11 @@ void AWGameMode::SpawnTower()
 				SpawnedActor->SetTeamID(SpawnPoint->TeamID);
 				WGS->AddTowerArray(SpawnedActor);
 				AssignTeam(SpawnedActor,static_cast<int32>(SpawnedActor->TeamID));
+				ATower* TowerColor = Cast<ATower>(SpawnedActor);
+				if (TowerColor)
+				{
+					TowerColor->S_SetHPbarColor();
+				}
 			}
 		}
 	}
@@ -254,7 +259,7 @@ void AWGameMode::RespawnPlayer(APawn* Player, AController* PlayerController)
 				}
 				else
 				{
-					APawn* RespawnChar = GetWorld()->SpawnActor<APawn>(PS->SelectedPawnClass, PS->PlayerSpawner->GetActorLocation(), PS->PlayerSpawner->GetActorRotation());
+					AWCharacterBase* RespawnChar = GetWorld()->SpawnActor<AWCharacterBase>(PS->SelectedPawnClass, PS->PlayerSpawner->GetActorLocation(), PS->PlayerSpawner->GetActorRotation());
 
 					PC->OnPossess(RespawnChar);
 					
@@ -285,7 +290,7 @@ void AWGameMode::OnObjectKilled(TScriptInterface<IDestructible> DestroyedObject,
 	}
 }
 
-void AWGameMode::OnNexusDestroyed()
+void AWGameMode::OnNexusDestroyed(E_TeamID LoseTeam)
 {
 	if (!HasAuthority()) return;
 
@@ -300,7 +305,7 @@ void AWGameMode::OnNexusDestroyed()
 		AWPlayerController* PC = Cast<AWPlayerController>(It->Get());
 		if (PC)
 		{
-			PC->GameEnded(1);
+			PC->GameEnded(LoseTeam);
 		}
 	}
 }

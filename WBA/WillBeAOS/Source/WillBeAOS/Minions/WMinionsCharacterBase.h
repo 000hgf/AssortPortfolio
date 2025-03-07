@@ -6,6 +6,8 @@
 
 #define KILLGOLD 30
 
+class AWPlayerController;
+class AWCharacterBase;
 class UAnimMontage;
 class UCombatComponent;
 class UWidgetComponent;
@@ -24,6 +26,23 @@ public:
 
 public:
 	AWMinionsCharacterBase();
+
+public:
+	// ----- HP 위젯 조절 함수 -----
+	UPROPERTY(EditAnywhere, Category = "UI")
+	float MaxVisibleDistance = 5000.f;		// 최대 가시 거리
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	float MinWidgetScale = 0.2f;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	float MaxWidgetScale = 1.f;
+
+	AWCharacterBase* PlayerChar;
+	AWPlayerController* PlayerController;
+
+	UFUNCTION()
+	void FindPlayerPC();
 
 public://트랙 관련
 	UPROPERTY(Replicated,EditAnywhere, BlueprintReadOnly, Category = "Track")

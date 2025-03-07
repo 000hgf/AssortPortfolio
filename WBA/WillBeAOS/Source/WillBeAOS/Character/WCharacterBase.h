@@ -52,7 +52,7 @@ private:
 	
 public:
 	UPROPERTY(BlueprintReadonly)
-	bool IsDead;
+	bool IsDead = false;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Health")
 	UAnimMontage* DeadAnimMontage;	//죽을???�일 몽�?�?
@@ -89,6 +89,12 @@ public:
 	void S_Behavior();
 	UFUNCTION(NetMulticast, Reliable)
 	void NM_Behavior(int32 Combo);
+
+	// ----- Hit 이벤트 -----
+	UFUNCTION(BlueprintNativeEvent)
+	void SpawnHitEffect(FVector HitLocation);
+	UFUNCTION(NetMulticast, Reliable)
+	void NM_SpawnHitEffect(FVector HitLocation);
 
 	// ---- Dead 관련 함수 -----
 	UFUNCTION(Server, Reliable)

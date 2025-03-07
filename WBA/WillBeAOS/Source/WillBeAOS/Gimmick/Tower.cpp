@@ -11,17 +11,18 @@
 #include "../Minions/HealthBar.h"
 #include "../Game/WGameState.h"
 #include "../Minions/WMinionsCharacterBase.h"
+#include "Character/WPlayerController.h"
 #include "Game/WGameMode.h"
+#include "Net/UnrealNetwork.h"
 
 ATower::ATower()
 {
+	bReplicates = true;           // 이 액터가 복제되도록 설정
+	
 	PrimaryActorTick.bCanEverTick = true;
 
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	SetRootComponent(DefaultSceneRoot);
-
-	DamagedNiagara = CreateDefaultSubobject<UNiagaraComponent>(TEXT("DamagedParticle"));
-	DamagedNiagara->SetupAttachment(GetRootComponent());
 
 	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraParticleSystem"));
 	NiagaraComponent->SetupAttachment(GetRootComponent());
@@ -54,23 +55,42 @@ ATower::ATower()
 void ATower::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FindPlayerPC();
 }
 
 void ATower::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (PlayerController && WidgetComponent)
+	{
+		PlayerChar = Cast<AWCharacterBase>(PlayerController->GetPawn());
+
+		if (!PlayerChar) return;
+		
+		float Distance = FVector::Dist(PlayerChar->GetActorLocation(), GetActorLocation());
+
+		if (Distance > MaxVisibleDistance)
+		{
+			WidgetComponent->SetVisibility(false);
+		}
+		else
+		{
+			WidgetComponent->SetVisibility(true);
+			float ScaleFactor = FMath::Clamp(1.0f - (Distance / MaxVisibleDistance), MinWidgetScale, MaxWidgetScale);
+			WidgetComponent->SetRelativeScale3D(FVector(ScaleFactor));
+		}
+	}
+
+	if (!HasAuthority()) return;
+	
 	if (OverlappingActors.IsValidIndex(0))
 	{
+
 		TargetOfActors = OverlappingActors[0];
-
-		FVector BeamStart = AttackStartPoint->GetComponentLocation(); // 빔 시작 위치
-		FVector BeamEnd = TargetOfActors->GetActorLocation();         // 빔 끝 위치
 		
-		NiagaraComponent->SetVectorParameter("MyBeamStart", BeamStart);
-		NiagaraComponent->SetVectorParameter("MyBeamEnd", BeamEnd);
-		NiagaraComponent->SetVisibility(true);
-
+		NM_BeamToTarget(TargetOfActors->GetActorLocation());
 		
 		// 공격 2초마다 한번씩 스폰
 		Delta += DeltaTime;
@@ -81,6 +101,26 @@ void ATower::Tick(float DeltaTime)
 			GetWorld()->SpawnActor<AActor>(SpawnActors, AttackStartPoint->GetComponentTransform(), SpawnParams);
 			Delta = 0;
 		}
+	}
+}
+
+void ATower::NM_BeamToTarget_Implementation(FVector TargetLocation)
+{
+	FVector BeamStart = AttackStartPoint->GetComponentLocation(); // 빔 시작 위치
+	FVector BeamEnd = TargetLocation;         // 빔 끝 위치
+		
+	NiagaraComponent->SetVectorParameter("MyBeamStart", BeamStart);
+	NiagaraComponent->SetVectorParameter("MyBeamEnd", BeamEnd);
+	NiagaraComponent->SetVisibility(true);
+}
+
+void ATower::FindPlayerPC()
+{
+	PlayerController = Cast<AWPlayerController>(GetWorld()->GetFirstPlayerController());
+	FTimerHandle PCTimerManager;
+	if (!PlayerController)
+	{
+		GetWorldTimerManager().SetTimer(PCTimerManager, this, &ThisClass::FindPlayerPC, 0.2f, true);
 	}
 }
 
@@ -163,6 +203,10 @@ void ATower::spawn()
 	GetWorld()->SpawnActor<AActor>(SpawnActors, AttackStartPoint->GetComponentTransform(), SpawnParams);
 }
 
+void ATower::DamagedParticle_Implementation()
+{
+}
+
 void ATower::S_SetHpPercentage_Implementation(float Health, float MaxHealth)
 {
 	SetHpPercentage(Health, MaxHealth);
@@ -179,28 +223,42 @@ void ATower::SetHpPercentage_Implementation(float Health, float MaxHealth)
 	}
 }
 
-void ATower::SetHPbarColor_Implementation()
+void ATower::S_SetHPbarColor_Implementation()
 {
-	UHealthBar* Widget = Cast<UHealthBar>(WidgetComponent->GetWidget());
-	if (!Widget) return;
-	
-	FLinearColor HealthBarColor;
+	static FLinearColor HealthBarColor;
 	switch (TeamID)
 	{
 	case E_TeamID::Red:
-		HealthBarColor = FLinearColor::Red;
+		HealthBarColor = RedTeamColor;
 		break;
 	case E_TeamID::Blue:
-		HealthBarColor = FLinearColor::Blue;
+		HealthBarColor = BlueTeamColor;
 		break;
 	case E_TeamID::Neutral:
-		HealthBarColor = FLinearColor::Yellow;
+		HealthBarColor = DefaultColor;
 		break;
 	}
-	
-	if (Widget->HealthBar)
+
+	SetHPbarColor(HealthBarColor);
+}
+
+void ATower::SetHPbarColor_Implementation(FLinearColor HealthBarColor)
+{
+	UHealthBar* HealthBarWidget = Cast<UHealthBar>(WidgetComponent->GetWidget());
+	if (!HealthBarWidget)
 	{
-		Widget->HealthBar->SetFillColorAndOpacity(HealthBarColor);
+		GetWorld()->GetTimerManager().SetTimerForNextTick([this, HealthBarColor]()
+		{
+			SetHPbarColor(HealthBarColor);
+		});
+		return;
+	}
+	
+	if (HealthBarWidget->HealthBar)
+	{
+		HealthBarWidget->HealthBar->SetFillColorAndOpacity(HealthBarColor);
+
+		HealthBarWidget->InvalidateLayoutAndVolatility();
 	}
 }
 
@@ -212,5 +270,12 @@ void ATower::S_SetDamaged_Implementation()
 void ATower::NM_SetDamaged_Implementation()
 {
 	StaticMesh->SetStaticMesh(DamagedStaticMesh);
-	DamagedNiagara->SetAsset(DamageParticle);
+	DamagedParticle();
+}
+
+void ATower::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+    
+	DOREPLIFETIME(ATower, TargetOfActors);
 }

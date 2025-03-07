@@ -23,7 +23,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 TrackNum;
 	
-	UPROPERTY(EditAnywhere)
 	int32 SpawnCount = 0;
 
 	void StartSpawnMinions();
