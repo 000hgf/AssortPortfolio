@@ -89,6 +89,10 @@ public://리스폰 함수(PlayerController->GameHasEnded())
 	
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetPlayerReady(); // 서버에 준비 완료 신호 전송
+	
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 public:
 	virtual void OnPossess(APawn* InPawn) override;

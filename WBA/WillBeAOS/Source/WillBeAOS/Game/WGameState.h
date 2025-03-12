@@ -61,6 +61,10 @@ public: //PlayerReady단계
 
 	int32 CheckSpawnedPlayers = 0;
 
+	// 모든 플레이어가 준비되었는지 확인하는 함수
+	UFUNCTION()
+	void CheckAllPlayersReady(); 
+
 public:
 	int32 CountdownTime = 0;
 protected:

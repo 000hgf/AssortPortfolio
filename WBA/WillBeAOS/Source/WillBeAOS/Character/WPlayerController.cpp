@@ -5,6 +5,8 @@
 #include "WPlayerState.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Gimmick/PlayerSpawner.h"
+#include "Gimmick/Tower.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "UI/TowerNexusHPWidget.h"
 
@@ -32,6 +34,17 @@ void AWPlayerController::BeginPlay()
 			if (PlayerHUD)
 				PlayerHUD->AddToViewport();
 		}
+
+		Server_SetPlayerReady();
+	}
+}
+
+void AWPlayerController::Server_SetPlayerReady_Implementation()
+{
+	AWPlayerState* PS = GetPlayerState<AWPlayerState>();
+	if (PS)
+	{
+		PS->S_SetPlayerReady(true); // 플레이어 상태 변경
 	}
 }
 
@@ -48,7 +61,20 @@ void AWPlayerController::OnPossess(APawn* InPawn)
 			UE_LOG(LogTemp, Log, TEXT("AWPlayerController::OnPossess %d"),PlayerChar->TeamID);
 		}
 
-		
+		if (this == GetWorld()->GetFirstPlayerController())
+		{
+			TArray<AActor*> FoundTowers;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATower::StaticClass(), FoundTowers);
+
+			for (AActor* Actor : FoundTowers)
+			{
+				ATower* Tower = Cast<ATower>(Actor);
+				if (Tower)
+				{
+					Tower->FindPlayerPawn();  // 타워의 특정 함수 호출
+				}
+			}
+		}
 	}
 }
 

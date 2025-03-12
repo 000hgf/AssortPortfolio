@@ -57,54 +57,59 @@ void ATower::BeginPlay()
 	Super::BeginPlay();
 
 	FindPlayerPC();
+	FindPlayerPawn();
 }
 
 void ATower::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (PlayerController && WidgetComponent)
+	if (!HasAuthority() && PlayerController && WidgetComponent)
 	{
-		PlayerChar = Cast<AWCharacterBase>(PlayerController->GetPawn());
-
 		if (!PlayerChar) return;
 		
 		float Distance = FVector::Dist(PlayerChar->GetActorLocation(), GetActorLocation());
+		bool bIsVisible = Distance <= MaxVisibleDistance;
 
-		if (Distance > MaxVisibleDistance)
+		if (bIsVisible != bLastVisibleState)
 		{
-			WidgetComponent->SetVisibility(false);
+			WidgetComponent->SetVisibility(bIsVisible);
+			bLastVisibleState = bIsVisible;
 		}
-		else
+
+		if (bIsVisible)
 		{
-			WidgetComponent->SetVisibility(true);
 			float ScaleFactor = FMath::Clamp(1.0f - (Distance / MaxVisibleDistance), MinWidgetScale, MaxWidgetScale);
 			WidgetComponent->SetRelativeScale3D(FVector(ScaleFactor));
 		}
 	}
-
-	if (!HasAuthority()) return;
 	
-	if (OverlappingActors.IsValidIndex(0))
+	if (HasAuthority() && OverlappingActors.IsValidIndex(0))
 	{
 
 		TargetOfActors = OverlappingActors[0];
-		
-		NM_BeamToTarget(TargetOfActors->GetActorLocation());
 		
 		// 공격 2초마다 한번씩 스폰
 		Delta += DeltaTime;
 		if(Delta >= 2)
 		{
+			Delta = 0;
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
 			GetWorld()->SpawnActor<AActor>(SpawnActors, AttackStartPoint->GetComponentTransform(), SpawnParams);
-			Delta = 0;
 		}
+	}
+
+	if (!HasAuthority() && OverlappingActors.IsValidIndex(0))
+	{
+		TargetOfActors = OverlappingActors[0];
+
+		// 타겟에 빔 조준
+		BeamToTarget(TargetOfActors->GetActorLocation());
 	}
 }
 
-void ATower::NM_BeamToTarget_Implementation(FVector TargetLocation)
+void ATower::BeamToTarget(FVector TargetLocation)
 {
 	FVector BeamStart = AttackStartPoint->GetComponentLocation(); // 빔 시작 위치
 	FVector BeamEnd = TargetLocation;         // 빔 끝 위치
@@ -121,6 +126,14 @@ void ATower::FindPlayerPC()
 	if (!PlayerController)
 	{
 		GetWorldTimerManager().SetTimer(PCTimerManager, this, &ThisClass::FindPlayerPC, 0.2f, true);
+	}
+}
+
+void ATower::FindPlayerPawn()
+{
+	if (PlayerController)
+	{
+		PlayerChar = Cast<AWCharacterBase>(PlayerController->GetPawn());
 	}
 }
 
@@ -187,8 +200,7 @@ void ATower::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAc
 void ATower::OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	OverlappingActors.Remove(OtherActor);
-
-
+	
 	// 타깃 배열이 비어있으면 스폰 시간 초기화 및 Niagara 비활성화
 	if (OverlappingActors.IsEmpty())
 	{

@@ -29,6 +29,8 @@ public:
 
 public:
 	// ----- HP 위젯 조절 함수 -----
+	bool bLastVisibleState = true;
+	
 	UPROPERTY(EditAnywhere, Category = "UI")
 	float MaxVisibleDistance = 5000.f;		// 최대 가시 거리
 
@@ -43,6 +45,7 @@ public:
 
 	UFUNCTION()
 	void FindPlayerPC();
+	void FindPlayerPawn();
 
 public://트랙 관련
 	UPROPERTY(Replicated,EditAnywhere, BlueprintReadOnly, Category = "Track")

@@ -44,7 +44,7 @@ void AWGameMode::PostLogin(APlayerController* NewPlayer)
 		if (WGS)
 		{
 			SetGSPlayerControllers();
-			WGS->CheckPlayerIsReady();
+			//WGS->CheckPlayerIsReady();
 		}
 	}
 }
@@ -231,6 +231,8 @@ void AWGameMode::RespawnPlayer(APawn* Player, AController* PlayerController)
 					{
 						UE_LOG(LogTemp, Log, TEXT("Player Spawner %s, %d"),*PC->GetName(),PS->TeamID);
 
+
+						// 나중에 고칠 부분 --- 캐릭터 많아지면 힘들어짐, 캐릭터 베이스로 퉁칠 수 있을것
 						AChar_Wraith* RespawnWraith = Cast<AChar_Wraith>(RespawnChar);
 						if (RespawnWraith)
 						{
@@ -299,7 +301,8 @@ void AWGameMode::OnNexusDestroyed(E_TeamID LoseTeam)
 	{
 		GS->SetGamePlay(E_GamePlay::GameEnded);
 	}
-
+//고쳐야함
+	
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
 		AWPlayerController* PC = Cast<AWPlayerController>(It->Get());

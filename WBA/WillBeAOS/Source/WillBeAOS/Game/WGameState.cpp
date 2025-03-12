@@ -106,7 +106,6 @@ void AWGameState::CheckPlayerIsReady()
 {
     if (IsAllPlayerIsReady())
     {
-        
         SetGamePlay(E_GamePlay::PlayerReady);
     }
 }
@@ -189,6 +188,26 @@ void AWGameState::CheckPlayerSpawned(AWPlayerController* WPlayerController)
     else
     {
         UE_LOG(LogTemp, Log, TEXT("All Players are not Spawned"));
+    }
+}
+
+void AWGameState::CheckAllPlayersReady()
+{
+    bool bAllReady = true;
+
+    for (APlayerState* PS : PlayerArray) // 모든 플레이어 상태 확인
+    {
+        AWPlayerState* WPS = Cast<AWPlayerState>(PS);
+        if (WPS && !WPS->bIsGameReady) // 아직 준비 안된 플레이어가 있다면
+        {
+            bAllReady = false;
+            break;
+        }
+    }
+
+    if (bAllReady)
+    {
+        CheckPlayerIsReady();
     }
 }
 

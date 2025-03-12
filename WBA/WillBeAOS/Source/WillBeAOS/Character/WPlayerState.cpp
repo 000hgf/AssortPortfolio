@@ -1,7 +1,25 @@
 #include "Character/WPlayerState.h"
 
 #include "WCharacterBase.h"
+#include "Game/WGameState.h"
 #include "Net/UnrealNetwork.h"
+
+void AWPlayerState::S_SetPlayerReady_Implementation(bool bReady)
+{
+    bIsGameReady = bReady;
+
+    // 서버의 모든 플레이어가 준비가 되어있는지 확인
+    AWGameState* GS = GetWorld()->GetGameState<AWGameState>();
+    if (GS)
+    {
+        GS->CheckAllPlayersReady();
+    }
+}
+
+bool AWPlayerState::S_SetPlayerReady_Validate(bool bReady)
+{
+    return true;
+}
 
 AWPlayerState::AWPlayerState()
 {
@@ -138,4 +156,5 @@ void AWPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
     DOREPLIFETIME(ThisClass, TeamID);
+    DOREPLIFETIME(ThisClass, bIsGameReady);
 }

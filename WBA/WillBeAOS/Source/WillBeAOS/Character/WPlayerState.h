@@ -11,6 +11,12 @@ class WILLBEAOS_API AWPlayerState : public APlayerState
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(Replicated)
+	bool bIsGameReady = false;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void S_SetPlayerReady(bool bReady);
+	
 	UPROPERTY(BlueprintReadWrite,Replicated, Category = "Teams")
 	E_TeamID TeamID;
 	UPROPERTY(BlueprintReadWrite, Category = "Pawn")

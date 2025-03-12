@@ -12,6 +12,7 @@
 #include "Character/WCharacterBase.h"
 #include "Character/WPlayerController.h"
 #include "Game/WGameMode.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Gimmick/Tower.h"
 #include "Net/UnrealNetwork.h"
 
@@ -40,47 +41,48 @@ void AWMinionsCharacterBase::BeginPlay()
 	CombatComponent->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
 
 	FindPlayerPC();
+	FindPlayerPawn();
+
+	// 게임이 끝나면 로직 끊기
+	// AWGameState* WGS = Cast<AWGameState>(GetWorld()->GetGameState());
+	// if (WGS && WGS->CurrentGameState==E_GamePlay::GameEnded)
+	// {
+	// 	AWMinionsAIController* MinionController = Cast<AWMinionsAIController>(GetController());
+	// 	if(MinionController)
+	// 		MinionController->GetBrainComponent()->StopLogic(TEXT("None"));
+	// }
 }
 
 void AWMinionsCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (PlayerController && WidgetComponent)
-	{
-		PlayerChar = Cast<AWCharacterBase>(PlayerController->GetPawn());
-
-		if (!PlayerChar) return;
-		
-		float Distance = FVector::Dist(PlayerChar->GetActorLocation(), GetActorLocation());
-
-		if (Distance > MaxVisibleDistance)
-		{
-			WidgetComponent->SetVisibility(false);
-		}
-		else
-		{
-			WidgetComponent->SetVisibility(true);
-			float ScaleFactor = FMath::Clamp(1.0f - (Distance / MaxVisibleDistance), MinWidgetScale, MaxWidgetScale);
-			WidgetComponent->SetRelativeScale3D(FVector(ScaleFactor));
-		}
-	}
-
-	if (!HasAuthority()) return;
+	// if (PlayerController && WidgetComponent)
+	// {
+	// 	if (!PlayerChar) return;
+	// 	
+	// 	float Distance = FVector::Dist(PlayerChar->GetActorLocation(), GetActorLocation());
+	// 	bool bIsVisible = Distance <= MaxVisibleDistance;
+	//
+	// 	if (bIsVisible != bLastVisibleState)
+	// 	{
+	// 		WidgetComponent->SetVisibility(bIsVisible);
+	// 		bLastVisibleState = bIsVisible;
+	// 	}
+	//
+	// 	if (bIsVisible)
+	// 	{
+	// 		float ScaleFactor = FMath::Clamp(1.0f - (Distance / MaxVisibleDistance), MinWidgetScale, MaxWidgetScale);
+	// 		WidgetComponent->SetRelativeScale3D(FVector(ScaleFactor));
+	// 	}
+	//}
 	
-	float HP = CombatComponent->Health;
-	float MAXHP = CombatComponent->Max_Health;
-
-	S_SetHpPercentage(HP, MAXHP);
-
-	// 게임이 끝나면 로직 끊기
-	AWGameState* WGS = Cast<AWGameState>(GetWorld()->GetGameState());
-	if (WGS && WGS->CurrentGameState==E_GamePlay::GameEnded)
-	{
-		AWMinionsAIController* MinionController = Cast<AWMinionsAIController>(GetController());
-		if(MinionController)
-			MinionController->GetBrainComponent()->StopLogic(TEXT("None"));
-	}
+	// if (!HasAuthority()) return;
+	//
+	// float HP = CombatComponent->Health;
+	// float MAXHP = CombatComponent->Max_Health;
+	//
+	// S_SetHpPercentage(HP, MAXHP);
 }
 
 void AWMinionsCharacterBase::FindPlayerPC()
@@ -90,6 +92,14 @@ void AWMinionsCharacterBase::FindPlayerPC()
 	if (!PlayerController)
 	{
 		GetWorldTimerManager().SetTimer(PCTimerManager, this, &ThisClass::FindPlayerPC, 0.2f, true);
+	}
+}
+
+void AWMinionsCharacterBase::FindPlayerPawn()
+{
+	if (PlayerController)
+	{
+		PlayerChar = Cast<AWCharacterBase>(PlayerController->GetPawn());
 	}
 }
 

@@ -1,5 +1,4 @@
 #include "CombatComponent.h"
-
 #include "WCharacterBase.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Minions/WMinionsCharacterBase.h"

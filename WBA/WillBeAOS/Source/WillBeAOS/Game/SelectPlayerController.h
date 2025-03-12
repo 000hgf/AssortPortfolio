@@ -34,11 +34,13 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category= "Server")
 	void S_ServerUpdateChecked(int32 MWidgetID, int32 MUnCheckWidgetID, const FText& MNickName);
 	
+	UFUNCTION(Server, Reliable, BlueprintCallable, category = "Server")
+	void S_SetCharName(int32 MWidgetID, const FText& MCharName);
+	
 	UFUNCTION(BlueprintCallable, category = "UI")
 	void SetCharName(int32 MWidgetID, const FText& MCharName);//서버 함수 실행하는 역할
 	
-	UFUNCTION(Server, Reliable, BlueprintCallable, category = "Server")
-	void S_SetCharName(int32 MWidgetID, const FText& MCharName);
+	
 	
 	UFUNCTION(BlueprintCallable, category = "UI")
 	void HandleWidgetUpdate(int32 MWidgetID, const FText& MUserNickName);

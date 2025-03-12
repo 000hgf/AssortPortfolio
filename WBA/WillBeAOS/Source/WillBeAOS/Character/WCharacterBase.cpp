@@ -52,7 +52,10 @@ void AWCharacterBase::BeginPlay()
 	AWPlayerController* PC = Cast<AWPlayerController>(GetController());
 	if (PC)
 	{
-		PC->SetControlRotation(FRotator(0, 0, 0));
+		FVector StartLocation = GetActorLocation();  // 현재 위치
+		FRotator LookAtRotation = FRotationMatrix::MakeFromX(FVector(0, 0, 0) - StartLocation).Rotator();
+    
+		PC->SetControlRotation(LookAtRotation);
 	}
 }
 

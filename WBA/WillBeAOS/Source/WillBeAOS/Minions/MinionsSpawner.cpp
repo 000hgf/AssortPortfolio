@@ -10,7 +10,6 @@ AMinionsSpawner::AMinionsSpawner()
 void AMinionsSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void AMinionsSpawner::StartSpawnMinions()

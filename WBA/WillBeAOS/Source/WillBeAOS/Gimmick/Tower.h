@@ -98,6 +98,8 @@ public://타격 관련
 
 public:
 	// ----- HP 위젯 조절 함수 -----
+	bool bLastVisibleState = true;
+	
 	UPROPERTY(EditAnywhere, Category = "UI")
 	float MaxVisibleDistance = 5000.f;		// 최대 가시 거리
 
@@ -112,10 +114,13 @@ public:
 
 	UFUNCTION()
 	void FindPlayerPC();
+	void FindPlayerPawn();
 
 	// 타겟 빔
-	UFUNCTION(NetMulticast, Reliable)
-	void NM_BeamToTarget(FVector TargetLocation);
+	void BeamToTarget(FVector TargetLocation);
+
+	// Projectile
+	float LastTime = 0.0f;
 
 public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
