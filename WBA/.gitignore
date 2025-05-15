@@ -84,3 +84,6 @@ VR/Intermediate/*
 VR/Saved/*
 VR/.vsconfig
 VR/Binaries/*
+
+# Git에서 무시할 폴더
+Content/

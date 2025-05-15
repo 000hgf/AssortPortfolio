@@ -17,6 +17,9 @@ class WILLBEAOS_API AWMinionsAIController : public AAIController
 protected:
 	virtual void BeginPlay() override;
 
-public:
-	virtual void Tick(float DeltaSeconds) override;
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastCorrectPosition(FVector CorrectLocation);
+	
+private:
+	void StartBTWithDelay();
 };

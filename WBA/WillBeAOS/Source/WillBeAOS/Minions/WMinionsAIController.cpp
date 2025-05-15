@@ -1,24 +1,48 @@
 #include "WMinionsAIController.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 void AWMinionsAIController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (MinionBT != nullptr)
+	if (HasAuthority())
 	{
-		RunBehaviorTree(MinionBT);
-
-		// �÷��̾� �� ����
-		//APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-		//SetFocus(PlayerPawn);
+		if (MinionBT != nullptr)
+		{
+			FTimerHandle DelayTimer;
+			GetWorld()->GetTimerManager().SetTimer(DelayTimer, this, &AWMinionsAIController::StartBTWithDelay, 0.3f, false);
+		}
 	}
 }
 
-void AWMinionsAIController::Tick(float DeltaSeconds)
+void AWMinionsAIController::MulticastCorrectPosition_Implementation(FVector CorrectLocation)
 {
-	Super::Tick(DeltaSeconds);
+	APawn* ControlledPawn = GetPawn();
+	if (ControlledPawn)
+	{
+		ControlledPawn->SetActorLocation(CorrectLocation, false, nullptr, ETeleportType::TeleportPhysics);
+	}
 
+	// **Velocity 강제 초기화 (클라에서도 실행됨)**
+	if (UCharacterMovementComponent* MoveComp = Cast<UCharacterMovementComponent>(ControlledPawn->GetMovementComponent()))
+	{
+		MoveComp->StopMovementImmediately();
+	}
+}
 
+void AWMinionsAIController::StartBTWithDelay()
+{
+	// 위치 보정 후 BT 실행
+	APawn* ControlledPawn = GetPawn();
+	if (ControlledPawn)
+	{
+		MulticastCorrectPosition(ControlledPawn->GetActorLocation());
+	}
+
+	if (MinionBT)
+	{
+		RunBehaviorTree(MinionBT);
+	}
 }

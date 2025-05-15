@@ -5,6 +5,8 @@
 #include "Destructible.h"
 #include "WGameMode.generated.h"
 
+class AWPlayerState;
+
 UCLASS(config = Game)
 class WILLBEAOS_API AWGameMode : public AGameMode
 {

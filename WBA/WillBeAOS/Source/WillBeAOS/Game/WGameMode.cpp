@@ -156,7 +156,7 @@ void AWGameMode::DestroyWall()
 	}
 }
 
-void AWGameMode::SpawnMinions()
+void AWGameMode::SpawnMinions()		// 미니언 스폰
 {	
 	TArray<AActor*> MinionSpawnPoints;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(),AMinionsSpawner::StaticClass(), MinionSpawnPoints);

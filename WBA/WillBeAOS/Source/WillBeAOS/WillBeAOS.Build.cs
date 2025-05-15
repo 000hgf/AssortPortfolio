@@ -10,9 +10,9 @@ public class WillBeAOS : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "Niagara" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		PrivateDependencyModuleNames.AddRange(new string[] { "AIModule" });
 
-        // Æú´õ °æ·Î Ãß°¡
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
         PublicIncludePaths.Add(ModuleDirectory);
         PublicIncludePaths.Add("WillBeAOS");
 

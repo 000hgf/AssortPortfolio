@@ -40,8 +40,7 @@ void AWMinionsCharacterBase::BeginPlay()
 	//HandleApplyPointDamage 멀티델리게이트 바인딩
 	CombatComponent->DelegatePointDamage.AddUObject(this, &ThisClass::HandleApplyPointDamage);
 
-	FindPlayerPC();
-	FindPlayerPawn();
+	FindPlayerPC();	//주석 다시 없애기
 
 	// 게임이 끝나면 로직 끊기
 	// AWGameState* WGS = Cast<AWGameState>(GetWorld()->GetGameState());
@@ -93,6 +92,8 @@ void AWMinionsCharacterBase::FindPlayerPC()
 	{
 		GetWorldTimerManager().SetTimer(PCTimerManager, this, &ThisClass::FindPlayerPC, 0.2f, true);
 	}
+	
+	FindPlayerPawn();
 }
 
 void AWMinionsCharacterBase::FindPlayerPawn()

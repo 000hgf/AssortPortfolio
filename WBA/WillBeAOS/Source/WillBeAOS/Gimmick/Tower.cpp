@@ -57,32 +57,19 @@ void ATower::BeginPlay()
 	Super::BeginPlay();
 
 	FindPlayerPC();
-	FindPlayerPawn();
+
+	GetWorldTimerManager().SetTimer(
+		CheckDistanceTimer,
+		this,
+		&ATower::CheckDistanceToPlayer,
+		0.3f,
+		true
+		);
 }
 
 void ATower::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (!HasAuthority() && PlayerController && WidgetComponent)
-	{
-		if (!PlayerChar) return;
-		
-		float Distance = FVector::Dist(PlayerChar->GetActorLocation(), GetActorLocation());
-		bool bIsVisible = Distance <= MaxVisibleDistance;
-
-		if (bIsVisible != bLastVisibleState)
-		{
-			WidgetComponent->SetVisibility(bIsVisible);
-			bLastVisibleState = bIsVisible;
-		}
-
-		if (bIsVisible)
-		{
-			float ScaleFactor = FMath::Clamp(1.0f - (Distance / MaxVisibleDistance), MinWidgetScale, MaxWidgetScale);
-			WidgetComponent->SetRelativeScale3D(FVector(ScaleFactor));
-		}
-	}
 	
 	if (HasAuthority() && OverlappingActors.IsValidIndex(0))
 	{
@@ -119,6 +106,19 @@ void ATower::BeamToTarget(FVector TargetLocation)
 	NiagaraComponent->SetVisibility(true);
 }
 
+void ATower::CheckDistanceToPlayer()
+{
+	if (!PlayerChar) return;
+
+	float Distance = FVector::Dist(PlayerChar->GetActorLocation(), GetActorLocation());
+	bool bIsVisible = Distance <= MaxVisibleDistance;
+
+	if (WidgetComponent->IsVisible() != bIsVisible)
+	{
+		WidgetComponent->SetVisibility(bIsVisible);
+	}
+}
+
 void ATower::FindPlayerPC()
 {
 	PlayerController = Cast<AWPlayerController>(GetWorld()->GetFirstPlayerController());
@@ -127,6 +127,8 @@ void ATower::FindPlayerPC()
 	{
 		GetWorldTimerManager().SetTimer(PCTimerManager, this, &ThisClass::FindPlayerPC, 0.2f, true);
 	}
+	
+	FindPlayerPawn();
 }
 
 void ATower::FindPlayerPawn()
