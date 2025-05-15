@@ -22,7 +22,7 @@ AProjectile::AProjectile()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->UpdatedComponent = CollisionComponent;
-	ProjectileMovement->InitialSpeed = 1000.f;
+	ProjectileMovement->InitialSpeed = 1500.f;
 
 	InitialLifeSpan = 5.f;
 }
